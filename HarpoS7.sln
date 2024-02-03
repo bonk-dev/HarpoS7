@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7", "HarpoS7\HarpoS7.csproj", "{250CC719-595C-47F5-84F3-80C7322D17B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Tests", "HarpoS7.Tests\HarpoS7.Tests.csproj", "{87563264-8CA5-4B72-A99D-535A42202C89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7SslTest", "HarpoS7SslTest\HarpoS7SslTest.csproj", "{A20E33FB-D288-4409-BF74-678A6837A1C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.PoC", "HarpoS7.PoC\HarpoS7.PoC.csproj", "{1531B4ED-2321-46EB-AB81-7C187DD0DC8D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{250CC719-595C-47F5-84F3-80C7322D17B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{250CC719-595C-47F5-84F3-80C7322D17B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{250CC719-595C-47F5-84F3-80C7322D17B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{250CC719-595C-47F5-84F3-80C7322D17B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87563264-8CA5-4B72-A99D-535A42202C89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87563264-8CA5-4B72-A99D-535A42202C89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87563264-8CA5-4B72-A99D-535A42202C89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87563264-8CA5-4B72-A99D-535A42202C89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A20E33FB-D288-4409-BF74-678A6837A1C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A20E33FB-D288-4409-BF74-678A6837A1C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A20E33FB-D288-4409-BF74-678A6837A1C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A20E33FB-D288-4409-BF74-678A6837A1C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1531B4ED-2321-46EB-AB81-7C187DD0DC8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1531B4ED-2321-46EB-AB81-7C187DD0DC8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1531B4ED-2321-46EB-AB81-7C187DD0DC8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1531B4ED-2321-46EB-AB81-7C187DD0DC8D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
