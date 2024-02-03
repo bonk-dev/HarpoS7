@@ -35,6 +35,46 @@ by your selected PLC.
 
 _TODO: Add a guide_
 
+### Legacy auth sample
+In order to authenticate a legacy session (challenge-based):
+```csharp
+// The "input" buffers - you have to load/fill them yourselves
+// The "output" buffers - the library fills them
+
+// Input - challenge received from the PLC (20 bytes long)
+var challenge = new byte[20];
+
+// Input - public key used by the PLC (loaded from local storage, 
+// can be identified by the fingerprint sent by the PLC)
+var publicKey = new byte[64];
+
+// Output - "Encrypted key" which you send back to the PLC (216 bytes long)
+var keyBlob = new byte[Constants.FinalBlobDataLength];
+
+// Output - Session key used later on to calculate packet integrity hashes (24 bytes long)
+var sessionKey = new byte[Constants.SessionKeyLength];
+
+LegacyAuthenticationScheme.Authenticate(
+    keyBlob.AsSpan(),
+    sessionKey.AsSpan(),
+    challenge.Span,
+    publicKey.AsSpan());
+```
+
+In order to calculate a packet digest (these are used to prevent tampering):
+```csharp
+// Input - your packet data (without the S7-Header and S7-Trailer)
+var data = new byte[dataLength];
+
+// Input - session key (output from LegacyAuthenticationScheme.Authenticate)
+var sessionKey = new byte[Constants.SessionKeyLength];
+
+// Output - the packet data digest, usually placed in the S7-header
+var digestBuffer = new byte[HarpoPacketDigest.DigestLength];
+
+HarpoPacketDigest.CalculateDigest(digestBuffer.AsSpan(), data, sessionKey);
+```
+
 ## TLS auth
 It is important to note that although TLS authentication is present in HarpoS7, it should be treated as a proof
 of concept rather than a ready-to-use solution. 
