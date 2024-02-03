@@ -57,7 +57,7 @@ var sessionKey = new byte[Constants.SessionKeyLength];
 LegacyAuthenticationScheme.Authenticate(
     keyBlob.AsSpan(),
     sessionKey.AsSpan(),
-    challenge.Span,
+    challenge.AsSpan(),
     publicKey.AsSpan());
 ```
 
