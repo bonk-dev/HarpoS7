@@ -1,7 +1,7 @@
 ![Logo](tools/padded-logo.png)
 
 ![GitHub License](https://img.shields.io/github/license/StereoKit/StereoKit)
-![Codecov](https://img.shields.io/codecov/c/github/bonk-dev/HarpoS7)
+![Codecov](https://img.shields.io/codecov/c/github/bonk-dev/HarpoS7?token=37FRE22MLI)
 ![GitHub top language](https://img.shields.io/github/languages/top/bonk-dev/HarpoS7)
 ![Nuget](https://img.shields.io/badge/nuget-Soon%E2%84%A2-yellow)
 
