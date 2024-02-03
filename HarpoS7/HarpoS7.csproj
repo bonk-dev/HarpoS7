@@ -4,10 +4,33 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Title>HarpoS7</Title>
+        <Description>HarpoS7 is a C# library designed to authenticate sessions in the S7 Comm Plus protocol. </Description>
+        <PackageProjectUrl>https://github.com/bonk-dev/HarpoS7</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>nuget-icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/bonk-dev/HarpoS7</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>siemens</PackageTags>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="..\tools\nuget-icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+        <Link>nuget-icon.png</Link>
+      </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath=""/>
+    </ItemGroup>
+    
 </Project>
