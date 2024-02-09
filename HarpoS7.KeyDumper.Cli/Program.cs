@@ -7,10 +7,6 @@ using HarpoS7.KeyDumper;
 using HarpoS7.KeyDumper.Cli;
 using HarpoS7.KeyDumper.Models;
 
-Console.WriteLine("Scanning");
-await Task.Delay(1000);
-Console.WriteLine("Scanning2");
-
 var optionsResult = Parser.Default.ParseArguments<Options>(args);
 var options = optionsResult.Value;
 
