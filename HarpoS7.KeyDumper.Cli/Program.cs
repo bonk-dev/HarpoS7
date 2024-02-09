@@ -6,7 +6,7 @@ using HarpoS7.KeyDumper;
 using HarpoS7.KeyDumper.Cli;
 using HarpoS7.KeyDumper.Models;
 
-Parser.Default.ParseArguments<Options>(args)
+await Parser.Default.ParseArguments<Options>(args)
     .WithParsedAsync((async options =>
     {
         var logger = new Logger(options.Quiet);
