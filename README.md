@@ -33,6 +33,8 @@ the example code and comments to fully understand how to use the library.
 If you are not using the S7-1200 provided by PLCSIM V16, you must extract the corresponding public keys used
 by your selected PLC.
 
+You can use the [HarpoS7.KeyDumper.Cli](HarpoS7.KeyDumper.Cli) utility to dump public keys from a TIA Portal installation.
+
 _TODO: Add a guide_
 
 ### Legacy auth sample
