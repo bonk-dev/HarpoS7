@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 using CommandLine;
 using HarpoS7.KeyDumper;
 using HarpoS7.KeyDumper.Cli;
@@ -89,7 +88,7 @@ Parser.Default.ParseArguments<Options>(args)
         var index = 0;
         ConcurrentBag<KeyData> keyDataCollection = [];
 
-        await Parallel.ForEachAsync(mpkFiles, async (mpkFile, token) =>
+        await Parallel.ForEachAsync(mpkFiles, async (mpkFile, _) =>
         {
             var taskIndex = ++index;
             logger.LogInfo($"Reading keys from {mpkFile} (#{taskIndex})");
