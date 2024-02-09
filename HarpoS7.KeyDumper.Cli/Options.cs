@@ -18,4 +18,7 @@ public class Options
     
     [Option('j', "indent-json", Required = false, HelpText = "Whether or not to indent the resulting JSON", Default = true)]
     public bool IndentJson { get; set; }
+    
+    [Option('w', "do-not-wait", Required = false, HelpText = "Whether or not to wait for a key press on exit")]
+    public bool DoNotWaitForKey { get; set; }
 }

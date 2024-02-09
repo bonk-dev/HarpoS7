@@ -134,3 +134,9 @@ await JsonSerializer.SerializeAsync(
     jsonOptions);
 
 logger.LogInfo("All done!");
+
+if (!options.DoNotWaitForKey)
+{
+    logger.LogInfo("Press any key to exit");
+    Console.ReadKey(true);
+}
