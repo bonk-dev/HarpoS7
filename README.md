@@ -3,7 +3,7 @@
 ![GitHub License](https://img.shields.io/github/license/StereoKit/StereoKit)
 ![Codecov](https://img.shields.io/codecov/c/github/bonk-dev/HarpoS7?token=37FRE22MLI)
 ![GitHub top language](https://img.shields.io/github/languages/top/bonk-dev/HarpoS7)
-![Nuget](https://img.shields.io/badge/nuget-Soon%E2%84%A2-yellow)
+![Nuget](https://img.shields.io/nuget/v/HarpoS7)
 
 
 HarpoS7 is a C# library designed to authenticate sessions in the S7 Comm Plus protocol. It supports both **legacy
