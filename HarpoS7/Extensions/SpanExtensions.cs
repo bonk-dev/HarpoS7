@@ -1,5 +1,6 @@
 ﻿using System.Buffers.Binary;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace HarpoS7.Extensions;
 

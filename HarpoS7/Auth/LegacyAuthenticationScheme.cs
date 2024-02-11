@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.HighPerformance.Buffers;
+﻿using System.Security.Cryptography;
+using CommunityToolkit.HighPerformance.Buffers;
 using HarpoS7.Aes;
 using HarpoS7.Extensions;
 using HarpoS7.Keys;
@@ -38,8 +39,8 @@ public static class LegacyAuthenticationScheme
         key1.Fill(0x11);
         key2.Fill(0x22);
 #else
-        RandomNumberGenerator.Fill(key1Buffer.Span);
-        RandomNumberGenerator.Fill(key2Buffer.Span);
+        RandomNumberGenerator.Fill(key1);
+        RandomNumberGenerator.Fill(key2);
 #endif
 
         // 2. Derive the challenge encryption key
@@ -52,7 +53,7 @@ public static class LegacyAuthenticationScheme
 #if DEBUG
         ivBuffer.Fill(0xCC);
 #else
-        RandomNumberGenerator.Fill(ivBuffer.Span);
+        RandomNumberGenerator.Fill(ivBuffer);
 #endif
 
         // 4. Write metadata
