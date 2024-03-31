@@ -34,20 +34,30 @@ public class KeyUtilitiesTests
         }
 
         [Test]
-        public void DeriveChallengeEncryptionKeyTest()
-        {
-            Span<byte> input = new byte[24];
-            input.Fill(0xDD);
-            Span<byte> output = new byte[16];
-
-            KeyUtilities.DeriveChallengeEncryptionKey(output, input);
-
-            ReadOnlySpan<byte> expectedKey = new byte[16]
-            {
+        [TestCase(
+            new byte[24] {
+                0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 
+                0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD
+            }, 
+            new byte[16] {
                 0x4E, 0x00, 0x10, 0x16, 0xDB, 0x62, 0x5D, 0xCC, 0xE9, 0x10, 0x5B, 0xDC,
                 0xD8, 0xA1, 0xB4, 0x2C
-            };
-            Assert.That(expectedKey.SequenceEqual(output));
+            })]
+        [TestCase(
+            new byte[24] {
+                0xD3, 0x6E, 0x04, 0xF6, 0x4F, 0x89, 0xC2, 0x4E, 0x6C, 0xB9, 0x27, 0x6D, 
+                0x82, 0x40, 0x9E, 0xE0, 0xE5, 0x7B, 0x98, 0xF8, 0x15, 0x06, 0x3E, 0xF4
+            }, 
+            new byte[16] {
+                0xB2, 0xB7, 0xDE, 0x61, 0x83, 0xFC, 0x1A, 0x97, 0xF8, 0x63, 0x69, 0x52, 
+                0xF1, 0xAB, 0xA0, 0xFD
+            })]
+        public void DeriveChallengeEncryptionKeyTest(byte[] input, byte[] expected)
+        {
+            var output = new byte[16];
+            KeyUtilities.DeriveChallengeEncryptionKey(output, input);
+
+            Assert.That(output, Is.EqualTo(expected));
         }
 
         [Test]
