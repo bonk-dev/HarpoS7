@@ -8,11 +8,15 @@ namespace HarpoS7.Keys;
 public static class KeyUtilities
 {
     private static readonly Memory<byte> DeriveKeyIdMagic;
+    private static readonly Memory<byte> DeriveLegitimationKeyMagic;
 
     static KeyUtilities()
     {
         DeriveKeyIdMagic = new byte[6];
         Encoding.ASCII.GetBytes("DERIVE", DeriveKeyIdMagic.Span);
+
+        DeriveLegitimationKeyMagic = new byte[8];
+        Encoding.ASCII.GetBytes("MISTRUST", DeriveLegitimationKeyMagic.Span);
     }
 
     public static void DeriveKeyId(this byte[] key, Span<byte> keyId) =>
@@ -157,5 +161,38 @@ public static class KeyUtilities
         HMACSHA256.HashData(key1[..24], source, digestBuffer);
 
         digestBuffer[..24].CopyTo(sessionKeyDestination);
+    }
+
+    /// <summary>
+    /// Derive the key for encrypting the legitimation challenge
+    /// </summary>
+    /// <param name="destination">Destination of the key (at least <see cref="Constants.SessionKeyLength"/> bytes)</param>
+    /// <param name="sessionKey">Session key obtained from the initial authentication</param>
+    /// <exception cref="ArgumentException">When either span is shorter than <see cref="Constants.SessionKeyLength"/></exception>
+    public static void DeriveLegitimationChallengeKey(Span<byte> destination, ReadOnlySpan<byte> sessionKey)
+    {
+        if (sessionKey.Length < Constants.SessionKeyLength)
+        {
+            throw new ArgumentException($"Session key must be at least {Constants.SessionKeyLength} bytes long",
+                nameof(sessionKey));
+        }
+        if (destination.Length < Constants.SessionKeyLength)
+        {
+            throw new ArgumentException($"Destination must be at least {Constants.SessionKeyLength} bytes long",
+                nameof(sessionKey));
+        }
+
+        // Concat session key and "MISTRUST"
+        Span<byte> source = stackalloc byte[Constants.SessionKeyLength + DeriveLegitimationKeyMagic.Length];
+        sessionKey.CopyTo(source[..Constants.SessionKeyLength]);
+        DeriveLegitimationKeyMagic.Span.CopyTo(source[Constants.SessionKeyLength..]);
+        
+        // SHA256 the concat
+        Span<byte> digest = stackalloc byte[SHA256.HashSizeInBytes];
+        _ = SHA256.HashData(source, digest);
+        
+        // Skip first 4 and take 24 bytes
+        digest.Slice(4, 24)
+            .CopyTo(destination);
     }
 }
