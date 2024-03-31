@@ -17,6 +17,15 @@ public static class LegitimateScheme
     public const int OutputBlobDataLength = 284;
     public const int ChallengeLength = 20;
 
+    /// <summary>
+    /// Solve the legitimation challenge to be able to communicate with PLCs that require a password.
+    /// </summary>
+    /// <param name="blobDataDestination">Blob data output for SetVarSubStreamed</param>
+    /// <param name="challenge">Challenge from GetVarSubStreamed</param>
+    /// <param name="publicKey">Public key required by PLC</param>
+    /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
+    /// <param name="password">The password</param>
+    /// <exception cref="ArgumentException"></exception>
     public static void SolveLegitimateChallenge(
         Span<byte> blobDataDestination,
         ReadOnlySpan<byte> challenge,
@@ -39,6 +48,15 @@ public static class LegitimateScheme
             hash);
     }
     
+    /// <summary>
+    /// Solve the legitimation challenge to be able to communicate with PLCs that require a password.
+    /// </summary>
+    /// <param name="blobDataDestination">Blob data output for SetVarSubStreamed</param>
+    /// <param name="challenge">Challenge from GetVarSubStreamed</param>
+    /// <param name="publicKey">Public key required by PLC</param>
+    /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
+    /// <param name="passwordHash">SHA-1 hash of the PLC password</param>
+    /// <exception cref="ArgumentException"></exception>
     public static void SolveLegitimateChallenge(
         Span<byte> blobDataDestination, 
         ReadOnlySpan<byte> challenge, 
