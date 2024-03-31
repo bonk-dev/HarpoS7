@@ -12,10 +12,6 @@ namespace HarpoS7.Auth;
 /// </summary>
 public static class LegacyAuthenticationScheme
 {
-    private const int AesKeyLengthInBytes = 128 / 8;
-    private const int AesIvLength = 16;
-    private const int EncryptedSeedLength = 96;
-
     public const int EncryptedBlobLength = 216;
 
     public static void Authenticate(
@@ -44,11 +40,11 @@ public static class LegacyAuthenticationScheme
 #endif
 
         // 2. Derive the challenge encryption key
-        Span<byte> challengeKey = stackalloc byte[AesKeyLengthInBytes];
+        Span<byte> challengeKey = stackalloc byte[CommonConstants.AesKeyLengthInBytes];
         KeyUtilities.DeriveChallengeEncryptionKey(challengeKey, key2);
 
         // 3. Generate IV for challenge encryption
-        Span<byte> ivBuffer = stackalloc byte[AesIvLength];
+        Span<byte> ivBuffer = stackalloc byte[CommonConstants.AesIvLength];
 
 #if DEBUG
         ivBuffer.Fill(0xCC);
@@ -61,10 +57,10 @@ public static class LegacyAuthenticationScheme
 
         // 5. Generate and encrypt seed
         HarpoSeedUtilities.GenerateEncryptedSeed(
-            encryptedBlobData.Slice(blobIndex, EncryptedSeedLength),
+            encryptedBlobData.Slice(blobIndex, CommonConstants.EncryptedSeedLength),
             publicKey,
             challengeKey);
-        blobIndex += EncryptedSeedLength;
+        blobIndex += CommonConstants.EncryptedSeedLength;
 
         // 6. Write IV
         ivBuffer.CopyTo(encryptedBlobData[blobIndex..]);
