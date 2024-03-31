@@ -34,20 +34,30 @@ public class KeyUtilitiesTests
         }
 
         [Test]
-        public void DeriveChallengeEncryptionKeyTest()
-        {
-            Span<byte> input = new byte[24];
-            input.Fill(0xDD);
-            Span<byte> output = new byte[16];
-
-            KeyUtilities.DeriveChallengeEncryptionKey(output, input);
-
-            ReadOnlySpan<byte> expectedKey = new byte[16]
-            {
+        [TestCase(
+            new byte[24] {
+                0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 
+                0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD
+            }, 
+            new byte[16] {
                 0x4E, 0x00, 0x10, 0x16, 0xDB, 0x62, 0x5D, 0xCC, 0xE9, 0x10, 0x5B, 0xDC,
                 0xD8, 0xA1, 0xB4, 0x2C
-            };
-            Assert.That(expectedKey.SequenceEqual(output));
+            })]
+        [TestCase(
+            new byte[24] {
+                0xD3, 0x6E, 0x04, 0xF6, 0x4F, 0x89, 0xC2, 0x4E, 0x6C, 0xB9, 0x27, 0x6D, 
+                0x82, 0x40, 0x9E, 0xE0, 0xE5, 0x7B, 0x98, 0xF8, 0x15, 0x06, 0x3E, 0xF4
+            }, 
+            new byte[16] {
+                0xB2, 0xB7, 0xDE, 0x61, 0x83, 0xFC, 0x1A, 0x97, 0xF8, 0x63, 0x69, 0x52, 
+                0xF1, 0xAB, 0xA0, 0xFD
+            })]
+        public void DeriveChallengeEncryptionKeyTest(byte[] input, byte[] expected)
+        {
+            var output = new byte[16];
+            KeyUtilities.DeriveChallengeEncryptionKey(output, input);
+
+            Assert.That(output, Is.EqualTo(expected));
         }
 
         [Test]
@@ -144,5 +154,25 @@ public class KeyUtilitiesTests
             KeyUtilities.DeriveSessionKey(sessionKey, key1, challenge);
 
             Assert.That(sessionKey, Is.EqualTo(expected));
+        }
+
+        [Test]
+        [TestCase(
+            new byte[24] {
+                0x4E, 0xAF, 0x8D, 0x97, 0x1F, 0xFC, 0xF4, 0x5A,
+                0x99, 0x59, 0x47, 0xCC, 0x06, 0xBF, 0xF8, 0x5B,
+                0x0A, 0x2D, 0xF1, 0xBA, 0x6F, 0x3A, 0xE9, 0x4D
+                
+            }, new byte[24] {
+                0xD3, 0x6E, 0x04, 0xF6, 0x4F, 0x89, 0xC2, 0x4E,
+                0x6C, 0xB9, 0x27, 0x6D, 0x82, 0x40, 0x9E, 0xE0,
+                0xE5, 0x7B, 0x98, 0xF8, 0x15, 0x06, 0x3E, 0xF4
+            })]
+        public void DeriveLegitimationChallengeKeyTest(byte[] sessionKey, byte[] expected)
+        {
+            var destination = new byte[expected.Length];
+            KeyUtilities.DeriveLegitimationChallengeKey(destination, sessionKey);
+            
+            Assert.That(destination, Is.EqualTo(expected));
         }
 }
