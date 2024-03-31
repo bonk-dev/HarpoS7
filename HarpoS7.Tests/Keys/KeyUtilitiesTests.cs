@@ -145,4 +145,24 @@ public class KeyUtilitiesTests
 
             Assert.That(sessionKey, Is.EqualTo(expected));
         }
+
+        [Test]
+        [TestCase(
+            new byte[24] {
+                0x4E, 0xAF, 0x8D, 0x97, 0x1F, 0xFC, 0xF4, 0x5A,
+                0x99, 0x59, 0x47, 0xCC, 0x06, 0xBF, 0xF8, 0x5B,
+                0x0A, 0x2D, 0xF1, 0xBA, 0x6F, 0x3A, 0xE9, 0x4D
+                
+            }, new byte[24] {
+                0xD3, 0x6E, 0x04, 0xF6, 0x4F, 0x89, 0xC2, 0x4E,
+                0x6C, 0xB9, 0x27, 0x6D, 0x82, 0x40, 0x9E, 0xE0,
+                0xE5, 0x7B, 0x98, 0xF8, 0x15, 0x06, 0x3E, 0xF4
+            })]
+        public void DeriveLegitimationChallengeKeyTest(byte[] sessionKey, byte[] expected)
+        {
+            var destination = new byte[expected.Length];
+            KeyUtilities.DeriveLegitimationChallengeKey(destination, sessionKey);
+            
+            Assert.That(destination, Is.EqualTo(expected));
+        }
 }
