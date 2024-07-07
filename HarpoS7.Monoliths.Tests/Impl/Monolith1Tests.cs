@@ -1,3 +1,4 @@
+using System.Reflection;
 using HarpoS7.Monoliths.Impl;
 using HarpoS7.Monoliths.Tests.Utils;
 using HarpoS7.Monoliths.Utils;
@@ -18,4 +19,30 @@ public class Monolith1Tests
         Assert.That(result, Is.EqualTo(0));
         Assert.That(actualDst.ToArray(), Is.EqualTo(dstBytes));
     }
+
+    [Test]
+    [TestCase(2)]
+    public void ExecuteNoResult(int monolithIndex)
+    {
+        var type = typeof(Monolith1)
+            .Assembly
+            .ExportedTypes
+            .SingleOrDefault(t => t.Name == "Monolith" + monolithIndex);
+        Assert.That(type, Is.Not.Null);
+
+        var executeMethod = type.GetMethod("Execute", BindingFlags.Public | BindingFlags.Static);
+        Assert.That(executeMethod, Is.Not.Null);
+
+        var expectedSrcBytes = File.ReadAllBytes(BlobUtils.GetSourcePath(monolithIndex));
+        var expectedDstBytes = File.ReadAllBytes(BlobUtils.GetDestinationPath(monolithIndex));
+        Span<byte> destinationBuffer = stackalloc byte[MonolithBufferSizes.GetDestinationBufferSize(monolithIndex)];
+
+        var executeDelegate = executeMethod.CreateDelegate<MonolithExecuteMethodNoResult>();
+        executeDelegate(destinationBuffer, expectedSrcBytes.AsSpan());
+        
+        // Arrays work better with Is.EqualTo than Span<T> (shows the error index) 
+        Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
+    }
+
+    private delegate void MonolithExecuteMethodNoResult(Span<byte> destination, ReadOnlySpan<byte> source);
 }
