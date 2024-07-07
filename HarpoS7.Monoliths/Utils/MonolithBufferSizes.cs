@@ -9,7 +9,8 @@ public static class MonolithBufferSizes
         0x2A * sizeof(uint),
         0x24 * sizeof(uint),
         0x36 * sizeof(uint),
-        0x36 * sizeof(uint)
+        0x36 * sizeof(uint),
+        0x18 * sizeof(uint)
     ];
     
     internal static readonly int[] DstSizes =
@@ -19,6 +20,7 @@ public static class MonolithBufferSizes
         0x24 * sizeof(uint),
         0x12 * sizeof(uint),
         0x0C * sizeof(uint),
+        0x24 * sizeof(uint),
         0x24 * sizeof(uint)
     ];
 
