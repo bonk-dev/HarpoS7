@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using HarpoS7.Monoliths.Exceptions;
 using HarpoS7.Monoliths.Utils;
 
 namespace HarpoS7.Monoliths.Impl;
@@ -9,10 +10,8 @@ public static class Monolith1
     [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
     public static uint Execute(Span<byte> destination, ReadOnlySpan<byte> source)
     {
-        if (destination.Length < MonolithBufferSizes.GetDestinationBufferSize(1))
-        {
-            throw new ArgumentException($"Destination span must be at least {MonolithBufferSizes.GetDestinationBufferSize(1)} bytes long", nameof(source));
-        }
+        BufferLengthException.ThrowIfBufferTooSmall(nameof(destination), destination, 1);
+        BufferLengthException.ThrowIfBufferTooSmall(nameof(source), source, 1);
 
         if (source.Length < MonolithBufferSizes.GetSourceBufferSize(1))
         {
