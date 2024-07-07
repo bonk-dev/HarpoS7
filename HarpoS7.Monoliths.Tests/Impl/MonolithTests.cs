@@ -5,7 +5,7 @@ using HarpoS7.Monoliths.Utils;
 
 namespace HarpoS7.Monoliths.Tests.Impl;
 
-public class Monolith1Tests
+public class MonolithTests
 {
     [Test]
     public void Execute()
