@@ -6,9 +6,6 @@ namespace HarpoS7.Monoliths.Impl;
 
 public static class Monolith2
 {
-    public const int SourceBufferSize = 72;
-    public const int DestinationBufferSize = 20;
-    
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> source)
     {
         BufferLengthException.ThrowIfBufferTooSmall(
