@@ -1,23 +1,22 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using HarpoS7.Monoliths.Utils;
 
 namespace HarpoS7.Monoliths.Impl;
 
 public static class Monolith1
 {
-    public const int BufferSize = 0x12 * sizeof(uint);
-
     [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
     public static uint Execute(Span<byte> destination, ReadOnlySpan<byte> source)
     {
-        if (destination.Length < BufferSize)
+        if (destination.Length < MonolithBufferSizes.GetDestinationBufferSize(1))
         {
-            throw new ArgumentException($"Destination span must be at least {BufferSize} bytes long", nameof(source));
+            throw new ArgumentException($"Destination span must be at least {MonolithBufferSizes.GetDestinationBufferSize(1)} bytes long", nameof(source));
         }
 
-        if (source.Length < BufferSize)
+        if (source.Length < MonolithBufferSizes.GetSourceBufferSize(1))
         {
-            throw new ArgumentException($"Source span must be at least {BufferSize} bytes long", nameof(destination));
+            throw new ArgumentException($"Source span must be at least {MonolithBufferSizes.GetSourceBufferSize(1)} bytes long", nameof(destination));
         }
 
         var srcDwords = MemoryMarshal.Cast<byte, uint>(source);
