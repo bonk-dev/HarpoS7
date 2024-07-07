@@ -22,7 +22,7 @@ public class MonolithTests
 
     [Test]
     [TestCase(2)]
-    public void ExecuteNoResult(int monolithIndex)
+    public void ExecuteNoReturn(int monolithIndex)
     {
         var type = typeof(Monolith1)
             .Assembly
@@ -37,12 +37,12 @@ public class MonolithTests
         var expectedDstBytes = File.ReadAllBytes(BlobUtils.GetDestinationPath(monolithIndex));
         Span<byte> destinationBuffer = stackalloc byte[MonolithBufferSizes.GetDestinationBufferSize(monolithIndex)];
 
-        var executeDelegate = executeMethod.CreateDelegate<MonolithExecuteMethodNoResult>();
+        var executeDelegate = executeMethod.CreateDelegate<MonolithExecuteMethodNoReturn>();
         executeDelegate(destinationBuffer, expectedSrcBytes.AsSpan());
         
         // Arrays work better with Is.EqualTo than Span<T> (shows the error index) 
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
 
-    private delegate void MonolithExecuteMethodNoResult(Span<byte> destination, ReadOnlySpan<byte> source);
+    private delegate void MonolithExecuteMethodNoReturn(Span<byte> destination, ReadOnlySpan<byte> source);
 }
