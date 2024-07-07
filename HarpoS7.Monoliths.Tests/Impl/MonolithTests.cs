@@ -23,6 +23,7 @@ public class MonolithTests
     [Test]
     [TestCase(2)]
     [TestCase(3)]
+    [TestCase(4)]
     public void ExecuteNoReturn(int monolithIndex)
     {
         var type = typeof(Monolith1)
