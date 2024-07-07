@@ -11,7 +11,8 @@ public static class MonolithBufferSizes
         0x36 * sizeof(uint),
         0x36 * sizeof(uint),
         0x18 * sizeof(uint),
-        0x12 * sizeof(uint)
+        0x12 * sizeof(uint),
+        0xC5 * sizeof(uint)
     ];
     
     internal static readonly int[] DstSizes =
@@ -23,7 +24,8 @@ public static class MonolithBufferSizes
         0x0C * sizeof(uint),
         0x24 * sizeof(uint),
         0x24 * sizeof(uint),
-        0x0F * sizeof(uint)
+        0x0F * sizeof(uint),
+        0x06 * sizeof(uint)
     ];
 
     public static int GetSourceBufferSize(int monolithIndex) => SrcSizes[monolithIndex - 1];
