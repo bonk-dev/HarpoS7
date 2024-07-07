@@ -37,8 +37,22 @@ public class MonolithTests
         var executeMethod = type.GetMethod("Execute", BindingFlags.Public | BindingFlags.Static);
         Assert.That(executeMethod, Is.Not.Null);
 
-        var expectedSrcBytes = File.ReadAllBytes(BlobUtils.GetSourcePath(monolithIndex));
-        var expectedDstBytes = File.ReadAllBytes(BlobUtils.GetDestinationPath(monolithIndex));
+        var expectedSrcPath = BlobUtils.GetSourcePath(monolithIndex);
+        var expectedSrcBytes = File.ReadAllBytes(expectedSrcPath);
+
+        var expectedDstPath = BlobUtils.GetDestinationPath(monolithIndex);
+        var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
+
+        var expectedSrcSize = MonolithBufferSizes.GetSourceBufferSize(monolithIndex);
+        Assert.That(
+            expectedSrcBytes, Has.Length.EqualTo(expectedSrcSize),
+            () => $"The test source blob ({expectedSrcPath}) length was different than expected");
+        
+        var expectedDstSize = MonolithBufferSizes.GetDestinationBufferSize(monolithIndex);
+        Assert.That(
+            expectedDstBytes, Has.Length.EqualTo(expectedDstSize),
+            () => $"The test destination blob ({expectedDstPath}) length was different than expected");
+        
         Span<byte> destinationBuffer = stackalloc byte[MonolithBufferSizes.GetDestinationBufferSize(monolithIndex)];
 
         var executeDelegate = executeMethod.CreateDelegate<MonolithExecuteMethodNoReturn>();
