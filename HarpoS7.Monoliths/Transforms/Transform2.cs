@@ -12,6 +12,19 @@ public static class Transform2
     
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> source)
     {
+        if (destination.Length < DestinationSize)
+        {
+            throw new ArgumentException(
+                $"The destination buffer is too small ({destination.Length} bytes, should be at least {DestinationSize})",
+                nameof(destination));
+        }
+        if (source.Length < SourceSize)
+        {
+            throw new ArgumentException(
+                $"The source buffer is too small ({source.Length} bytes, should be at least {SourceSize})",
+                nameof(source));
+        }
+        
         const int buffer1Size = 0x18 * sizeof(uint);
         Span<byte> buffer1 = stackalloc byte[buffer1Size];
         Span<uint> buffer1Dwords = MemoryMarshal.Cast<byte, uint>(buffer1);
