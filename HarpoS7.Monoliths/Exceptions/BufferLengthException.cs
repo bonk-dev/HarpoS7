@@ -25,7 +25,7 @@ public class BufferLengthException : Exception
         
         if (buffer.Length < minimalLength)
         {
-            throw new BufferLengthException(argumentName, isSourceBuffer, minimalLength, buffer.Length);   
+            throw new BufferLengthException(argumentName, isSourceBuffer, monolithIndex, buffer.Length);   
         }
     }
 }
