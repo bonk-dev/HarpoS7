@@ -1,8 +1,6 @@
-using System.Text.RegularExpressions;
-
 namespace HarpoS7.Monoliths.Tests.Utils;
 
-public static partial class BlobUtils
+public static class BlobUtils
 {
     private const string BlobsDirName = "Blobs";
     private const string MonolithsBlobsDirName = "Monoliths";
