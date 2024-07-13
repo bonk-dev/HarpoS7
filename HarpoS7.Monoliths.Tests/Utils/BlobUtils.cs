@@ -5,13 +5,16 @@ namespace HarpoS7.Monoliths.Tests.Utils;
 public static partial class BlobUtils
 {
     private const string BlobsDirName = "Blobs";
+    private const string MonolithsBlobsDirName = "Monoliths";
     private const string TransformsBlobsDirName = "Transforms";
     
     public static string GetSourcePath(int index) => 
-        Path.Combine(GetBasePath(), BlobsDirName, $"monolith{index}-src.bin");
+        Path.Combine(GetBasePath(), BlobsDirName, MonolithsBlobsDirName, 
+            $"monolith{index}-src.bin");
     
     public static string GetDestinationPath(int index) => 
-        Path.Combine(GetBasePath(), BlobsDirName, $"monolith{index}-dst.bin");
+        Path.Combine(GetBasePath(), BlobsDirName, MonolithsBlobsDirName, 
+            $"monolith{index}-dst.bin");
 
     public static string GetTransformSourcePath(int transformIndex) => 
         Path.Combine(GetBasePath(), BlobsDirName, TransformsBlobsDirName, 
