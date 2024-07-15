@@ -15,12 +15,14 @@ public static class BlobUtils
             $"monolith{index}-dst.bin");
 
     public static string GetTransformSourcePath(int transformIndex) => 
+        GetTransformFilePath(transformIndex, "src");
+
+    public static string GetTransformDestinationPath(int transformIndex) =>
+        GetTransformFilePath(transformIndex, "dst");
+
+    public static string GetTransformFilePath(int transformIndex, string postfix) => 
         Path.Combine(GetBasePath(), BlobsDirName, TransformsBlobsDirName, 
-            $"transform{transformIndex}-src.bin");
-    
-    public static string GetTransformDestinationPath(int transformIndex) => 
-        Path.Combine(GetBasePath(), BlobsDirName, TransformsBlobsDirName, 
-            $"transform{transformIndex}-dst.bin");
+            $"transform{transformIndex}-{postfix}.bin");
 
     private static string GetBasePath() => TestContext.CurrentContext.WorkDirectory;
 }
