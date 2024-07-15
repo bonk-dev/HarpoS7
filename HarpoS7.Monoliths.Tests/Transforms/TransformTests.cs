@@ -36,6 +36,25 @@ public class TransformTests
         // Arrays work better with Is.EqualTo than Span<T> (shows the error index) 
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
+
+    [Test]
+    public void ExecuteTransform4()
+    {
+        var expectedKeyPath = BlobUtils.GetTransformFilePath(4, "key");
+        var expectedKeyBytes = File.ReadAllBytes(expectedKeyPath);
+
+        var expectedDstPath = BlobUtils.GetTransformDestinationPath(4);
+        var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
+        
+        var expectedLutPath = BlobUtils.GetTransformFilePath(4, "lut");
+        var expectedLutBytes = File.ReadAllBytes(expectedLutPath);
+        
+        Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[4 - 1]];
+        
+        Transform4.Execute(destinationBuffer, expectedKeyBytes.AsSpan(), expectedLutBytes.AsSpan());
+        
+        Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
+    }
     
     private delegate void TransformExecuteMethodNoReturn(Span<byte> destination, ReadOnlySpan<byte> source);
 }

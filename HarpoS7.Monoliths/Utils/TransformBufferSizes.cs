@@ -8,12 +8,14 @@ internal static class TransformBufferSizes
     [
         Transform1.SourceSize,
         Transform2.SourceSize,
-        Transform3.SourceSize
+        Transform3.SourceSize,
+        0x00,
     ];
     public static int[] DstSizes { get; } = 
     [
         Transform1.DestinationSize,
         Transform2.DestinationSize,
-        Transform3.DestinationSize
+        Transform3.DestinationSize,
+        Transform4.DestinationSize
     ];
 }
