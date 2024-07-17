@@ -1,4 +1,5 @@
 using System.Reflection;
+using HarpoS7.Extensions;
 using HarpoS7.Monoliths.Tests.Utils;
 using HarpoS7.Monoliths.Transforms;
 using HarpoS7.Monoliths.Utils;
@@ -52,6 +53,27 @@ public class TransformTests
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[4 - 1]];
         
         Transform4.Execute(destinationBuffer, expectedKeyBytes.AsSpan(), expectedLutBytes.AsSpan());
+        
+        Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
+    }
+    
+    [Test]
+    public void ExecuteTransform6()
+    {
+        SpanExtensions.StaticFillSequence = [0x2D];
+        
+        var expectedDstPath = BlobUtils.GetTransformDestinationPath(6);
+        var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
+        
+        var publicKeyPath = BlobUtils.GetTransformFilePath(6, "publicKey");
+        var publicKeyBytes = File.ReadAllBytes(publicKeyPath);
+        
+        var transform1Path = BlobUtils.GetTransformFilePath(6, "t1");
+        var transform1Bytes = File.ReadAllBytes(transform1Path);
+        
+        Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[6 - 1]];
+        
+        Transform6.Execute(destinationBuffer, publicKeyBytes.AsSpan(), transform1Bytes.AsSpan());
         
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
