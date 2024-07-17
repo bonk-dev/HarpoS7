@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using CommunityToolkit.HighPerformance.Buffers;
 using HarpoS7.Aes;
-using HarpoS7.Extensions;
+using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
 
 namespace HarpoS7.Seed;

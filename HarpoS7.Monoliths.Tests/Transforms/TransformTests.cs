@@ -1,5 +1,5 @@
 using System.Reflection;
-using HarpoS7.Extensions;
+using HarpoS7.Utilities.Extensions;
 using HarpoS7.Monoliths.Tests.Utils;
 using HarpoS7.Monoliths.Transforms;
 using HarpoS7.Monoliths.Utils;

@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using CommunityToolkit.HighPerformance.Buffers;
 using HarpoS7.Aes;
-using HarpoS7.Extensions;
+using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
 using HarpoS7.Seed;
 

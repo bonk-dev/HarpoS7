@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using HarpoS7.Auth;
-using HarpoS7.Extensions;
+using HarpoS7.Utilities.Extensions;
 
 namespace HarpoS7.Tests.Auth;
 

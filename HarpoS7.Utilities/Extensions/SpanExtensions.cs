@@ -2,9 +2,9 @@
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
-namespace HarpoS7.Extensions;
+namespace HarpoS7.Utilities.Extensions;
 
-internal static class SpanExtensions
+public static class SpanExtensions
 {
     private static int _staticFillIndex = 0;
     private static byte[]? _staticFillSequence;

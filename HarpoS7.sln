@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Monoliths", "HarpoS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Monoliths.Tests", "HarpoS7.Monoliths.Tests\HarpoS7.Monoliths.Tests.csproj", "{064D2FDD-A863-4192-8D6F-62B6DAEC9804}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Utilities", "HarpoS7.Utilities\HarpoS7.Utilities.csproj", "{0BBD08C4-7521-41BF-B028-CC3F89CB192D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{064D2FDD-A863-4192-8D6F-62B6DAEC9804}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{064D2FDD-A863-4192-8D6F-62B6DAEC9804}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{064D2FDD-A863-4192-8D6F-62B6DAEC9804}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BBD08C4-7521-41BF-B028-CC3F89CB192D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BBD08C4-7521-41BF-B028-CC3F89CB192D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BBD08C4-7521-41BF-B028-CC3F89CB192D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BBD08C4-7521-41BF-B028-CC3F89CB192D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

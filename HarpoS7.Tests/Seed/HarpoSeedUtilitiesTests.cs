@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using HarpoS7.Extensions;
+using HarpoS7.Utilities.Extensions;
 using HarpoS7.Seed;
 
 namespace HarpoS7.Tests.Seed;
