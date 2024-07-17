@@ -1,10 +1,17 @@
 using System.Security.Cryptography;
 using HarpoS7.Auth;
+using HarpoS7.Extensions;
 
 namespace HarpoS7.Tests.Auth;
 
 public class LegitimateSchemeTests
 {
+    [SetUp]
+    public void SetupPrng()
+    {
+        SpanExtensions.StaticFillSequence = [0x33, 0xCC];
+    }
+    
     [Test]
     [TestCase(
         // TODO: Add test case for random challenge

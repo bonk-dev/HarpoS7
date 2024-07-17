@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using HarpoS7.Extensions;
 using HarpoS7.Seed;
 
 namespace HarpoS7.Tests.Seed;
@@ -88,7 +89,12 @@ public class HarpoSeedUtilitiesTests
             }
         }
 
-        // hell yeah
+        [SetUp]
+        public void SetupPrng()
+        {
+            SpanExtensions.ResetStaticSequence();
+        }
+    
         [Test]
         public void GenerateEncryptedSeedTest()
         {
