@@ -6,13 +6,50 @@ namespace HarpoS7.Extensions;
 
 internal static class SpanExtensions
 {
+    private static int _staticFillIndex = 0;
+    private static byte[]? _staticFillSequence;
+
+    internal static byte[]? StaticFillSequence
+    {
+        get => _staticFillSequence;
+        set
+        {
+            _staticFillSequence = value;
+            _staticFillIndex = 0;
+        }
+    }
+
+    static SpanExtensions()
+    {
+        #if DEBUG
+        ResetStaticSequence();
+        #endif
+    }
+
+    internal static void ResetStaticSequence()
+    {
+        StaticFillSequence = [0x33];
+    }
+    
     #region Span
-    public static void FillWithCryptoRandomBytes(this Span<byte> spanOfBytes) =>
-#if DEBUG
-        spanOfBytes.Fill(0x33);
-#else
+
+    public static void FillWithCryptoRandomBytes(this Span<byte> spanOfBytes)
+    {
+        if (StaticFillSequence != null)
+        {
+            var fillByte = StaticFillSequence[_staticFillIndex++];
+            if (_staticFillIndex >= StaticFillSequence.Length)
+            {
+                _staticFillIndex = 0;
+            }
+            
+            spanOfBytes.Fill(fillByte);
+        }
+        else
+        {
             RandomNumberGenerator.Fill(spanOfBytes);
-#endif
+        }
+    }
 
     public static void ReverseBytes(this Span<byte> data, Span<byte> destination)
     {
