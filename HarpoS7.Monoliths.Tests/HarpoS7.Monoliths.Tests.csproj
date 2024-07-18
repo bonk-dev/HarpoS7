@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <Folder Include="Blobs\Transforms\" />
+      <Folder Include="Blobs\WithCopy\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -116,6 +117,21 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Blobs\Transforms\transform6-t1.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\WithCopy\3_in1.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\WithCopy\3_in2.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\WithCopy\3_in3.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\WithCopy\3_out1.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\WithCopy\3_out2.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
