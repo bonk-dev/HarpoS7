@@ -16,4 +16,16 @@ public class BitOperationsTests
         
         Assert.That(destinationBuffer, Is.EqualTo(expectedDstBytes));
     }
+    
+    [Test]
+    public void BitOperation2Execute()
+    {
+        var srcBytes = File.ReadAllBytes(BlobUtils.GetBitOperationBlobPath(2, false));
+        var expectedDstBytes = File.ReadAllBytes(BlobUtils.GetBitOperationBlobPath(2, true));
+
+        var destinationBuffer = new byte[BitOperation2.DestinationSize]; 
+        BitOperation2.Execute(destinationBuffer.AsSpan(), srcBytes.AsSpan());
+        
+        Assert.That(destinationBuffer, Is.EqualTo(expectedDstBytes));
+    }
 }
