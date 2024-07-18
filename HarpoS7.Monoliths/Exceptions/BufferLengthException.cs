@@ -6,12 +6,8 @@ public class BufferLengthException : Exception
 {
     public override string Message { get; }
 
-    public BufferLengthException(string argumentName, bool isSourceBuffer, int monolithIndex, int actualLength)
+    public BufferLengthException(string argumentName, bool isSourceBuffer, int minimalLength, int actualLength)
     {
-        int minimalLength = isSourceBuffer
-            ? MonolithBufferSizes.GetSourceBufferSize(monolithIndex)
-            : MonolithBufferSizes.GetDestinationBufferSize(monolithIndex);
-
         var bufferTypeStr = isSourceBuffer ? "source" : "destination";
         Message = $"The {bufferTypeStr} ({argumentName}) buffer must be at least {minimalLength} bytes long (actual length: {actualLength})";
     }
@@ -25,7 +21,7 @@ public class BufferLengthException : Exception
         
         if (buffer.Length < minimalLength)
         {
-            throw new BufferLengthException(argumentName, isSourceBuffer, monolithIndex, buffer.Length);   
+            throw new BufferLengthException(argumentName, isSourceBuffer, minimalLength, buffer.Length);   
         }
     }
 }
