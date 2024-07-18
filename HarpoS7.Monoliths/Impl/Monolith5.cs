@@ -1,11 +1,75 @@
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.Exceptions;
+using HarpoS7.Monoliths.Utils;
+
 // ReSharper disable JoinDeclarationAndInitializer
 
 namespace HarpoS7.Monoliths.Impl;
 
 public static class Monolith5
 {
+    public const int WithCopyIn1Size = 0x48;
+    public const int WithCopyIn2Size = 0x48;
+    public const int WithCopyIn3Size = 0x48;
+    
+    public const int WithCopyOut1Size = 0x18;
+    public const int WithCopyOut2Size = 0x18;
+    
+    /// <summary>
+    /// Combines multiple buffers into one monolith source and destination buffer
+    /// </summary>
+    /// <param name="destination1">First part of the destination</param>
+    /// <param name="destination2">Second part of the destination</param>
+    /// <param name="source1">First part of the source</param>
+    /// <param name="source2">Second part of the source</param>
+    /// <param name="source3">Third part of the source</param>
+    public static void WithCopy(
+        Span<byte> destination1, 
+        Span<byte> destination2, 
+        ReadOnlySpan<byte> source1, 
+        ReadOnlySpan<byte> source2, 
+        ReadOnlySpan<byte> source3)
+    {
+        if (destination1.Length < WithCopyOut1Size)
+        {
+            throw new BufferLengthException(
+                nameof(destination1), false, WithCopyOut1Size, destination1.Length);
+        }
+        if (destination2.Length < WithCopyOut2Size)
+        {
+            throw new BufferLengthException(
+                nameof(destination2), false, WithCopyOut2Size, destination2.Length);
+        }
+        
+        if (source1.Length < WithCopyIn1Size)
+        {
+            throw new BufferLengthException(
+                nameof(source1), true, WithCopyIn1Size, source1.Length);
+        }
+        if (source2.Length < WithCopyIn2Size)
+        {
+            throw new BufferLengthException(
+                nameof(source2), true, WithCopyIn2Size, source2.Length);
+        }
+        if (source3.Length < WithCopyIn3Size)
+        {
+            throw new BufferLengthException(
+                nameof(source3), true, WithCopyIn3Size, source3.Length);
+        }
+        
+        Span<byte> monolithSrc = stackalloc byte[MonolithBufferSizes.GetSourceBufferSize(5)];
+        Span<byte> monolithDst = stackalloc byte[MonolithBufferSizes.GetDestinationBufferSize(5)];
+        
+        source1.CopyTo(monolithSrc);
+        source2.CopyTo(monolithSrc[source1.Length..]);
+        source3.CopyTo(monolithSrc[(source1.Length + source2.Length)..]);
+        
+        Execute(monolithDst, monolithSrc);
+        
+        monolithDst[..WithCopyOut1Size].CopyTo(destination1);
+        monolithDst.Slice(WithCopyOut1Size, WithCopyOut2Size).CopyTo(destination2);
+    }
+    
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> source)
     {
         BufferLengthException.ThrowIfBufferTooSmall(
