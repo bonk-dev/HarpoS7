@@ -109,4 +109,31 @@ public class MonolithWithCopyTests
             Assert.That(out2Array, Is.EqualTo(expectedOut2Bytes));
         });
     }
+    
+    [Test]
+    public void Monolith7WithCopyTest()
+    {
+        var in1Bytes = File.ReadAllBytes(BlobUtils.GetWithCopyBlobPath(7, false, 1));
+        var in2Bytes = File.ReadAllBytes(BlobUtils.GetWithCopyBlobPath(7, false, 2));
+        
+        var expectedOut1Bytes = File.ReadAllBytes(BlobUtils.GetWithCopyBlobPath(7, true, 1));
+        var expectedOut2Bytes = File.ReadAllBytes(BlobUtils.GetWithCopyBlobPath(7, true, 2));
+
+        Span<byte> out1Buffer = stackalloc byte[Monolith7.WithCopyOut1Size];
+        Span<byte> out2Buffer = stackalloc byte[Monolith7.WithCopyOut2Size];
+        Monolith7.WithCopy(
+            out1Buffer,
+            out2Buffer, 
+            in1Bytes.AsSpan(), 
+            in2Bytes.AsSpan()
+        );
+
+        var out1Array = out1Buffer.ToArray();
+        var out2Array = out2Buffer.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(out1Array, Is.EqualTo(expectedOut1Bytes));
+            Assert.That(out2Array, Is.EqualTo(expectedOut2Bytes));
+        });
+    }
 }
