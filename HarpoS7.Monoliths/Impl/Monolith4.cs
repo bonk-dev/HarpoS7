@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.Exceptions;
+using HarpoS7.Monoliths.Utils;
 
 // ReSharper disable JoinDeclarationAndInitializer
 
@@ -7,6 +8,30 @@ namespace HarpoS7.Monoliths.Impl;
 
 public static class Monolith4
 {
+    public const int WithCopyIn1Size = 0x48;
+    public const int WithCopyIn2Size = 0x48;
+    
+    public static void WithCopy(Span<byte> destination, ReadOnlySpan<byte> source1, ReadOnlySpan<byte> source2)
+    {
+        if (source1.Length < WithCopyIn1Size)
+        {
+            throw new BufferLengthException(
+                nameof(source1), true, WithCopyIn1Size, source1.Length);
+        }
+        if (source2.Length < WithCopyIn2Size)
+        {
+            throw new BufferLengthException(
+                nameof(source2), true, WithCopyIn2Size, source2.Length);
+        }
+
+        Span<byte> monolithSrc = stackalloc byte[MonolithBufferSizes.GetSourceBufferSize(4)];
+        
+        source1.CopyTo(monolithSrc);
+        source2.CopyTo(monolithSrc[source1.Length..]);
+        
+        Execute(destination, monolithSrc);
+    }
+    
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> source)
     {
         BufferLengthException.ThrowIfBufferTooSmall(
