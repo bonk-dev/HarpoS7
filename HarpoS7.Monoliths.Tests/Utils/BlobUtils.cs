@@ -2,6 +2,7 @@ namespace HarpoS7.Monoliths.Tests.Utils;
 
 public static class BlobUtils
 {
+    private const string BitOperationsBlobsDirName = "BitOperations";
     private const string BlobsDirName = "Blobs";
     private const string MonolithsBlobsDirName = "Monoliths";
     private const string MonolithsWithCopyBlobsDirName = "WithCopy";
@@ -28,6 +29,10 @@ public static class BlobUtils
     public static string GetWithCopyBlobPath(int monolithIndex, bool isOut, int index) =>
         Path.Combine(GetBasePath(), BlobsDirName, MonolithsWithCopyBlobsDirName, 
             $"{monolithIndex}_{(isOut ? "out" : "in")}{index}.bin");
+
+    public static string GetBitOperationBlobPath(int index, bool isDst) =>
+        Path.Combine(GetBasePath(), BlobsDirName, BitOperationsBlobsDirName,
+            $"{index}_{(isDst ? "dst" : "src")}.bin");
 
     private static string GetBasePath() => TestContext.CurrentContext.WorkDirectory;
 }
