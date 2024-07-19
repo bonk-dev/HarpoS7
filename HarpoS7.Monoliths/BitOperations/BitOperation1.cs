@@ -6,7 +6,7 @@ namespace HarpoS7.Monoliths.BitOperations;
 public static class BitOperation1
 {
     public const int DestinationSize = 0x05 * sizeof(uint);
-    public const int SourceSize = 0x04 * sizeof(uint);
+    public const int SourceSize = 0x06 * sizeof(uint);
     
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> source)
     {

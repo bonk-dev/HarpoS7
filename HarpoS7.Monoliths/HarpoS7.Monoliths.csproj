@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\HarpoS7.Utilities\HarpoS7.Utilities.csproj" />
+    </ItemGroup>
+
 </Project>
