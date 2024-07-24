@@ -24,6 +24,7 @@ internal static class TransformBufferSizes
         0x00,
         Transform6.DestinationSize,
         0x00,
-        Transform8.DestinationSize
+        Transform8.DestinationSize,
+        Transform9.DestinationSize
     ];
 }

@@ -94,5 +94,23 @@ public class TransformTests
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
     
+    [Test]
+    [TestCase(null)]
+    [TestCase(2)]
+    public void ExecuteTransform9(int? subIndex)
+    {
+        var expectedDstPath = BlobUtils.GetTransformDestinationPath(9, subIndex);
+        var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
+
+        var source1Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(9, "source1", subIndex));
+        var source2Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(9, "source2", subIndex));
+        
+        Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[9 - 1]];
+        
+        Transform9.Execute(destinationBuffer, source1Bytes.AsSpan(), source2Bytes.AsSpan());
+        
+        Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
+    }
+    
     private delegate void TransformExecuteMethodNoReturn(Span<byte> destination, ReadOnlySpan<byte> source);
 }
