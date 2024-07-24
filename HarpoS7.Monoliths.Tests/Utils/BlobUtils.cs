@@ -19,12 +19,17 @@ public static class BlobUtils
     public static string GetTransformSourcePath(int transformIndex) => 
         GetTransformFilePath(transformIndex, "src");
 
-    public static string GetTransformDestinationPath(int transformIndex) =>
-        GetTransformFilePath(transformIndex, "dst");
+    public static string GetTransformDestinationPath(int transformIndex, int? subIndex = null) =>
+        GetTransformFilePath(transformIndex, "dst", subIndex);
 
-    public static string GetTransformFilePath(int transformIndex, string postfix) => 
-        Path.Combine(GetBasePath(), BlobsDirName, TransformsBlobsDirName, 
-            $"transform{transformIndex}-{postfix}.bin");
+    public static string GetTransformFilePath(int transformIndex, string postfix, int? subIndex = null)
+    {
+        var subIndexPart = subIndex == null
+            ? string.Empty
+            : '_' + subIndex.ToString();
+        return Path.Combine(GetBasePath(), BlobsDirName, TransformsBlobsDirName,
+            $"transform{transformIndex}{subIndexPart}-{postfix}.bin");
+    }
 
     public static string GetWithCopyBlobPath(int monolithIndex, bool isOut, int index) =>
         Path.Combine(GetBasePath(), BlobsDirName, MonolithsWithCopyBlobsDirName, 
