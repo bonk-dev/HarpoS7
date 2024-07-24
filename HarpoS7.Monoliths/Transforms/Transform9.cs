@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.BitOperations;
 using HarpoS7.Monoliths.Exceptions;
+using HarpoS7.Monoliths.Utils;
 
 namespace HarpoS7.Monoliths.Transforms;
 
@@ -45,32 +46,9 @@ public static class Transform9
         Span<byte> productBuffer = stackalloc byte[productLength];
         _ = product.TryWriteBytes(productBuffer, out _, isUnsigned: true, isBigEndian: false);
 
-        // Returns true if compression is still needed
-        // This shrinks the big integer (deals with overflows), so that the integer fits in the BitOperation2 function 
-        bool CompressBigInt(Span<byte> integerBuffer, out int length)
-        {
-            length = integerBuffer.Length;
-            if (length > BitOperation2.SourceSize)
-            {
-                var overflowInt = new BigInteger(
-                    integerBuffer[BitOperation2.SourceSize..],
-                    isUnsigned: true,
-                    isBigEndian: false);
-                var compressedProduct = new BigInteger(
-                    integerBuffer[..BitOperation2.SourceSize],
-                    isUnsigned: true,
-                    isBigEndian: false);
-
-                product = overflowInt * 0x2F + compressedProduct;
-                _ = product.TryWriteBytes(integerBuffer, out length, isUnsigned: true, isBigEndian: false);
-            }
-
-            return length > BitOperation2.SourceSize;
-        }
-
         // Compress max 2 times
-        if (CompressBigInt(productBuffer, out productLength) &&
-            CompressBigInt(productBuffer[..productLength], out productLength))
+        if (BigIntegerCompressor.Compress(productBuffer, out productLength) &&
+            BigIntegerCompressor.Compress(productBuffer[..productLength], out productLength))
         {
             var productDwords = MemoryMarshal.Cast<byte, uint>(productBuffer);
             productDwords[0] += 0x2F;
