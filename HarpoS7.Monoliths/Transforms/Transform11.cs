@@ -1,5 +1,6 @@
 using System.Numerics;
 using HarpoS7.Monoliths.BitOperations;
+using HarpoS7.Monoliths.Exceptions;
 
 namespace HarpoS7.Monoliths.Transforms;
 
@@ -11,6 +12,22 @@ public static class Transform11
     
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> minuend, ReadOnlySpan<byte> subtrahend)
     {
+        if (destination.Length < DestinationSize)
+        {
+            throw new BufferLengthException(
+                nameof(destination), false, DestinationSize, destination.Length);
+        }
+        if (minuend.Length < MinuendSize)
+        {
+            throw new BufferLengthException(
+                nameof(minuend), true, MinuendSize, minuend.Length);
+        }
+        if (subtrahend.Length < Subtrahend)
+        {
+            throw new BufferLengthException(
+                nameof(subtrahend), true, Subtrahend, subtrahend.Length);
+        }
+        
         Span<byte> minuendBuffer = stackalloc byte[BitOperation1.DestinationSize];
         BitOperation1.Execute(minuendBuffer, minuend);
 
