@@ -50,8 +50,7 @@ public static class Transform9
         if (BigIntegerCompressor.Compress(productBuffer, out productLength) &&
             BigIntegerCompressor.Compress(productBuffer[..productLength], out productLength))
         {
-            var productDwords = MemoryMarshal.Cast<byte, uint>(productBuffer);
-            productDwords[0] += 0x2F;
+            BigIntegerCompressor.FinalCompress(productBuffer[..productLength]);
         }
 
         BitOperation2.Execute(destination, productBuffer[..productLength]);

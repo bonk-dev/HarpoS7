@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.BitOperations;
 
 namespace HarpoS7.Monoliths.Utils;
@@ -30,5 +31,23 @@ public static class BigIntegerCompressor
         }
 
         return length > BitOperation2.SourceSize;
+    }
+
+    /// <summary>
+    /// Ends the big integer compression (adds 0x2F to the first uint)
+    /// </summary>
+    /// <param name="integerBuffer">Big integer buffer</param>
+    /// <exception cref="ArgumentException">Thrown when <see cref="integerBuffer"/> length is smaller or equal to <see cref="BitOperation2.SourceSize"/></exception>
+    public static void FinalCompress(Span<byte> integerBuffer)
+    {
+        if (integerBuffer.Length <= BitOperation2.SourceSize)
+        {
+            throw new ArgumentException(
+                $"This BigInteger does not need any compression (it is already smaller than or equal to {BitOperation2.SourceSize})",
+                nameof(integerBuffer));
+        }
+        
+        var productDwords = MemoryMarshal.Cast<byte, uint>(integerBuffer);
+        productDwords[0] += 0x2F;
     }
 }
