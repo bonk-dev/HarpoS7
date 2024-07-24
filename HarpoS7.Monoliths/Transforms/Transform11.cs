@@ -8,7 +8,7 @@ public static class Transform11
 {
     public const int DestinationSize = BitOperation2.DestinationSize;
     public const int MinuendSize = BitOperation1.SourceSize;
-    public const int Subtrahend = BitOperation1.SourceSize;
+    public const int SubtrahendSize = BitOperation1.SourceSize;
     
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> minuend, ReadOnlySpan<byte> subtrahend)
     {
@@ -22,10 +22,10 @@ public static class Transform11
             throw new BufferLengthException(
                 nameof(minuend), true, MinuendSize, minuend.Length);
         }
-        if (subtrahend.Length < Subtrahend)
+        if (subtrahend.Length < SubtrahendSize)
         {
             throw new BufferLengthException(
-                nameof(subtrahend), true, Subtrahend, subtrahend.Length);
+                nameof(subtrahend), true, SubtrahendSize, subtrahend.Length);
         }
         
         Span<byte> minuendBuffer = stackalloc byte[BitOperation1.DestinationSize];
