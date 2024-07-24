@@ -12,6 +12,7 @@ public class TransformTests
     [TestCase(1)]
     [TestCase(2)]
     [TestCase(3)]
+    [TestCase(10)]
     public void Execute(int transformIndex)
     {
         var type = typeof(Transform1)
