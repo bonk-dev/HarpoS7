@@ -16,8 +16,8 @@ public static class BlobUtils
         Path.Combine(GetBasePath(), BlobsDirName, MonolithsBlobsDirName, 
             $"monolith{index}-dst.bin");
 
-    public static string GetTransformSourcePath(int transformIndex) => 
-        GetTransformFilePath(transformIndex, "src");
+    public static string GetTransformSourcePath(int transformIndex, int? subIndex = null) => 
+        GetTransformFilePath(transformIndex, "src", subIndex);
 
     public static string GetTransformDestinationPath(int transformIndex, int? subIndex = null) =>
         GetTransformFilePath(transformIndex, "dst", subIndex);

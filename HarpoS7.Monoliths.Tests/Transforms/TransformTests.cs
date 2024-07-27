@@ -13,7 +13,8 @@ public class TransformTests
     [TestCase(2)]
     [TestCase(3)]
     [TestCase(10)]
-    public void Execute(int transformIndex)
+    [TestCase(10, 2)]
+    public void Execute(int transformIndex, int? subIndex = null)
     {
         var type = typeof(Transform1)
             .Assembly
@@ -24,10 +25,10 @@ public class TransformTests
         var executeMethod = type.GetMethod("Execute", BindingFlags.Public | BindingFlags.Static);
         Assert.That(executeMethod, Is.Not.Null);
 
-        var expectedSrcPath = BlobUtils.GetTransformSourcePath(transformIndex);
+        var expectedSrcPath = BlobUtils.GetTransformSourcePath(transformIndex, subIndex);
         var expectedSrcBytes = File.ReadAllBytes(expectedSrcPath);
 
-        var expectedDstPath = BlobUtils.GetTransformDestinationPath(transformIndex);
+        var expectedDstPath = BlobUtils.GetTransformDestinationPath(transformIndex, subIndex);
         var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
 
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[transformIndex - 1]];

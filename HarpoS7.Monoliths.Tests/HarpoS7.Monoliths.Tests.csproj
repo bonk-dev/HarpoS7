@@ -255,6 +255,12 @@
       <None Update="Blobs\Transforms\transform8_2-dst.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Blobs\Transforms\transform10_2-dst.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\Transforms\transform10_2-src.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
