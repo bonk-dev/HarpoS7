@@ -132,5 +132,16 @@ public class TransformTests
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
     
+    [Test]
+    [TestCase(0, 0x772A, 0x7E)]
+    public void ExecuteTransform12(int blobIndex, int dwordIndex, int count)
+    {
+        var initialCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx"));
+        Transform12.Execute(initialCtx, dwordIndex, count);
+        
+        var expectedCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx"));
+        Assert.That(initialCtx, Is.EqualTo(expectedCtx));
+    }
+    
     private delegate void TransformExecuteMethodNoReturn(Span<byte> destination, ReadOnlySpan<byte> source);
 }
