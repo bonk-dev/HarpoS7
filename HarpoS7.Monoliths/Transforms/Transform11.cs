@@ -4,6 +4,9 @@ using HarpoS7.Monoliths.Exceptions;
 
 namespace HarpoS7.Monoliths.Transforms;
 
+/// <summary>
+/// Big integer transform - subtraction
+/// </summary>
 public static class Transform11
 {
     public const int DestinationSize = BitOperation2.DestinationSize;

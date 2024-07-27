@@ -5,6 +5,9 @@ using HarpoS7.Monoliths.Utils;
 
 namespace HarpoS7.Monoliths.Transforms;
 
+/// <summary>
+/// Big integer transform - raise int to the power of 2
+/// </summary>
 public static class Transform10
 {
     public const int DestinationSize = BitOperation2.DestinationSize;

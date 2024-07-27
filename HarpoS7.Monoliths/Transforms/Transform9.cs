@@ -7,6 +7,9 @@ using HarpoS7.Monoliths.Utils;
 
 namespace HarpoS7.Monoliths.Transforms;
 
+/// <summary>
+/// Big integer transform - multiplication
+/// </summary>
 public static class Transform9
 {
     public const int DestinationSize = BitOperation2.DestinationSize;

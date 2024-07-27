@@ -7,6 +7,9 @@ using HarpoS7.Utilities;
 
 namespace HarpoS7.Monoliths.Transforms;
 
+/// <summary>
+/// Big integer transform - addition
+/// </summary>
 public static class Transform8
 {
     public const int DestinationSize = BitOperation2.DestinationSize;
