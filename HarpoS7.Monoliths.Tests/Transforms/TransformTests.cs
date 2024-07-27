@@ -80,15 +80,18 @@ public class TransformTests
     }
     
     [Test]
-    public void ExecuteTransform8()
+    [TestCase(null)]
+    [TestCase(2)]
+    public void ExecuteTransform8(int? subIndex)
     {
-        var expectedDstPath = BlobUtils.GetTransformDestinationPath(8);
+        var expectedDstPath = BlobUtils.GetTransformDestinationPath(8, subIndex);
         var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
 
-        var source1Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(8, "source1"));
-        var source2Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(8, "source2"));
+        var source1Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(8, "source1", subIndex));
+        var source2Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(8, "source2", subIndex));
         
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[8 - 1]];
+        destinationBuffer.Clear();
         
         Transform8.Execute(destinationBuffer, source1Bytes.AsSpan(), source2Bytes.AsSpan());
         

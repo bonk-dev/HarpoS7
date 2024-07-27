@@ -10,4 +10,9 @@
       <ProjectReference Include="..\HarpoS7.Utilities\HarpoS7.Utilities.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Data\Blobs\Transform12Metadata.bin" />
+      <EmbeddedResource Include="Data\Blobs\Transform12Metadata.bin" />
+    </ItemGroup>
+
 </Project>
