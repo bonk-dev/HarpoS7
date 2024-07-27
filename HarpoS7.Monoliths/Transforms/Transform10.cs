@@ -33,7 +33,8 @@ public static class Transform10
         Span<byte> productBuffer = stackalloc byte[length];
         _ = result.TryWriteBytes(productBuffer, out _, isUnsigned: true, isBigEndian: false);
 
-        if (BigIntegerCompressor.Compress(productBuffer[..length], out length))
+        if (BigIntegerCompressor.Compress(productBuffer[..length], out length) && 
+            BigIntegerCompressor.Compress(productBuffer[..length], out length))
         {
             BigIntegerCompressor.FinalCompress(productBuffer[..length]);
         }
