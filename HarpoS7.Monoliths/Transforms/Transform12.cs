@@ -47,10 +47,6 @@ public static class Transform12
                     Transform11.Execute(dst, src, src2);
                     break;
             }
-            
-            Debug.WriteLine("I: " + i);
         }
-        
-        Debugger.Break();
     }
 }
