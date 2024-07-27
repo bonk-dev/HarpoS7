@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.Data;
 
@@ -46,6 +47,10 @@ public static class Transform12
                     Transform11.Execute(dst, src, src2);
                     break;
             }
+            
+            Debug.WriteLine("I: " + i);
         }
+        
+        Debugger.Break();
     }
 }

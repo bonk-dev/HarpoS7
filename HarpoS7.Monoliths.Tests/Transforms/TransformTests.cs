@@ -140,7 +140,7 @@ public class TransformTests
         var initialCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx"));
         Transform12.Execute(initialCtx, dwordIndex, count);
         
-        var expectedCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx"));
+        var expectedCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx-expected"));
         Assert.That(initialCtx, Is.EqualTo(expectedCtx));
     }
     
