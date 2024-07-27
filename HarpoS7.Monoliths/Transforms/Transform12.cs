@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.Data;
+using HarpoS7.Monoliths.Exceptions;
 
 namespace HarpoS7.Monoliths.Transforms;
 
@@ -11,6 +12,12 @@ public static class Transform12
     public static void Execute(Span<byte> context, int index, int count)
     {
         if (count == 0) return;
+
+        if (context.Length < ContextSize)
+        {
+            throw new BufferLengthException(
+                nameof(context), false, ContextSize, context.Length);
+        }
 
         var metadata = MemoryMarshal.Cast<byte, uint>(BlobReader.Transform12Metadata.Span);
         
