@@ -186,16 +186,16 @@
       <None Update="Blobs\WithCopy\7_out2.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Blobs\BitOperations\1_dst.bin">
+      <None Update="Blobs\BitOperations\prep_dst.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Blobs\BitOperations\1_src.bin">
+      <None Update="Blobs\BitOperations\prep_src.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Blobs\BitOperations\2_dst.bin">
+      <None Update="Blobs\BitOperations\finalize_dst.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Blobs\BitOperations\2_src.bin">
+      <None Update="Blobs\BitOperations\finalize_src.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Blobs\Transforms\transform8-dst.bin">

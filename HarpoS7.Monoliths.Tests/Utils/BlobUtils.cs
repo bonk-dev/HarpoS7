@@ -35,9 +35,9 @@ public static class BlobUtils
         Path.Combine(GetBasePath(), BlobsDirName, MonolithsWithCopyBlobsDirName, 
             $"{monolithIndex}_{(isOut ? "out" : "in")}{index}.bin");
 
-    public static string GetBitOperationBlobPath(int index, bool isDst) =>
+    public static string GetBitOperationBlobPath(string name, bool isDst) =>
         Path.Combine(GetBasePath(), BlobsDirName, BitOperationsBlobsDirName,
-            $"{index}_{(isDst ? "dst" : "src")}.bin");
+            $"{name}_{(isDst ? "dst" : "src")}.bin");
 
     private static string GetBasePath() => TestContext.CurrentContext.WorkDirectory;
 }
