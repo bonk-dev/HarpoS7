@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.BitOperations;
 using HarpoS7.Monoliths.Tests.Utils;
 
@@ -27,5 +29,16 @@ public class BigIntOperationsTests
         BigIntOperations.Finalize(destinationBuffer.AsSpan(), srcBytes.AsSpan());
         
         Assert.That(destinationBuffer, Is.EqualTo(expectedDstBytes));
+    }
+    
+    [Test]
+    public void PrepareFinalizeMixTest()
+    {
+        var srcBytes = File.ReadAllBytes(BlobUtils.GetBitOperationBlobPath("mixed", false));
+        var expectedDstBytes = File.ReadAllBytes(BlobUtils.GetBitOperationBlobPath("mixed", true));
+
+        BigIntOperations.PrepareFinalize(srcBytes.AsSpan());
+        
+        Assert.That(srcBytes, Is.EqualTo(expectedDstBytes));
     }
 }

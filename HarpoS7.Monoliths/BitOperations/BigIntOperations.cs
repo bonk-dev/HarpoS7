@@ -90,6 +90,59 @@ public static class BigIntOperations
         dstDwords[5] = srcDwords[4] >> 0x0A & 0x3FFFFC;
     }
 
+    /// <summary>
+    /// <see cref="Prepare"/> and <see cref="Finalize"/> joined together
+    /// </summary>
+    /// <param name="destinationSource"></param>
+    public static void PrepareFinalize(Span<byte> destinationSource)
+    {
+        if (destinationSource.Length < FinalizeDestinationSize)
+        {
+            throw new BufferLengthException(
+                nameof(destinationSource), false, FinalizeDestinationSize, destinationSource.Length);
+        }
+
+        var destinationSourceDwords = MemoryMarshal.Cast<byte, uint>(destinationSource);
+        
+        var temp0 = destinationSourceDwords[1] * 0x4000000 + (destinationSourceDwords[0] >> 2);
+        var temp1 = CarryHelper(temp0, destinationSourceDwords[0] >> 2) + (destinationSourceDwords[1] >> 6);
+        
+        var temp2 = destinationSourceDwords[2] * 0x400000 + temp1;
+        temp1 = CarryHelper(temp2, temp1) + (destinationSourceDwords[2] >> 10);
+        
+        var temp3 = destinationSourceDwords[3] * 0x40000 + temp1;
+        temp1 = CarryHelper(temp3, temp1) + (destinationSourceDwords[3] >> 0xe);
+        
+        var temp4 = destinationSourceDwords[4] * 0x4000 + temp1;
+        temp1 = CarryHelper(temp4, temp1) + (destinationSourceDwords[4] >> 0x12);
+        
+        var temp5 = destinationSourceDwords[5] * 0x400 + temp1;
+        temp1 = (CarryHelper(temp5, temp1) + (destinationSourceDwords[5] >> 0x16)) * 0x2f;
+        
+        if (temp1 != 0) {
+            var temp6 = CarryHelper(temp0 + temp1, temp1);
+            
+            temp2 += temp6;
+            temp6 = CarryHelper(temp2, temp6);
+            
+            temp3 += temp6;
+            temp6 = CarryHelper(temp3, temp6);
+            
+            temp4 += temp6;
+            temp6 = CarryHelper(temp4, temp6);
+            
+            temp5 += temp6;
+            temp0 = temp0 + temp1 + CarryHelper(temp5, temp6) * 0x2f;
+        }
+        
+        destinationSourceDwords[0] = (temp0 & 0xfffffff) << 2;
+        destinationSourceDwords[1] = (temp2 << 6 | temp0 >> 0x1a) & 0x3ffffffc;
+        destinationSourceDwords[2] = (temp3 << 10 | temp2 >> 0x16) & 0x3ffffffc;
+        destinationSourceDwords[3] = (temp4 << 0xe | temp3 >> 0x12) & 0x3ffffffc;
+        destinationSourceDwords[4] = (temp5 << 0x12 | temp4 >> 0xe) & 0x3ffffffc;
+        destinationSourceDwords[5] = temp5 >> 10 & 0x3ffffc;
+    }
+
     private static uint CarryHelper(uint a, uint b) => 
         a < b ? 1U : 0U;
 }
