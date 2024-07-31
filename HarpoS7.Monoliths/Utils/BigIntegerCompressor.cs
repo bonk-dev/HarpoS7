@@ -15,14 +15,14 @@ public static class BigIntegerCompressor
     public static bool Compress(Span<byte> integerBuffer, out int length)
     {
         length = integerBuffer.Length;
-        if (length > BitOperation2.SourceSize)
+        if (length > BigIntOperations.FinalizeSourceSize)
         {
             var overflowInt = new BigInteger(
-                integerBuffer[BitOperation2.SourceSize..],
+                integerBuffer[BigIntOperations.FinalizeSourceSize..],
                 isUnsigned: true,
                 isBigEndian: false);
             var compressedProduct = new BigInteger(
-                integerBuffer[..BitOperation2.SourceSize],
+                integerBuffer[..BigIntOperations.FinalizeSourceSize],
                 isUnsigned: true,
                 isBigEndian: false);
 
@@ -30,20 +30,20 @@ public static class BigIntegerCompressor
             _ = product.TryWriteBytes(integerBuffer, out length, isUnsigned: true, isBigEndian: false);
         }
 
-        return length > BitOperation2.SourceSize;
+        return length > BigIntOperations.FinalizeSourceSize;
     }
 
     /// <summary>
     /// Ends the big integer compression (adds 0x2F to the first uint)
     /// </summary>
     /// <param name="integerBuffer">Big integer buffer</param>
-    /// <exception cref="ArgumentException">Thrown when <see cref="integerBuffer"/> length is smaller or equal to <see cref="BitOperation2.SourceSize"/></exception>
+    /// <exception cref="ArgumentException">Thrown when <see cref="integerBuffer"/> length is smaller or equal to <see cref="BigIntOperations.FinalizeSourceSize"/></exception>
     public static void FinalCompress(Span<byte> integerBuffer)
     {
-        if (integerBuffer.Length <= BitOperation2.SourceSize)
+        if (integerBuffer.Length <= BigIntOperations.FinalizeSourceSize)
         {
             throw new ArgumentException(
-                $"This BigInteger does not need any compression (it is already smaller than or equal to {BitOperation2.SourceSize})",
+                $"This BigInteger does not need any compression (it is already smaller than or equal to {BigIntOperations.FinalizeSourceSize})",
                 nameof(integerBuffer));
         }
         

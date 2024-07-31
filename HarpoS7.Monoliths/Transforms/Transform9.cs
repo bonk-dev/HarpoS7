@@ -12,9 +12,9 @@ namespace HarpoS7.Monoliths.Transforms;
 /// </summary>
 public static class Transform9
 {
-    public const int DestinationSize = BitOperation2.DestinationSize;
-    public const int Source1Size = BitOperation1.SourceSize;
-    public const int Source2Size = BitOperation1.SourceSize;
+    public const int DestinationSize = BigIntOperations.FinalizeDestinationSize;
+    public const int Source1Size = BigIntOperations.PrepareSourceSize;
+    public const int Source2Size = BigIntOperations.PrepareSourceSize;
         
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> source1, ReadOnlySpan<byte> source2)
     {
@@ -35,10 +35,10 @@ public static class Transform9
         }
         
         Span<byte> buffer1 = stackalloc byte[5 * sizeof(uint)];
-        BitOperation1.Execute(buffer1, source1);
+        BigIntOperations.Prepare(buffer1, source1);
         
         Span<byte> buffer2 = stackalloc byte[5 * sizeof(uint)];
-        BitOperation1.Execute(buffer2, source2);
+        BigIntOperations.Prepare(buffer2, source2);
 
         var buf1BigInteger = new BigInteger(buffer1, isUnsigned: true, isBigEndian: false);
         var buf2BigInteger = new BigInteger(buffer2, isUnsigned: true, isBigEndian: false);
@@ -56,6 +56,6 @@ public static class Transform9
             BigIntegerCompressor.FinalCompress(productBuffer[..productLength]);
         }
 
-        BitOperation2.Execute(destination, productBuffer[..productLength]);
+        BigIntOperations.Finalize(destination, productBuffer[..productLength]);
     }
 }

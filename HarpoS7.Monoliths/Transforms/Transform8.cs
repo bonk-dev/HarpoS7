@@ -12,9 +12,9 @@ namespace HarpoS7.Monoliths.Transforms;
 /// </summary>
 public static class Transform8
 {
-    public const int DestinationSize = BitOperation2.DestinationSize;
-    public const int Source1Size = BitOperation1.SourceSize;
-    public const int Source2Size = BitOperation1.SourceSize;
+    public const int DestinationSize = BigIntOperations.FinalizeDestinationSize;
+    public const int Source1Size = BigIntOperations.PrepareSourceSize;
+    public const int Source2Size = BigIntOperations.PrepareSourceSize;
     
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> source1, ReadOnlySpan<byte> source2)
     {
@@ -34,10 +34,10 @@ public static class Transform8
                 nameof(source2), true, Source2Size, source2.Length);
         }
         
-        Span<byte> buffer1 = stackalloc byte[BitOperation1.DestinationSize];
-        Span<byte> buffer2 = stackalloc byte[BitOperation1.DestinationSize];
-        BitOperation1.Execute(buffer1, source1);
-        BitOperation1.Execute(buffer2, source2);
+        Span<byte> buffer1 = stackalloc byte[BigIntOperations.PrepareDestinationSize];
+        Span<byte> buffer2 = stackalloc byte[BigIntOperations.PrepareDestinationSize];
+        BigIntOperations.Prepare(buffer1, source1);
+        BigIntOperations.Prepare(buffer2, source2);
 
         var bigInt1 = new BigInteger(buffer1, isUnsigned: true, isBigEndian: false);
         var bigInt2 = new BigInteger(buffer2, isUnsigned: true, isBigEndian: false);
@@ -49,7 +49,7 @@ public static class Transform8
         Span<byte> sumBuffer = stackalloc byte[length];
         _ = sum.TryWriteBytes(sumBuffer, out length, isUnsigned: true, isBigEndian: false);
 
-        if (length > BitOperation2.SourceSize)
+        if (length > BigIntOperations.FinalizeSourceSize)
         {
             var sumDword = MemoryMarshal.Cast<byte, uint>(sumBuffer);
             sumDword[0] += 0x2F;
@@ -70,6 +70,6 @@ public static class Transform8
             }
         }
         
-        BitOperation2.Execute(destination, sumBuffer);
+        BigIntOperations.Finalize(destination, sumBuffer);
     }
 }
