@@ -102,6 +102,7 @@ public class TransformTests
     [Test]
     [TestCase(null)]
     [TestCase(2)]
+    [TestCase(3, Description = "Resulting BigInteger is 19 bytes long, not 20")]
     public void ExecuteTransform9(int? subIndex)
     {
         var expectedDstPath = BlobUtils.GetTransformDestinationPath(9, subIndex);

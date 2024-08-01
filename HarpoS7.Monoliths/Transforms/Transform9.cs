@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.BitOperations;
@@ -54,6 +55,15 @@ public static class Transform9
             BigIntegerCompressor.Compress(productBuffer[..productLength], out productLength))
         {
             BigIntegerCompressor.FinalCompress(productBuffer[..productLength]);
+        }
+
+        // Pad product with zeros
+        if (productLength < BigIntOperations.FinalizeSourceSize)
+        {
+            productBuffer
+                .Slice(productLength, BigIntOperations.FinalizeSourceSize - productLength)
+                .Clear();
+            productLength = BigIntOperations.FinalizeSourceSize;
         }
 
         BigIntOperations.Finalize(destination, productBuffer[..productLength]);
