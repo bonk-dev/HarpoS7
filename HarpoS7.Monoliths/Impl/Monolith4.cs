@@ -8,6 +8,7 @@ namespace HarpoS7.Monoliths.Impl;
 
 public static class Monolith4
 {
+    public const int DestinationSize = 0x48;
     public const int WithCopyIn1Size = 0x48;
     public const int WithCopyIn2Size = 0x48;
     
