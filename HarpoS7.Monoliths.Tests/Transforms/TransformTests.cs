@@ -118,13 +118,16 @@ public class TransformTests
     }
     
     [Test]
-    public void ExecuteTransform11()
+    [TestCase(null)]
+    [TestCase(2)]
+    [TestCase(3)]
+    public void ExecuteTransform11(int? subIndex)
     {
-        var expectedDstPath = BlobUtils.GetTransformDestinationPath(11);
+        var expectedDstPath = BlobUtils.GetTransformDestinationPath(11, subIndex);
         var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
 
-        var source1Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(11, "source1"));
-        var source2Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(11, "source2"));
+        var source1Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(11, "source1", subIndex));
+        var source2Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(11, "source2", subIndex));
         
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[11 - 1]];
         

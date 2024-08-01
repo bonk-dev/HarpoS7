@@ -10,7 +10,7 @@ namespace HarpoS7.Monoliths.Transforms;
 public static class Transform11
 {
     public const int DestinationSize = BigIntOperations.FinalizeDestinationSize;
-    public const int MinuendSize = BigIntOperations.PrepareDestinationSize;
+    public const int MinuendSize = BigIntOperations.PrepareSourceSize;
     public const int SubtrahendSize = BigIntOperations.PrepareSourceSize;
     
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> minuend, ReadOnlySpan<byte> subtrahend)
@@ -41,13 +41,19 @@ public static class Transform11
         var subtrahendBigInt = new BigInteger(subtrahendBuffer, isUnsigned: true, isBigEndian: false);
         var difference = minuendBigInt - subtrahendBigInt;
 
+        if (difference.Sign == -1)
+        {
+            difference -= 0x2F;
+        }
+        
         var diffLength = difference.GetByteCount();
         Span<byte> diffBytes = stackalloc byte[diffLength];
-        _ = difference.TryWriteBytes(diffBytes, out diffLength, isUnsigned: true, isBigEndian: false);
-
+        _ = difference.TryWriteBytes(diffBytes, out diffLength, isBigEndian: false);
+        
         if (diffLength > BigIntOperations.FinalizeSourceSize)
         {
-            throw new NotImplementedException($"Difference was larger than {BigIntOperations.FinalizeSourceSize}");
+            // TODO: Examine further, trimming does the job for now
+            diffLength = BigIntOperations.FinalizeSourceSize;
         }
         
         BigIntOperations.Finalize(destination, diffBytes[..diffLength]);
