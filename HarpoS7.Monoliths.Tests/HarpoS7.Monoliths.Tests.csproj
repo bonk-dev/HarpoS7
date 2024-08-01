@@ -240,10 +240,10 @@
       <None Update="Blobs\Transforms\transform11-source2.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Blobs\Transforms\transform12-ctx.bin">
+      <None Update="Blobs\Transforms\transform12_0x0-ctx.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Blobs\Transforms\transform12-ctx-expected.bin">
+      <None Update="Blobs\Transforms\transform12_0x0-ctx-expected.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Blobs\Transforms\transform8_2-source1.bin">
@@ -265,6 +265,10 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Blobs\BitOperations\mixed_src.bin">
+      <None Update="Blobs\Transforms\transform12_0x29-ctx.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\Transforms\transform12_0x29-ctx-expected.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

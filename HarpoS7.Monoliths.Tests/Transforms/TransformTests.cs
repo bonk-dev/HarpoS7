@@ -139,12 +139,13 @@ public class TransformTests
     
     [Test]
     [TestCase(0, 0x772A, 0x7E)]
+    [TestCase(0x29, 0xC2B0, 0x67)]
     public void ExecuteTransform12(int blobIndex, int dwordIndex, int count)
     {
-        var initialCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx"));
+        var initialCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx", $"0x{blobIndex:X}"));
         Transform12.Execute(initialCtx, dwordIndex, count);
         
-        var expectedCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx-expected"));
+        var expectedCtx = File.ReadAllBytes(BlobUtils.GetTransformFilePath(12, "ctx-expected", $"0x{blobIndex:X}"));
         Assert.That(initialCtx, Is.EqualTo(expectedCtx));
     }
     
