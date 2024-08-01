@@ -122,6 +122,7 @@ public class TransformTests
     [TestCase(null)]
     [TestCase(2)]
     [TestCase(3)]
+    [TestCase(4)]
     public void ExecuteTransform11(int? subIndex)
     {
         var expectedDstPath = BlobUtils.GetTransformDestinationPath(11, subIndex);

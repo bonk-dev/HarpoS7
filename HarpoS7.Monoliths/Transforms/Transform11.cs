@@ -34,7 +34,7 @@ public static class Transform11
         Span<byte> minuendBuffer = stackalloc byte[BigIntOperations.PrepareDestinationSize];
         BigIntOperations.Prepare(minuendBuffer, minuend);
 
-        Span<byte> subtrahendBuffer = stackalloc byte[BigIntOperations.PrepareDestinationSize];
+        Span<byte> subtrahendBuffer = stackalloc byte[1 + BigIntOperations.PrepareDestinationSize];
         BigIntOperations.Prepare(subtrahendBuffer, subtrahend);
 
         var minuendBigInt = new BigInteger(minuendBuffer, isUnsigned: true, isBigEndian: false);
@@ -47,12 +47,19 @@ public static class Transform11
         }
         
         var diffLength = difference.GetByteCount();
-        Span<byte> diffBytes = stackalloc byte[diffLength];
+        Span<byte> diffBytes = stackalloc byte[Math.Max(diffLength, BigIntOperations.FinalizeSourceSize)];
         _ = difference.TryWriteBytes(diffBytes, out diffLength, isBigEndian: false);
         
         if (diffLength > BigIntOperations.FinalizeSourceSize)
         {
             // TODO: Examine further, trimming does the job for now
+            diffLength = BigIntOperations.FinalizeSourceSize;
+        }
+        else if (diffLength < BigIntOperations.FinalizeSourceSize && difference.Sign == -1)
+        {
+            // TODO: This is shaky, at best
+            // work around for negative bits (BigInteger does not serialize them, but the original impl leaves them in)
+            diffBytes[diffLength..].Fill(0xFF);
             diffLength = BigIntOperations.FinalizeSourceSize;
         }
         

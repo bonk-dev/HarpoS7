@@ -312,6 +312,15 @@
       <None Update="Blobs\Transforms\transform12_0x29-ctx-expected.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Blobs\Transforms\transform11_4-dst.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\Transforms\transform11_4-source1.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\Transforms\transform11_4-source2.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
