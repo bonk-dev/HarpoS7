@@ -73,14 +73,24 @@ public static class BigIntOperations
             throw new BufferLengthException(
                 nameof(destination), false, FinalizeDestinationSize, destination.Length);
         }
-        if (source.Length < FinalizeSourceSize)
+        if (source.IsEmpty)
         {
-            throw new BufferLengthException(
-                nameof(source), true, FinalizeSourceSize, source.Length);
+            throw new ArgumentException("Source span cannot be empty", nameof(source));
+        }
+
+        Span<byte> realSource = stackalloc byte[FinalizeSourceSize];
+        source[..Math.Min(source.Length, FinalizeSourceSize)].CopyTo(realSource);
+        
+        // Pad source with zeros
+        if (realSource.Length < FinalizeSourceSize)
+        {
+            source
+                .Slice(source.Length, FinalizeSourceSize - source.Length)
+                .CopyTo(realSource);
         }
 
         var dstDwords = MemoryMarshal.Cast<byte, uint>(destination);
-        var srcDwords = MemoryMarshal.Cast<byte, uint>(source);
+        var srcDwords = MemoryMarshal.Cast<byte, uint>(realSource);
         
         dstDwords[0] = (srcDwords[0] & 0x0FFFFFFF) << 2;
         dstDwords[1] = (srcDwords[1] << 0x06 | srcDwords[0] >> 0x1A) & 0x3FFFFFFC;

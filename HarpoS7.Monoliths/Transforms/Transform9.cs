@@ -57,15 +57,6 @@ public static class Transform9
             BigIntegerCompressor.FinalCompress(productBuffer[..productLength]);
         }
 
-        // Pad product with zeros
-        if (productLength < BigIntOperations.FinalizeSourceSize)
-        {
-            productBuffer
-                .Slice(productLength, BigIntOperations.FinalizeSourceSize - productLength)
-                .Clear();
-            productLength = BigIntOperations.FinalizeSourceSize;
-        }
-
         BigIntOperations.Finalize(destination, productBuffer[..productLength]);
     }
 }
