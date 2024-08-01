@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.Data;
-using HarpoS7.Monoliths.Exceptions;
 using HarpoS7.Monoliths.Impl;
 using HarpoS7.Monoliths.Utils;
 

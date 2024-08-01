@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.Data;
 using HarpoS7.Monoliths.Exceptions;

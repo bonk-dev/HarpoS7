@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace HarpoS7.Monoliths.Impl.Nine;
 
 /// <summary>
