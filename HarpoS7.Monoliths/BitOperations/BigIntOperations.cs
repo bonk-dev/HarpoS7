@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.InteropServices;
 using HarpoS7.Monoliths.Exceptions;
 
@@ -151,6 +152,18 @@ public static class BigIntOperations
         destinationSourceDwords[3] = (temp4 << 0xe | temp3 >> 0x12) & 0x3ffffffc;
         destinationSourceDwords[4] = (temp5 << 0x12 | temp4 >> 0xe) & 0x3ffffffc;
         destinationSourceDwords[5] = temp5 >> 10 & 0x3ffffc;
+    }
+
+    public static void RotateRight30(Span<byte> destination)
+    {
+        var dstD = MemoryMarshal.Cast<byte, uint>(destination);
+
+        dstD[5] = dstD[4] >> 0x1E;
+        for (var i = 4; i > 0; --i)
+        {
+            dstD[i] = dstD[i - 1] >> 0x1E | dstD[i] << 2;
+        }
+        dstD[0] <<= 0x2;
     }
 
     private static uint CarryHelper(uint a, uint b) => 

@@ -81,6 +81,20 @@ public class TransformTests
     }
     
     [Test]
+    public void ExecuteTransform7()
+    {
+        var prng1Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(7, "prng1"));
+        var prng2Bytes = File.ReadAllBytes(BlobUtils.GetTransformFilePath(7, "prng2"));
+        var srcBytes = File.ReadAllBytes(BlobUtils.GetTransformSourcePath(7));
+        
+        var destination = new byte[Transform7.DestinationSize];
+        Transform7.Execute(destination.AsSpan(), prng1Bytes.AsSpan(), prng2Bytes.AsSpan(), srcBytes.AsSpan());
+        
+        var expectedDstBytes = File.ReadAllBytes(BlobUtils.GetTransformDestinationPath(7));
+        Assert.That(destination, Is.EqualTo(expectedDstBytes));
+    }
+    
+    [Test]
     [TestCase(null)]
     [TestCase(2)]
     public void ExecuteTransform8(int? subIndex)
