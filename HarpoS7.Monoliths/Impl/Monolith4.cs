@@ -27,8 +27,8 @@ public static class Monolith4
 
         Span<byte> monolithSrc = stackalloc byte[MonolithBufferSizes.GetSourceBufferSize(4)];
         
-        source1.CopyTo(monolithSrc);
-        source2.CopyTo(monolithSrc[source1.Length..]);
+        source1[..WithCopyIn1Size].CopyTo(monolithSrc);
+        source2[..WithCopyIn2Size].CopyTo(monolithSrc[WithCopyIn1Size..]);
         
         Execute(destination, monolithSrc);
     }

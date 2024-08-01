@@ -60,9 +60,9 @@ public static class Monolith5
         Span<byte> monolithSrc = stackalloc byte[MonolithBufferSizes.GetSourceBufferSize(5)];
         Span<byte> monolithDst = stackalloc byte[MonolithBufferSizes.GetDestinationBufferSize(5)];
         
-        source1.CopyTo(monolithSrc);
-        source2.CopyTo(monolithSrc[source1.Length..]);
-        source3.CopyTo(monolithSrc[(source1.Length + source2.Length)..]);
+        source1[..WithCopyIn1Size].CopyTo(monolithSrc);
+        source2[..WithCopyIn2Size].CopyTo(monolithSrc[WithCopyIn1Size..]);
+        source3[..WithCopyIn3Size].CopyTo(monolithSrc[(WithCopyIn1Size + WithCopyIn2Size)..]);
         
         Execute(monolithDst, monolithSrc);
         
