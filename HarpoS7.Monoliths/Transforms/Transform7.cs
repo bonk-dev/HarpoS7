@@ -62,8 +62,9 @@ public static class Transform7
 
         // TODO: Move to heap
         // as much as I love stackalloc, this is way too big
+        // ---
+        // no need to .Clear() the context - data gets overridden anyways
         Span<byte> ctx = stackalloc byte[894 * sizeof(uint)];
-        ctx.Clear();
         
         Monolith5.WithCopy(
             ctx[0x450..],
