@@ -48,11 +48,11 @@ public static class Transform2
         
         for (var i = 0; i < 6; ++i)
         {
-            buffer2Dwords[0xC0] = SharedData2.Data.Span[i * 2];
-            buffer2Dwords[0xC1] = SharedData2.Data.Span[i * 2 + 1];
-            buffer2Dwords[0xC2] = SharedData3.Data.Span[i * 3];
-            buffer2Dwords[0xC3] = SharedData3.Data.Span[i * 3 + 1];
-            buffer2Dwords[0xC4] = SharedData3.Data.Span[i * 3 + 2];
+            buffer2Dwords[0xC0] = SharedData.Data.Span[i * 2];
+            buffer2Dwords[0xC1] = SharedData.Data.Span[i * 2 + 1];
+            buffer2Dwords[0xC2] = SharedData.Data.Span[0x12 + i * 3];
+            buffer2Dwords[0xC3] = SharedData.Data.Span[0x12 + i * 3 + 1];
+            buffer2Dwords[0xC4] = SharedData.Data.Span[0x12 + i * 3 + 2];
             
             Monolith9.Execute(monolith9Destination, buffer2);
 
