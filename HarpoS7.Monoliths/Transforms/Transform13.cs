@@ -32,7 +32,7 @@ public static class Transform13
         
         Span<byte> monolith10Mask = stackalloc byte[staticMask.Length + SourceSize];
         staticMask.CopyTo(monolith10Mask);
-        source.CopyTo(monolith10Mask[staticMask.Length..]);
+        source[..SourceSize].CopyTo(monolith10Mask[staticMask.Length..]);
 
         // + 5 dwords is to match the Monolith9 source size
         Span<byte> monolith10Destination = stackalloc byte[MonolithBufferSizes.GetDestinationBufferSize(10) + 
