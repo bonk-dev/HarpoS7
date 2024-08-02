@@ -7,6 +7,21 @@ namespace HarpoS7.Monoliths.Impl;
 
 public static class Monolith1
 {
+    /// <summary>
+    /// Overrides <see cref="source"/> with <see cref="Execute"/> destination bytes until <see cref="Execute"/> result is NOT equal to 0
+    /// </summary>
+    /// <param name="destination"></param>
+    /// <param name="source"></param>
+    public static void Loop(Span<byte> destination, Span<byte> source)
+    {
+        var execResult = Execute(destination, source);
+        while (execResult == 0)
+        {
+            destination[..0x48].CopyTo(source);
+            execResult = Execute(destination, source);
+        }
+    }
+
     [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
     public static uint Execute(Span<byte> destination, ReadOnlySpan<byte> source)
     {

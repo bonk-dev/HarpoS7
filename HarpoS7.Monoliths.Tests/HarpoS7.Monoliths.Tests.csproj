@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <Folder Include="Blobs\BitOperations\" />
+      <Folder Include="Blobs\Monoliths\Loop\" />
       <Folder Include="Blobs\Transforms\" />
       <Folder Include="Blobs\WithCopy\" />
     </ItemGroup>
@@ -331,6 +332,12 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Blobs\Transforms\transform7_2-src.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\Monoliths\Loop\monolith1-loop-dst.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Blobs\Monoliths\Loop\monolith1-loop-src.bin">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

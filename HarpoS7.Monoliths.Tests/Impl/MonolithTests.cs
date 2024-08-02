@@ -21,6 +21,18 @@ public class MonolithTests
     }
 
     [Test]
+    public void Monolith1Loop()
+    {
+        var srcBytes = File.ReadAllBytes(BlobUtils.GetMonolithLoopSourcePath(1));
+        var dstBytes = File.ReadAllBytes(BlobUtils.GetMonolithLoopDestinationPath(1));
+
+        var actualDst = new byte[MonolithBufferSizes.GetDestinationBufferSize(1)];
+        Monolith1.Loop(actualDst.AsSpan(), srcBytes.AsSpan());
+
+        Assert.That(actualDst.ToArray(), Is.EqualTo(dstBytes));
+    }
+
+    [Test]
     [TestCase(2)]
     [TestCase(3)]
     [TestCase(4)]

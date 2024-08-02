@@ -6,6 +6,7 @@ public static class BlobUtils
     private const string BlobsDirName = "Blobs";
     private const string MonolithsBlobsDirName = "Monoliths";
     private const string MonolithsWithCopyBlobsDirName = "WithCopy";
+    private const string MonolithsLoopBlobsDirName = "Loop";
     private const string TransformsBlobsDirName = "Transforms";
     
     public static string GetSourcePath(int index) => 
@@ -15,6 +16,14 @@ public static class BlobUtils
     public static string GetDestinationPath(int index) => 
         Path.Combine(GetBasePath(), BlobsDirName, MonolithsBlobsDirName, 
             $"monolith{index}-dst.bin");
+    
+    public static string GetMonolithLoopSourcePath(int index) => 
+        Path.Combine(GetBasePath(), BlobsDirName, MonolithsBlobsDirName, MonolithsLoopBlobsDirName,
+            $"monolith{index}-loop-src.bin");
+    
+    public static string GetMonolithLoopDestinationPath(int index) => 
+        Path.Combine(GetBasePath(), BlobsDirName, MonolithsBlobsDirName, MonolithsLoopBlobsDirName,
+            $"monolith{index}-loop-dst.bin");
 
     public static string GetTransformSourcePath(int transformIndex, int? subIndex = null) => 
         GetTransformFilePath(transformIndex, "src", subIndex);
