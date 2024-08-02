@@ -14,6 +14,7 @@ public class TransformTests
     [TestCase(3)]
     [TestCase(10)]
     [TestCase(10, 2)]
+    [TestCase(13)]
     public void Execute(int transformIndex, int? subIndex = null)
     {
         var type = typeof(Transform1)
