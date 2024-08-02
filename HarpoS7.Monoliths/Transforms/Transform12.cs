@@ -6,7 +6,7 @@ namespace HarpoS7.Monoliths.Transforms;
 
 public static class Transform12
 {
-    public const int ContextSize = sizeof(uint) * 0x247;
+    public const int ContextSize = sizeof(uint) * 894;
     
     public static void Execute(Span<byte> context, int index, int count)
     {
