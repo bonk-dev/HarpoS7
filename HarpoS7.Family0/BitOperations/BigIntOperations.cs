@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using HarpoS7.Monoliths.Exceptions;
+using HarpoS7.Family0.Exceptions;
 
-namespace HarpoS7.Monoliths.BitOperations;
+namespace HarpoS7.Family0.BitOperations;
 
 public static class BigIntOperations
 {

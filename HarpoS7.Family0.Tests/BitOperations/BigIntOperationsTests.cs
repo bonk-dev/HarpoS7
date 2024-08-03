@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using HarpoS7.Monoliths.BitOperations;
-using HarpoS7.Monoliths.Tests.Utils;
+using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Tests.Utils;
 
-namespace HarpoS7.Monoliths.Tests.BitOperations;
+namespace HarpoS7.Family0.Tests.BitOperations;
 
 public class BigIntOperationsTests
 {

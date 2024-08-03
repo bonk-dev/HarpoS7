@@ -1,8 +1,8 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
-using HarpoS7.Monoliths.BitOperations;
+using HarpoS7.Family0.BitOperations;
 
-namespace HarpoS7.Monoliths.Utils;
+namespace HarpoS7.Family0.Utils;
 
 public static class BigIntegerCompressor
 {

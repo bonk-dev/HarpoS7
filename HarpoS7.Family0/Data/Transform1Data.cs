@@ -1,4 +1,4 @@
-namespace HarpoS7.Monoliths.Data;
+namespace HarpoS7.Family0.Data;
 
 /// <summary>
 /// Read-only data for Monolith9

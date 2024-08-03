@@ -1,9 +1,9 @@
 using System.Runtime.InteropServices;
-using HarpoS7.Monoliths.BitOperations;
-using HarpoS7.Monoliths.Data;
-using HarpoS7.Monoliths.Impl;
+using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Data;
+using HarpoS7.Family0.Impl;
 
-namespace HarpoS7.Monoliths.Transforms;
+namespace HarpoS7.Family0.Transforms;
 
 public static class Transform7
 {

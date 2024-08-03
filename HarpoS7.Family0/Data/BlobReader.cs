@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace HarpoS7.Monoliths.Data;
+namespace HarpoS7.Family0.Data;
 
 public static class BlobReader
 {

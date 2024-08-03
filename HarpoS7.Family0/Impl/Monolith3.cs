@@ -1,10 +1,10 @@
 using System.Runtime.InteropServices;
-using HarpoS7.Monoliths.Exceptions;
-using HarpoS7.Monoliths.Utils;
+using HarpoS7.Family0.Exceptions;
+using HarpoS7.Family0.Utils;
 
 // ReSharper disable JoinDeclarationAndInitializer
 
-namespace HarpoS7.Monoliths.Impl;
+namespace HarpoS7.Family0.Impl;
 
 public static class Monolith3
 {

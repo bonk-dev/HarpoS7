@@ -1,4 +1,4 @@
-namespace HarpoS7.Monoliths.Impl.Ten;
+namespace HarpoS7.Family0.Impl.Ten;
 
 /// <summary>
 /// Starts at line 2201, ends at line 4401

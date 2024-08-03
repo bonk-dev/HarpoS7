@@ -1,7 +1,7 @@
 using System.Reflection;
-using HarpoS7.Monoliths.Utils;
+using HarpoS7.Family0.Utils;
 
-namespace HarpoS7.Monoliths.Tests.Utils;
+namespace HarpoS7.Family0.Tests.Utils;
 
 public class MonolithBufferSizesTests
 {

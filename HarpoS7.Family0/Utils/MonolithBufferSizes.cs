@@ -1,4 +1,4 @@
-namespace HarpoS7.Monoliths.Utils;
+namespace HarpoS7.Family0.Utils;
 
 public static class MonolithBufferSizes
 {

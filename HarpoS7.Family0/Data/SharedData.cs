@@ -1,7 +1,9 @@
-namespace HarpoS7.Monoliths.Data;
+using HarpoS7.Family0.Impl;
+
+namespace HarpoS7.Family0.Data;
 
 /// <summary>
-/// Data used in transforms which utilize both the <see cref="Monoliths.Impl.Monolith9"/> and the <see cref="Monoliths.Impl.Monolith10"/>
+/// Data used in transforms which utilize both the <see cref="Monolith9"/> and the <see cref="Monolith10"/>
 /// </summary>
 public static class SharedData
 {

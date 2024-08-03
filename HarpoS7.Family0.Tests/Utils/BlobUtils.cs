@@ -1,4 +1,4 @@
-namespace HarpoS7.Monoliths.Tests.Utils;
+namespace HarpoS7.Family0.Tests.Utils;
 
 public static class BlobUtils
 {

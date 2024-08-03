@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 // ReSharper disable JoinDeclarationAndInitializer
 
-namespace HarpoS7.Monoliths.Impl.Nine;
+namespace HarpoS7.Family0.Impl.Nine;
 
 /// <summary>
 /// Ends at line 2200

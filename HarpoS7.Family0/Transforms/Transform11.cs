@@ -1,8 +1,8 @@
 using System.Numerics;
-using HarpoS7.Monoliths.BitOperations;
-using HarpoS7.Monoliths.Exceptions;
+using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Exceptions;
 
-namespace HarpoS7.Monoliths.Transforms;
+namespace HarpoS7.Family0.Transforms;
 
 /// <summary>
 /// Big integer transform - subtraction
