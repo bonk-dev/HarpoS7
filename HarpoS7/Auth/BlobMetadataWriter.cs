@@ -19,6 +19,21 @@ internal static class BlobMetadataWriter
         ReadOnlySpan<byte> key1,
         EPublicKeyFamily keyFamily)
     {
+        var publicKeyLength = keyFamily switch
+        {
+            EPublicKeyFamily.Family0 => CommonConstants.PublicKeyLengthFamilyZero,
+            EPublicKeyFamily.Family3 => CommonConstants.PublicKeyLengthFamilyThree,
+            _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
+        };
+
+        if (publicKey.Length < publicKeyLength)
+        {
+            throw new ArgumentException(
+                $"The public key ({publicKey.Length} bytes) is shorter than expected ({publicKeyLength} bytes)",
+                nameof(publicKey)
+            );
+        }
+        
         const uint blobMagic = 0xFEE1DEAD;
         
         // These are hardcoded to 1
@@ -31,11 +46,13 @@ internal static class BlobMetadataWriter
         blobDword[2] = unknownField1;
         blobDword[3] = unknownField2;
 
-        key1.DeriveKeyId(blobData[(sizeof(uint) * 4)..]);
+        const int symmetricKeyIdOffset = 4 * sizeof(uint);
+        key1.DeriveKeyId(blobData[symmetricKeyIdOffset..]);
         blobDword[6] = (uint)GetSymmetricKeyFlags(keyFamily);
         blobDword[7] = 0;
 
-        publicKey.DeriveKeyId(blobData[(sizeof(uint) * 8)..]);
+        const int publicKeyIdOffset = 8 * sizeof(uint);
+        publicKey.DeriveKeyId(blobData[publicKeyIdOffset..]);
         blobDword[10] = (uint)GetPublicKeyFlags(keyFamily);
         blobDword[11] = 0;
 
