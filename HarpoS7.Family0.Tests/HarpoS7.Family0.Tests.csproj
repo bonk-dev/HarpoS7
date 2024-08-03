@@ -7,6 +7,7 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <RootNamespace>HarpoS7.Monoliths.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -355,7 +356,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\HarpoS7.Monoliths\HarpoS7.Monoliths.csproj" />
+      <ProjectReference Include="..\HarpoS7.Family0\HarpoS7.Family0.csproj" />
       <ProjectReference Include="..\HarpoS7\HarpoS7.csproj" />
     </ItemGroup>
 

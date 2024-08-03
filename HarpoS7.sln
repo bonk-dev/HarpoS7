@@ -14,9 +14,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.KeyDumper.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.KeyDumper.Cli", "HarpoS7.KeyDumper.Cli\HarpoS7.KeyDumper.Cli.csproj", "{3AA76126-8F1A-4750-A276-127D92FD672B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Monoliths", "HarpoS7.Monoliths\HarpoS7.Monoliths.csproj", "{D0D34205-9E83-4D62-9EB2-285329357FEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Family0", "HarpoS7.Family0\HarpoS7.Family0.csproj", "{D0D34205-9E83-4D62-9EB2-285329357FEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Monoliths.Tests", "HarpoS7.Monoliths.Tests\HarpoS7.Monoliths.Tests.csproj", "{064D2FDD-A863-4192-8D6F-62B6DAEC9804}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Family0.Tests", "HarpoS7.Family0.Tests\HarpoS7.Family0.Tests.csproj", "{064D2FDD-A863-4192-8D6F-62B6DAEC9804}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Utilities", "HarpoS7.Utilities\HarpoS7.Utilities.csproj", "{0BBD08C4-7521-41BF-B028-CC3F89CB192D}"
 EndProject

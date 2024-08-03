@@ -22,7 +22,7 @@ public static class BlobReader
     public static void ReadTransform12Metadata()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream("HarpoS7.Monoliths.Data.Blobs.Transform12Metadata.bin");
+        using var stream = assembly.GetManifestResourceStream("HarpoS7.Family0.Data.Blobs.Transform12Metadata.bin");
         if (stream == null)
         {
             throw new Exception("Transform12 metadata stream was null");
