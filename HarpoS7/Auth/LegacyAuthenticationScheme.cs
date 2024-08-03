@@ -14,9 +14,6 @@ namespace HarpoS7.Auth;
 /// </summary>
 public static class LegacyAuthenticationScheme
 {
-    public const int EncryptedBlobLength = 216;
-    public const int EncryptedBlobLengthFamilyZero = 180;
-
     // TODO: This API will most likely change
     
     [Experimental("familyZero")]
@@ -26,9 +23,9 @@ public static class LegacyAuthenticationScheme
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey)
     {
-        if (encryptedBlobData.Length < EncryptedBlobLengthFamilyZero)
+        if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthFamilyZero)
         {
-            throw new ArgumentException($"Encrypted blob data must be at least {EncryptedBlobLengthFamilyZero} bytes long",
+            throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthFamilyZero} bytes long",
                 nameof(encryptedBlobData));
         }
         
@@ -36,9 +33,13 @@ public static class LegacyAuthenticationScheme
         key1.FillWithCryptoRandomBytes();
 
         #region Metadata
-        
-        // TODO: Write metadata, symmetric key is key1
-        var offset = 40;
+
+        var offset = BlobMetadataWriter.WriteMetadata(
+            encryptedBlobData, 
+            publicKey, 
+            key1, 
+            EPublicKeyFamily.Family0
+        );
 
         #endregion
 
@@ -70,9 +71,9 @@ public static class LegacyAuthenticationScheme
         ReadOnlySpan<byte> publicKey)
     {
         // so i dont forget - sessionkey, the one for calculating packet digests, is calculated using 0x11 key
-        if (encryptedBlobData.Length < EncryptedBlobLength)
+        if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthFamilyThree)
         {
-            throw new ArgumentException($"Encrypted blob data must be at least {EncryptedBlobLength} bytes long",
+            throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthFamilyThree} bytes long",
                 nameof(encryptedBlobData));
         }
 
@@ -102,7 +103,7 @@ public static class LegacyAuthenticationScheme
 #endif
 
         // 4. Write metadata
-        int blobIndex = WriteEncryptedBlobMetadata(encryptedBlobData, publicKey, key1);
+        int blobIndex = BlobMetadataWriter.WriteMetadata(encryptedBlobData, publicKey, key1, EPublicKeyFamily.Family3);
 
         // 5. Generate and encrypt seed
         HarpoSeedUtilities.GenerateEncryptedSeed(
@@ -133,36 +134,5 @@ public static class LegacyAuthenticationScheme
 
         // 10. Calculate the session key
         KeyUtilities.DeriveSessionKey(sessionKey, key1, challenge);
-    }
-
-    /// <summary>
-    /// Writes encrypted blob metadata
-    /// </summary>
-    /// <param name="blobData">The output</param>
-    /// <param name="publicKey">The used public key</param>
-    /// <param name="key1">The key used for deriving session key</param>
-    /// <returns>Next writeable offset in <paramref name="blobData"/></returns>
-    private static int WriteEncryptedBlobMetadata(
-        Span<byte> blobData,
-        ReadOnlySpan<byte> publicKey,
-        ReadOnlySpan<byte> key1)
-    {
-        const uint BlobMagic = 0xFEE1DEAD;
-
-        var blobDword = blobData.AsDwords();
-        blobDword[0] = BlobMagic;
-        blobDword[1] = EncryptedBlobLength;
-        blobDword[2] = 1;
-        blobDword[3] = 1;
-
-        key1.DeriveKeyId(blobData[(sizeof(uint) * 4)..]);
-        blobDword[6] = 769;
-        blobDword[7] = 0;
-
-        publicKey.DeriveKeyId(blobData[(sizeof(uint) * 8)..]);
-        blobDword[10] = 784;
-        blobDword[11] = 0;
-
-        return 12 * sizeof(uint);
     }
 }
