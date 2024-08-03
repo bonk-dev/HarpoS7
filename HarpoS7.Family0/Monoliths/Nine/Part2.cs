@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace HarpoS7.Family0.Impl.Nine;
+namespace HarpoS7.Family0.Monoliths.Nine;
 
 /// <summary>
 /// Starts at line 2201, ends at 4200

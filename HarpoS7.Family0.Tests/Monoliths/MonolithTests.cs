@@ -1,9 +1,9 @@
 using System.Reflection;
-using HarpoS7.Family0.Impl;
+using HarpoS7.Family0.Monoliths;
 using HarpoS7.Family0.Tests.Utils;
 using HarpoS7.Family0.Utils;
 
-namespace HarpoS7.Family0.Tests.Impl;
+namespace HarpoS7.Family0.Tests.Monoliths;
 
 public class MonolithTests
 {

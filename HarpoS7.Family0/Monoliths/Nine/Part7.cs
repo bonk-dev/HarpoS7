@@ -1,4 +1,4 @@
-namespace HarpoS7.Family0.Impl.Nine;
+namespace HarpoS7.Family0.Monoliths.Nine;
 
 /// <summary>
 /// Starts at line 12243, ends at 14244

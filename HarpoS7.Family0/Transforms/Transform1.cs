@@ -1,13 +1,13 @@
 using System.Runtime.InteropServices;
 using HarpoS7.Family0.Data;
-using HarpoS7.Family0.Impl;
+using HarpoS7.Family0.Monoliths;
 using HarpoS7.Family0.Utils;
 
 namespace HarpoS7.Family0.Transforms;
 
 /// <summary>
 /// Used in encrypted seed creation
-/// <para>Uses <see cref="Impl.Monolith9"/></para>
+/// <para>Uses <see cref="Monoliths.Monolith9"/></para>
 /// </summary>
 public static class Transform1
 {

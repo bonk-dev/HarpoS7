@@ -1,7 +1,7 @@
-using HarpoS7.Family0.Impl;
+using HarpoS7.Family0.Monoliths;
 using HarpoS7.Family0.Tests.Utils;
 
-namespace HarpoS7.Family0.Tests.Impl;
+namespace HarpoS7.Family0.Tests.Monoliths;
 
 public class MonolithWithCopyTests
 {

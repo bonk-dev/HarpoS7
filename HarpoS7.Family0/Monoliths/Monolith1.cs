@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using HarpoS7.Family0.Exceptions;
 using HarpoS7.Family0.Utils;
 
-namespace HarpoS7.Family0.Impl;
+namespace HarpoS7.Family0.Monoliths;
 
 public static class Monolith1
 {

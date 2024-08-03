@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using HarpoS7.Family0.Data;
 using HarpoS7.Family0.Exceptions;
-using HarpoS7.Family0.Impl;
+using HarpoS7.Family0.Monoliths;
 using HarpoS7.Family0.Utils;
 using HarpoS7.Utilities.Extensions;
 

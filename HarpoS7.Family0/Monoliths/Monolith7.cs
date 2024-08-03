@@ -4,7 +4,7 @@ using HarpoS7.Family0.Utils;
 
 // ReSharper disable JoinDeclarationAndInitializer
 
-namespace HarpoS7.Family0.Impl;
+namespace HarpoS7.Family0.Monoliths;
 
 public static class Monolith7
 {
