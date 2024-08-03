@@ -36,6 +36,7 @@
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\HarpoS7.Family0\HarpoS7.Family0.csproj" />
       <ProjectReference Include="..\HarpoS7.Utilities\HarpoS7.Utilities.csproj" />
     </ItemGroup>
     

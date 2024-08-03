@@ -1,6 +1,8 @@
-﻿using System.Security.Cryptography;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using CommunityToolkit.HighPerformance.Buffers;
 using HarpoS7.Aes;
+using HarpoS7.Family0.Transforms;
 using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
 using HarpoS7.Seed;
@@ -13,6 +15,53 @@ namespace HarpoS7.Auth;
 public static class LegacyAuthenticationScheme
 {
     public const int EncryptedBlobLength = 216;
+    public const int EncryptedBlobLengthFamilyZero = 180;
+
+    // TODO: This API will most likely change
+    
+    [Experimental("familyZero")]
+    public static void AuthenticateFamilyZero(
+        Span<byte> encryptedBlobData,
+        Span<byte> sessionKey,
+        ReadOnlySpan<byte> challenge,
+        ReadOnlySpan<byte> publicKey)
+    {
+        if (encryptedBlobData.Length < EncryptedBlobLengthFamilyZero)
+        {
+            throw new ArgumentException($"Encrypted blob data must be at least {EncryptedBlobLengthFamilyZero} bytes long",
+                nameof(encryptedBlobData));
+        }
+        
+        Span<byte> key1 = stackalloc byte[24];
+        key1.FillWithCryptoRandomBytes();
+
+        #region Metadata
+        
+        // TODO: Write metadata, symmetric key is key1
+        var offset = 40;
+
+        #endregion
+
+        #region Seed
+
+        Span<byte> t1 = stackalloc byte[Transform1.DestinationSize];
+        Transform1.Execute(t1, key1);
+        Transform6.Execute(encryptedBlobData[offset..], publicKey, t1);
+        offset += Transform1.DestinationSize;
+        
+        #endregion
+
+        #region IV
+
+        Span<byte> aesIv = stackalloc byte[16];
+        aesIv.FillWithCryptoRandomBytes();
+        aesIv.CopyTo(encryptedBlobData[offset..]);
+        offset += aesIv.Length;
+        
+        #endregion
+
+        throw new NotImplementedException("Challenge encryption is not yet implemented");
+    }
 
     public static void Authenticate(
         Span<byte> encryptedBlobData,
