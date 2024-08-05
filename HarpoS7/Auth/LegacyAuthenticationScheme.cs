@@ -70,7 +70,7 @@ public static class LegacyAuthenticationScheme
 
         #region Key generation
         
-        Span<byte> key2 = stackalloc byte[16];
+        Span<byte> key2 = stackalloc byte[24];
         key2.FillWithCryptoRandomBytes();
 
         // Generates 3, 128-bit keys
@@ -113,6 +113,7 @@ public static class LegacyAuthenticationScheme
             );
 
             blockCiphertext.CopyTo(encryptedBlobData[offset..]);
+            offset += blockCiphertext.Length;
             
             // IV gets carry-rotated after every encryption
             BigIntOperations.RotateLeft31(aesIv);
@@ -127,7 +128,7 @@ public static class LegacyAuthenticationScheme
 
             // Encrypt key2
             aes.EncryptCfb(
-                key2, 
+                key2[..(aes.BlockSize / 8)], 
                 aesIv, 
                 blockCiphertext,
                 PaddingMode.Zeros, 
@@ -142,6 +143,24 @@ public static class LegacyAuthenticationScheme
             key2.Slice(16, 8).CopyTo(challengeBuffer);
 
             #endregion
+            
+            // Re-encrypt the modified challenge
+            aes.EncryptCfb(
+                challengeBuffer,
+                aesIv,
+                blockCiphertext,
+                PaddingMode.Zeros,
+                feedbackSizeInBits: 128
+            );
+
+            blockCiphertext.CopyTo(encryptedBlobData[offset..]);
+            
+            // IV gets carry-rotated after every encryption
+            BigIntOperations.RotateLeft31(aesIv);
+            
+            // XOR checksum with enc. challenge
+            checksum.Xor(blockCiphertext);
+            Transform4.Execute(checksum, checksum, lookupTable);
 
             throw new NotImplementedException("Part2 encryption is not yet implemented");
         }
