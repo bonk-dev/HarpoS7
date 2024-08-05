@@ -86,6 +86,9 @@ public static class LegacyAuthenticationScheme
             const int encryptedChallengeLength = 16;
             Span<byte> encryptedChallenge = stackalloc byte[encryptedChallengeLength];
 
+            // Might not be CFB, because the orig. implementation does not seem to perform any chaining
+            // but what matters is that we need to first AES-Cipher the IV, then XOR the challenge with the ciphertext
+            // and that is exactly what the CFB mode does
             aes.EncryptCfb(
                 challenge.Slice(2, encryptedChallengeLength),
                 aesIv,
