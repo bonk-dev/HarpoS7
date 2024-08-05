@@ -1,7 +1,9 @@
 ﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Security.Cryptography;
 using HarpoS7.Aes;
+using HarpoS7.Family0.BitOperations;
 using HarpoS7.Family0.Transforms;
 using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
@@ -30,6 +32,9 @@ public static class LegacyAuthenticationScheme
             throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthFamilyZero} bytes long",
                 nameof(encryptedBlobData));
         }
+
+        Span<byte> challengeBuffer = stackalloc byte[16];
+        challenge.Slice(2, challengeBuffer.Length).CopyTo(challengeBuffer);
         
         Span<byte> key1 = stackalloc byte[24];
         key1.FillWithCryptoRandomBytes();
@@ -64,14 +69,24 @@ public static class LegacyAuthenticationScheme
         #endregion
 
         #region Key generation
+        
+        Span<byte> key2 = stackalloc byte[16];
+        key2.FillWithCryptoRandomBytes();
 
         // Generates 3, 128-bit keys
         Span<byte> transform2Buffer = stackalloc byte[Transform2.DestinationSize];
         Transform2.Execute(transform2Buffer, t1);
 
+        // Challenge encryption key (CEK)
         const int challengeEncryptionKeyLength = 128 / 8;
         var challengeEncryptionKey = AesKeyPool.Rent(challengeEncryptionKeyLength);
         transform2Buffer[..challengeEncryptionKeyLength].CopyTo(challengeEncryptionKey);
+
+        // Checksum
+        Span<byte> lookupTable = stackalloc byte[Transform3.DestinationSize];
+        Transform3.Execute(lookupTable, transform2Buffer[32..]);
+        Span<byte> checksum = stackalloc byte[Transform4.DestinationSize];
+        Transform4.Execute(checksum, aesIv, lookupTable);
         
         #endregion
         
@@ -84,20 +99,47 @@ public static class LegacyAuthenticationScheme
             aes.Key = challengeEncryptionKey;
 
             const int encryptedChallengeLength = 16;
-            Span<byte> encryptedChallenge = stackalloc byte[encryptedChallengeLength];
+            Span<byte> blockCiphertext = stackalloc byte[encryptedChallengeLength];
 
             // Might not be CFB, because the orig. implementation does not seem to perform any chaining
             // but what matters is that we need to first AES-Cipher the IV, then XOR the challenge with the ciphertext
             // and that is exactly what the CFB mode does
             aes.EncryptCfb(
-                challenge.Slice(2, encryptedChallengeLength),
+                challengeBuffer,
                 aesIv,
-                encryptedChallenge,
+                blockCiphertext,
                 PaddingMode.Zeros,
                 feedbackSizeInBits: 128
             );
 
-            encryptedChallenge.CopyTo(encryptedBlobData[offset..]);
+            blockCiphertext.CopyTo(encryptedBlobData[offset..]);
+            
+            // IV gets carry-rotated after every encryption
+            BigIntOperations.RotateLeft31(aesIv);
+            
+            // XOR checksum with enc. challenge
+            checksum.Xor(blockCiphertext);
+            Transform4.Execute(checksum, checksum, lookupTable);
+
+            #endregion
+
+            #region Key2 encryption
+
+            // Encrypt key2
+            aes.EncryptCfb(
+                key2, 
+                aesIv, 
+                blockCiphertext,
+                PaddingMode.Zeros, 
+                feedbackSizeInBits: 128
+            );
+            BigIntOperations.RotateLeft31(aesIv);
+            
+            checksum.Xor(blockCiphertext);
+            Transform4.Execute(checksum, checksum, lookupTable);
+            
+            // Replace first 8 bytes of the challenge with last 8 bytes of key2 
+            key2.Slice(16, 8).CopyTo(challengeBuffer);
 
             #endregion
 

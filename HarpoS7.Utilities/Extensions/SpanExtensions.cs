@@ -138,6 +138,14 @@ public static class SpanExtensions
 
         return MemoryMarshal.Cast<uint, byte>(spanOfDwords);
     }
+
+    public static void Xor(this Span<byte> a, ReadOnlySpan<byte> b)
+    {
+        for (var i = 0; i < b.Length; ++i)
+        {
+            a[i] ^= b[i];
+        }
+    }
     #endregion
 
     #region ReadOnlySpan

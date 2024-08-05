@@ -2,6 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace HarpoS7.Family0.Transforms;
 
+/// <summary>
+/// Lookup table generation
+/// </summary>
 public static class Transform3
 {
     public const int SourceSize = 0x10;
