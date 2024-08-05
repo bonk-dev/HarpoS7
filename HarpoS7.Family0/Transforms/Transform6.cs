@@ -75,7 +75,6 @@ public static class Transform6
         Transform13.Execute(monolith11Buffer[0x3C..], monolith8Buffer[20..]);
         
         transform1[..(0xF * sizeof(uint))].CopyTo(monolith11Buffer);
-        Debugger.Break();
         Monolith11.Execute(monolith8Buffer, monolith11Buffer);
         
         monolith8Buffer[..(5 * sizeof(uint))].CopyTo(destination);
