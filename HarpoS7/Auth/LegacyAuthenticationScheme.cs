@@ -134,6 +134,9 @@ public static class LegacyAuthenticationScheme
                 PaddingMode.Zeros, 
                 feedbackSizeInBits: 128
             );
+            blockCiphertext.CopyTo(encryptedBlobData[offset..]);
+            offset += blockCiphertext.Length;
+            
             BigIntOperations.RotateLeft31(aesIv);
             
             checksum.Xor(blockCiphertext);
