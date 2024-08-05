@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using CommunityToolkit.HighPerformance.Buffers;
 using HarpoS7.Aes;
@@ -61,7 +62,32 @@ public static class LegacyAuthenticationScheme
         
         #endregion
 
-        throw new NotImplementedException("Challenge encryption is not yet implemented");
+        #region Challenge encryption
+
+        // Can't allocate on stack, we need this key later for AES which requires an array
+        var challengeEncryptionKey = new byte[Transform2.DestinationSize];
+        Transform2.Execute(challengeEncryptionKey, t1);
+        
+        var aes = System.Security.Cryptography.Aes.Create();
+        aes.KeySize = 128;
+        aes.Key = challengeEncryptionKey[..(aes.KeySize / 8)].ToArray();
+
+        const int encryptedChallengeLength = 16;
+        Span<byte> encryptedChallenge = stackalloc byte[encryptedChallengeLength];
+
+        aes.EncryptCfb(
+            challenge.Slice(2, encryptedChallengeLength), 
+            aesIv, 
+            encryptedChallenge, 
+            PaddingMode.Zeros,
+            feedbackSizeInBits: 128
+        );
+        
+        encryptedChallenge.CopyTo(encryptedBlobData[offset..]);
+
+        #endregion
+
+        throw new NotImplementedException("Part2 encryption is not yet implemented");
     }
 
     public static void Authenticate(
