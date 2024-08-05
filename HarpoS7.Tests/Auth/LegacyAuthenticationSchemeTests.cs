@@ -48,7 +48,9 @@ public class LegacyAuthenticationSchemeTests
         byte[] publicKey)
     {
         var origSeq = SpanExtensions.StaticFillSequence;
-        SpanExtensions.StaticFillSequence = [0x35, 0x25, 0x35];
+        
+        // Key1, Transform6 (2x), IV, Key2
+        SpanExtensions.StaticFillSequence = [0x35, 0x2D, 0x2D, 0x25, 0x35];
         
         var blobData = new byte[CommonConstants.EncryptedBlobLengthFamilyZero];
         
