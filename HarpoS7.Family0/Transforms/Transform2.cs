@@ -5,6 +5,9 @@ using HarpoS7.Family0.Utils;
 
 namespace HarpoS7.Family0.Transforms;
 
+/// <summary>
+/// Challenge encryption key derivation
+/// </summary>
 public static class Transform2
 {    
     public const int SourceSize = 0x3C;
