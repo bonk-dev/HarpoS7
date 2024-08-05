@@ -16,7 +16,7 @@ namespace HarpoS7.Auth;
 /// </summary>
 public static class LegacyAuthenticationScheme
 {
-    private static readonly ArrayPool<byte> AesKeyPool = ArrayPool<byte>.Create(16, 3);
+    private static readonly ArrayPool<byte> AesKeyPool = ArrayPool<byte>.Create(16, 2);
     
     // TODO: This API will most likely change
     
