@@ -55,7 +55,7 @@ public static class LegacyAuthenticationScheme
         Span<byte> t1 = stackalloc byte[Transform1.DestinationSize];
         Transform1.Execute(t1, key1);
         Transform6.Execute(encryptedBlobData[offset..], publicKey, t1);
-        offset += Transform1.DestinationSize;
+        offset += Transform6.DestinationSize;
         
         #endregion
 
