@@ -1,6 +1,8 @@
 ﻿using System.Buffers;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using HarpoS7.Aes;
 using HarpoS7.Family0.BitOperations;
@@ -80,7 +82,12 @@ public static class LegacyAuthenticationScheme
         // Challenge encryption key (CEK)
         const int challengeEncryptionKeyLength = 128 / 8;
         var challengeEncryptionKey = AesKeyPool.Rent(challengeEncryptionKeyLength);
-        transform2Buffer[..challengeEncryptionKeyLength].CopyTo(challengeEncryptionKey);
+        transform2Buffer[..challengeEncryptionKeyLength].CopyTo(challengeEncryptionKey.AsSpan());
+
+        const int checksumEncryptionLength = 128 / 8;
+        var checksumEncryptionKey = AesKeyPool.Rent(checksumEncryptionLength);
+        transform2Buffer.Slice(challengeEncryptionKeyLength, checksumEncryptionLength)
+            .CopyTo(checksumEncryptionKey.AsSpan());
 
         // Checksum
         Span<byte> lookupTable = stackalloc byte[Transform3.DestinationSize];
@@ -142,14 +149,20 @@ public static class LegacyAuthenticationScheme
             checksum.Xor(blockCiphertext);
             Transform4.Execute(checksum, checksum, lookupTable);
 
-            const int key2EncryptionLength = 8;
+            #endregion
+
+            #region Key 2 encryption part 2
+            
+            var key2LeftOverLength = key2.Length - blockCiphertext.Length;
             
             // Replace first 8 bytes of the challenge with last 8 bytes of key2 
-            key2.Slice(16, key2EncryptionLength).CopyTo(challengeBuffer);
+            key2.Slice(16, key2LeftOverLength).CopyTo(challengeBuffer);
 
-            #endregion
-            
-            // Re-encrypt the modified challenge
+            // Encrypt last 8 bytes of key2
+            // ==============================
+            // This is done because the AES block size is 16 bytes and not 24 bytes
+            // If the original implementation actually used AES-CFB, we would be able to just EncryptCfb
+            // the entire key2 at once, but they are rotating the IV instead 
             aes.EncryptCfb(
                 challengeBuffer,
                 aesIv,
@@ -157,23 +170,41 @@ public static class LegacyAuthenticationScheme
                 PaddingMode.Zeros,
                 feedbackSizeInBits: 128
             );
+            
+            blockCiphertext[..key2LeftOverLength].CopyTo(encryptedBlobData[offset..]);
+            offset += key2LeftOverLength;
 
-            blockCiphertext[..key2EncryptionLength].CopyTo(encryptedBlobData[offset..]);
-            offset += key2EncryptionLength;
+            #endregion
+
+            #region Checksum
             
-            // IV gets carry-rotated after every encryption
-            BigIntOperations.RotateLeft31(aesIv);
-            
-            // XOR checksum with enc. challenge
+            blockCiphertext[key2LeftOverLength..].Clear();
             checksum.Xor(blockCiphertext);
             Transform4.Execute(checksum, checksum, lookupTable);
+            
+            var encryptedBytes = encryptedChallengeLength + key2.Length;
+            var checksumDwords = MemoryMarshal.Cast<byte, uint>(checksum);
+            checksumDwords[3] ^= (uint)encryptedBytes;
+            
+            Transform4.Execute(checksum, checksum, lookupTable);
 
-            throw new NotImplementedException("Part2 encryption is not yet implemented");
+            aes.Key = checksumEncryptionKey;
+            aes.EncryptEcb(
+                checksum,
+                blockCiphertext,
+                PaddingMode.Zeros
+            );
+
+            // Copy the final checksum
+            blockCiphertext.CopyTo(encryptedBlobData[offset..]);
+            
+            #endregion
         }
         finally
         {
             // I think it is a good practise to clear encryption keys
             AesKeyPool.Return(challengeEncryptionKey, clearArray: true);
+            AesKeyPool.Return(checksumEncryptionKey, clearArray: true);
         }
     }
 
