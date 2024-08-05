@@ -141,9 +141,11 @@ public static class LegacyAuthenticationScheme
             
             checksum.Xor(blockCiphertext);
             Transform4.Execute(checksum, checksum, lookupTable);
+
+            const int key2EncryptionLength = 8;
             
             // Replace first 8 bytes of the challenge with last 8 bytes of key2 
-            key2.Slice(16, 8).CopyTo(challengeBuffer);
+            key2.Slice(16, key2EncryptionLength).CopyTo(challengeBuffer);
 
             #endregion
             
@@ -156,7 +158,8 @@ public static class LegacyAuthenticationScheme
                 feedbackSizeInBits: 128
             );
 
-            blockCiphertext.CopyTo(encryptedBlobData[offset..]);
+            blockCiphertext[..key2EncryptionLength].CopyTo(encryptedBlobData[offset..]);
+            offset += key2EncryptionLength;
             
             // IV gets carry-rotated after every encryption
             BigIntOperations.RotateLeft31(aesIv);
