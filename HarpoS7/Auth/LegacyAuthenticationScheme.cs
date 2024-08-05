@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System.Buffers;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using CommunityToolkit.HighPerformance.Buffers;
 using HarpoS7.Aes;
@@ -15,6 +17,8 @@ namespace HarpoS7.Auth;
 /// </summary>
 public static class LegacyAuthenticationScheme
 {
+    private static readonly ArrayPool<byte> AesKeyPool = ArrayPool<byte>.Create(16, 3);
+    
     // TODO: This API will most likely change
     
     [Experimental("familyZero")]
@@ -62,32 +66,48 @@ public static class LegacyAuthenticationScheme
         
         #endregion
 
-        #region Challenge encryption
+        #region Key generation
 
-        // Can't allocate on stack, we need this key later for AES which requires an array
-        var challengeEncryptionKey = new byte[Transform2.DestinationSize];
-        Transform2.Execute(challengeEncryptionKey, t1);
+        // Generates 3, 128-bit keys
+        Span<byte> transform2Buffer = stackalloc byte[Transform2.DestinationSize];
+        Transform2.Execute(transform2Buffer, t1);
+
+        const int challengeEncryptionKeyLength = 128 / 8;
+        var challengeEncryptionKey = AesKeyPool.Rent(challengeEncryptionKeyLength);
+        transform2Buffer[..challengeEncryptionKeyLength].CopyTo(challengeEncryptionKey);
         
-        var aes = System.Security.Cryptography.Aes.Create();
-        aes.KeySize = 128;
-        aes.Key = challengeEncryptionKey[..(aes.KeySize / 8)].ToArray();
-
-        const int encryptedChallengeLength = 16;
-        Span<byte> encryptedChallenge = stackalloc byte[encryptedChallengeLength];
-
-        aes.EncryptCfb(
-            challenge.Slice(2, encryptedChallengeLength), 
-            aesIv, 
-            encryptedChallenge, 
-            PaddingMode.Zeros,
-            feedbackSizeInBits: 128
-        );
-        
-        encryptedChallenge.CopyTo(encryptedBlobData[offset..]);
-
         #endregion
+        
+        try
+        {
+            #region Challenge encryption
+            
+            using var aes = System.Security.Cryptography.Aes.Create();
+            aes.KeySize = 128;
+            aes.Key = challengeEncryptionKey;
 
-        throw new NotImplementedException("Part2 encryption is not yet implemented");
+            const int encryptedChallengeLength = 16;
+            Span<byte> encryptedChallenge = stackalloc byte[encryptedChallengeLength];
+
+            aes.EncryptCfb(
+                challenge.Slice(2, encryptedChallengeLength),
+                aesIv,
+                encryptedChallenge,
+                PaddingMode.Zeros,
+                feedbackSizeInBits: 128
+            );
+
+            encryptedChallenge.CopyTo(encryptedBlobData[offset..]);
+
+            #endregion
+
+            throw new NotImplementedException("Part2 encryption is not yet implemented");
+        }
+        finally
+        {
+            // I think it is a good practise to clear encryption keys
+            AesKeyPool.Return(challengeEncryptionKey, clearArray: true);
+        }
     }
 
     public static void Authenticate(
