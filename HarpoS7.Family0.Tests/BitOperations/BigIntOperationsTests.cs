@@ -41,4 +41,21 @@ public class BigIntOperationsTests
         
         Assert.That(srcBytes, Is.EqualTo(expectedDstBytes));
     }
+
+    [Test]
+    [TestCase(
+        new byte[]
+        {
+            0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25,
+        },
+        new byte[]
+        {
+            0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0x92, 0xF3
+        }
+    )]
+    public void RotateLeft31Test(byte[] dwords, byte[] expectedRotatedBytes)
+    {
+        BigIntOperations.RotateLeft31(dwords.AsSpan());
+        Assert.That(dwords, Is.EqualTo(expectedRotatedBytes));
+    }
 }

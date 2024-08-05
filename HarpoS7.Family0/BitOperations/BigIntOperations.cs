@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 using HarpoS7.Family0.Exceptions;
 
@@ -163,6 +164,19 @@ public static class BigIntOperations
             dstD[i] = dstD[i - 1] >> 0x1E | dstD[i] << 2;
         }
         dstD[0] <<= 0x2;
+    }
+
+    public static void RotateLeft31(Span<byte> destination)
+    {
+        var dstD = MemoryMarshal.Cast<byte, uint>(destination);
+        var firstDword = dstD[0];
+        var lastDword = dstD[3];
+        
+        var uInt128 = BinaryPrimitives.ReadUInt128LittleEndian(destination);
+        uInt128 = UInt128.RotateLeft(uInt128, 31);
+        BinaryPrimitives.WriteUInt128LittleEndian(destination, uInt128);
+        
+        dstD[3] = (uint)(lastDword >> 1 ^ -((firstDword & 1) != 0 ? 1U : 0U) & 0xE1000000);
     }
 
     private static uint CarryHelper(uint a, uint b) => 
