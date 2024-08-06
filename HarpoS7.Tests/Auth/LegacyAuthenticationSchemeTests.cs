@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using HarpoS7.Auth;
 using HarpoS7.Utilities.Extensions;
@@ -26,7 +27,11 @@ public class LegacyAuthenticationSchemeTests
             0x49, 0x1C, 0xA3, 0x4F, 0xEF, 0x12, 0xF9, 0x59, 0xEC, 0x90, 0x0F, 0x00,
             0x5F, 0x36, 0xDD, 0x38, 0x90, 0x40, 0x76, 0x1E, 0xF2, 0xB8, 0x56, 0xD6
         },
-        new byte[] {},// TODO: Add session key
+        new byte[]
+        {
+            0x65, 0xC4, 0xF1, 0x79, 0x98, 0x0A, 0x43, 0xCB, 0x60, 0xE1, 0x19, 0x4B, 
+            0xA5, 0x00, 0xF5, 0xB9, 0xD0, 0x4F, 0x37, 0x4B, 0x56, 0x37, 0x48, 0x66
+        },
         new byte[]
         {
             0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD,
@@ -53,17 +58,21 @@ public class LegacyAuthenticationSchemeTests
         SpanExtensions.StaticFillSequence = [0x35, 0x2D, 0x2D, 0x25, 0x35];
         
         var blobData = new byte[CommonConstants.EncryptedBlobLengthFamilyZero];
+        var sessionKey = new byte[expectedSessionKey.Length];
         
         LegacyAuthenticationScheme.AuthenticateFamilyZero(
             blobData, 
-            Span<byte>.Empty,
+            sessionKey.AsSpan(),
             challenge.AsSpan(),
             publicKey.AsSpan()
         );
         
-        Assert.That(blobData, Is.EqualTo(expectedEncryptedBlobData));
-        // TODO: Assert session key
-
+        Assert.Multiple(() =>
+        {
+            Assert.That(blobData, Is.EqualTo(expectedEncryptedBlobData));
+            Assert.That(sessionKey, Is.EqualTo(expectedSessionKey));
+        });
+        
         SpanExtensions.StaticFillSequence = origSeq;
     }
 }

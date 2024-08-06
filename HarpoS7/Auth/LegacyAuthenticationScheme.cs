@@ -204,6 +204,8 @@ public static class LegacyAuthenticationScheme
             AesKeyPool.Return(challengeEncryptionKey, clearArray: true);
             AesKeyPool.Return(checksumEncryptionKey, clearArray: true);
         }
+        
+        KeyUtilities.DeriveSessionKey(sessionKey, key1, challenge);
     }
 
     public static void Authenticate(
