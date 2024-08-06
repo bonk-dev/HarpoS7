@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using HarpoS7;
 using HarpoS7.Auth;
@@ -13,25 +14,30 @@ using HarpoS7.PublicKeys.Impl;
 // in a real library/app you would obviously serialize/deserialize these dynamically
 
 var readBuffer = new byte[1024];
-const string plcHost = "192.168.1.10";
-const int plcS7Port = 102;
+if (args.Length < 1 || !IPEndPoint.TryParse(args[0], out var endPoint))
+{
+    Console.WriteLine("Usage: HarpoS7.PoC ip_address:port");
+    Console.WriteLine("Example: HarpoS7.PoC 192.168.1.10:102");
+    
+    return;
+}
 
 // Connect to the PLC
 using var client = new TcpClient();
 
 try
 {
-	await client.ConnectAsync(plcHost, plcS7Port);
+	await client.ConnectAsync(endPoint);
 }
 catch (SocketException ex)
 {
-	Console.WriteLine($"[-] Could not connect to {plcHost}:{plcS7Port}");
+	Console.WriteLine($"[-] Could not connect to {endPoint}");
 	Console.WriteLine($"[-] Exception message: {ex.Message}");
 
 	return;
 }
 
-Console.WriteLine($"[+] Connected to {plcHost}:{plcS7Port}");
+Console.WriteLine($"[+] Connected to {endPoint}");
 var stream = client.GetStream();
 
 // Send COTP Connection Request
