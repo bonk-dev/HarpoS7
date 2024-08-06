@@ -208,7 +208,7 @@ public static class LegacyAuthenticationScheme
         KeyUtilities.DeriveSessionKey(sessionKey, key1, challenge);
     }
 
-    public static void Authenticate(
+    public static void AuthenticateFamilyThree(
         Span<byte> encryptedBlobData,
         Span<byte> sessionKey,
         ReadOnlySpan<byte> challenge,
