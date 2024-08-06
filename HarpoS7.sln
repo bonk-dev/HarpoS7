@@ -20,6 +20,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Family0.Tests", "Ha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.Utilities", "HarpoS7.Utilities\HarpoS7.Utilities.csproj", "{0BBD08C4-7521-41BF-B028-CC3F89CB192D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.PublicKeys", "HarpoS7.PublicKeys\HarpoS7.PublicKeys.csproj", "{5CBC2BA8-B3A7-434B-A850-F75A23395E6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarpoS7.PublicKeys.Tests", "HarpoS7.PublicKeys.Tests\HarpoS7.PublicKeys.Tests.csproj", "{42E3F7F3-4190-477B-8815-F33353E542C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,5 +70,13 @@ Global
 		{0BBD08C4-7521-41BF-B028-CC3F89CB192D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BBD08C4-7521-41BF-B028-CC3F89CB192D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BBD08C4-7521-41BF-B028-CC3F89CB192D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CBC2BA8-B3A7-434B-A850-F75A23395E6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CBC2BA8-B3A7-434B-A850-F75A23395E6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CBC2BA8-B3A7-434B-A850-F75A23395E6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CBC2BA8-B3A7-434B-A850-F75A23395E6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42E3F7F3-4190-477B-8815-F33353E542C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42E3F7F3-4190-477B-8815-F33353E542C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42E3F7F3-4190-477B-8815-F33353E542C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42E3F7F3-4190-477B-8815-F33353E542C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
