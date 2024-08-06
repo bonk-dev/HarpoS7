@@ -25,12 +25,12 @@ public static class Helpers
 
     public static void ParseAndReverseBytes(string fingerprint, Span<byte> destination)
     {
-        if (!fingerprint.StartsWith("03:"))
+        if (!fingerprint.StartsWith("03:") && !fingerprint.StartsWith("00:"))
         {
             throw new Exception("Invalid fingerprint");
         }
 
-        fingerprint = fingerprint.Replace("03:", string.Empty);
+        fingerprint = fingerprint[3..];
 
         // I didn't see this happen, but let's better be safe than sorry
         if (fingerprint.Length % 2 != 0)

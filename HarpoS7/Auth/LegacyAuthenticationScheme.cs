@@ -17,10 +17,27 @@ namespace HarpoS7.Auth;
 public static class LegacyAuthenticationScheme
 {
     private static readonly ArrayPool<byte> AesKeyPool = ArrayPool<byte>.Create(16, 2);
+
+    public static void Authenticate(
+        Span<byte> encryptedBlobData,
+        Span<byte> sessionKey,
+        ReadOnlySpan<byte> challenge,
+        ReadOnlySpan<byte> publicKey,
+        EPublicKeyFamily publicKeyFamily)
+    {
+        switch (publicKeyFamily)
+        {
+            case EPublicKeyFamily.Family0:
+                AuthenticateFamilyZero(encryptedBlobData, sessionKey, challenge, publicKey);
+                break;
+            case EPublicKeyFamily.Family3:
+                AuthenticateFamilyThree(encryptedBlobData, sessionKey, challenge, publicKey);
+                break;
+            default:
+                throw new ArgumentException("Unsupported key family", nameof(publicKeyFamily));
+        }
+    }
     
-    // TODO: This API will most likely change
-    
-    [Experimental("familyZero")]
     public static void AuthenticateFamilyZero(
         Span<byte> encryptedBlobData,
         Span<byte> sessionKey,
