@@ -13,10 +13,11 @@
         <RepositoryUrl>https://github.com/bonk-dev/HarpoS7</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>siemens</PackageTags>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
-        <Version>1.0.1</Version>
-        <PackageReleaseNotes>1.0.1 - basic legitimation (password auth) support</PackageReleaseNotes>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <FileVersion>1.1.0</FileVersion>
+        <Version>1.1.0</Version>
+        <PackageReleaseNotes>1.1.0 - S7-1500 support
+1.0.1 - basic legitimation (password auth) support</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
