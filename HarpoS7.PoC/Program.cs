@@ -5,6 +5,8 @@ using HarpoS7;
 using HarpoS7.Auth;
 using HarpoS7.Keys;
 using HarpoS7.PoC;
+using HarpoS7.PublicKeys.Exceptions;
+using HarpoS7.PublicKeys.Impl;
 
 // All "requests" were extracted from a Wireshark dump
 // in a real library/app you would obviously serialize/deserialize these dynamically
@@ -125,8 +127,14 @@ Console.Write("Actual fingerprint: ");
 Helpers.PrintBuffer(publicKeyFingerprint);
 
 // get the matching public key from the KeyStore
-var publicKey = PublicKeyStore.GetPublicKey(publicKeyFingerprint);
-if (publicKey == null)
+var store = new DefaultPublicKeyStore();
+var publicKey = new byte[store.GetPublicKeyLength(fingerprintString)];
+
+try
+{
+    store.ReadPublicKey(publicKey.AsSpan(), fingerprintString);
+}
+catch (UnknownPublicKeyException)
 {
     Console.WriteLine("[-] Public key for this fingerprint was not found in the key store. " +
                       "You need to find the appropriate key and add it to the key store.");

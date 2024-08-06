@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\HarpoS7.PublicKeys\HarpoS7.PublicKeys.csproj" />
       <ProjectReference Include="..\HarpoS7\HarpoS7.csproj" />
     </ItemGroup>
 
