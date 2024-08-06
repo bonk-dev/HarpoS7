@@ -224,8 +224,8 @@ if (read <= 0)
 }
 
 // an approximation of the return value field (should be all 0x00).
-// I might included the integrity id field or the unknown field by accident;
-// these should be all 0x00 anyways.
+// I might have included the integrity id field or the unknown field by accident;
+// these should be all 0x00 anyway.
 const int returnValueOffset = 0x15;
 const int returnValueLength = 7;
 for (var i = returnValueOffset; i < returnValueOffset + returnValueLength; ++i)

@@ -122,17 +122,13 @@ public static class LegacyAuthenticationScheme
 
             const int encryptedChallengeLength = 16;
             Span<byte> blockCiphertext = stackalloc byte[encryptedChallengeLength];
-
-            // Might not be CFB, because the orig. implementation does not seem to perform any chaining
-            // but what matters is that we need to first AES-Cipher the IV, then XOR the challenge with the ciphertext
-            // and that is exactly what the CFB mode does
-            aes.EncryptCfb(
-                challengeBuffer,
+            
+            aes.EncryptEcb(
                 aesIv,
                 blockCiphertext,
-                PaddingMode.Zeros,
-                feedbackSizeInBits: 128
+                PaddingMode.Zeros
             );
+            blockCiphertext.Xor(challengeBuffer);
 
             blockCiphertext.CopyTo(encryptedBlobData[offset..]);
             offset += blockCiphertext.Length;
@@ -149,13 +145,13 @@ public static class LegacyAuthenticationScheme
             #region Key2 encryption
 
             // Encrypt key2
-            aes.EncryptCfb(
-                key2[..(aes.BlockSize / 8)], 
+            aes.EncryptEcb( 
                 aesIv, 
                 blockCiphertext,
-                PaddingMode.Zeros, 
-                feedbackSizeInBits: 128
+                PaddingMode.Zeros
             );
+            blockCiphertext.Xor(key2[..(aes.BlockSize / 8)]);
+            
             blockCiphertext.CopyTo(encryptedBlobData[offset..]);
             offset += blockCiphertext.Length;
             
@@ -178,13 +174,12 @@ public static class LegacyAuthenticationScheme
             // This is done because the AES block size is 16 bytes and not 24 bytes
             // If the original implementation actually used AES-CFB, we would be able to just EncryptCfb
             // the entire key2 at once, but they are rotating the IV instead 
-            aes.EncryptCfb(
-                challengeBuffer,
+            aes.EncryptEcb(
                 aesIv,
                 blockCiphertext,
-                PaddingMode.Zeros,
-                feedbackSizeInBits: 128
+                PaddingMode.Zeros
             );
+            blockCiphertext.Xor(challengeBuffer);
             
             blockCiphertext[..key2LeftOverLength].CopyTo(encryptedBlobData[offset..]);
             offset += key2LeftOverLength;
