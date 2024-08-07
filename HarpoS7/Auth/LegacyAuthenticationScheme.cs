@@ -65,13 +65,16 @@ public static class LegacyAuthenticationScheme
         
         Span<byte> key1 = stackalloc byte[24];
         key1.FillWithCryptoRandomBytes();
+        
+        Span<byte> key2 = stackalloc byte[24];
+        key2.FillWithCryptoRandomBytes();
 
         #region Metadata
 
         var offset = BlobMetadataWriter.WriteMetadata(
             encryptedBlobData, 
             publicKey, 
-            key1, 
+            key2, 
             publicKeyFamily
         );
 
@@ -96,9 +99,6 @@ public static class LegacyAuthenticationScheme
         #endregion
 
         #region Key generation
-        
-        Span<byte> key2 = stackalloc byte[24];
-        key2.FillWithCryptoRandomBytes();
 
         // Generates 3, 128-bit keys
         Span<byte> transform2Buffer = stackalloc byte[Transform2.DestinationSize];
