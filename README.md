@@ -20,6 +20,7 @@ for end users.
 - Supports legitimation (password authorization) - requires testing
 
 ### Tested on
+- S7-1200 (1214C DC/DC/DC, 214-1AG40-0XB0)
 - S7-PLCSIM V16 (PLC: S7-1200)
 - S7-PLCSIM V18 (PLC: S7-1500)
 
