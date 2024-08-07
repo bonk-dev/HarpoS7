@@ -32,12 +32,12 @@ This project provides a hands-on demonstration of how to integrate HarpoS7 into 
 the example code and comments to fully understand how to use the library.
 
 ### Public keys
-If you are not using the S7-1200 provided by PLCSIM V16, you must extract the corresponding public keys used
-by your selected PLC.
+Since 1.1.0 the default public keys are integrated into the library.
 
-You can use the [HarpoS7.KeyDumper.Cli](HarpoS7.KeyDumper.Cli) utility to dump public keys from a TIA Portal installation.
-
-_TODO: Add a guide_
+If you want to use a public key, you can implement your own 
+[IPublicKeyStore](HarpoS7.PublicKeys/Interfaces/IPublicKeyStore.cs)
+or pass in a raw public key to the [Authenticate](HarpoS7/Auth/LegacyAuthenticationScheme.cs) 
+function directly.
 
 ### Legacy auth sample
 In order to authenticate a legacy session (challenge-based):
