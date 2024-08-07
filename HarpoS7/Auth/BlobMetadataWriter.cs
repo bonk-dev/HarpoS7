@@ -22,6 +22,7 @@ internal static class BlobMetadataWriter
         var publicKeyLength = keyFamily switch
         {
             EPublicKeyFamily.Family0 => CommonConstants.PublicKeyLengthFamilyZero,
+            EPublicKeyFamily.Family1 => CommonConstants.PublicKeyLengthFamilyZero,
             EPublicKeyFamily.Family3 => CommonConstants.PublicKeyLengthFamilyThree,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
@@ -69,6 +70,7 @@ internal static class BlobMetadataWriter
         keyFamily switch
         {
             EPublicKeyFamily.Family0 => CommonConstants.EncryptedBlobLengthFamilyZero,
+            EPublicKeyFamily.Family1 => CommonConstants.EncryptedBlobLengthFamilyZero,
             EPublicKeyFamily.Family3 => CommonConstants.EncryptedBlobLengthFamilyThree,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
@@ -83,6 +85,7 @@ internal static class BlobMetadataWriter
         keyFamily switch
         {
             EPublicKeyFamily.Family0 => 0x1,
+            EPublicKeyFamily.Family1 => 0x101,
             EPublicKeyFamily.Family3 => 0x301,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
@@ -97,6 +100,7 @@ internal static class BlobMetadataWriter
         keyFamily switch
         {
             EPublicKeyFamily.Family0 => 0x10,
+            EPublicKeyFamily.Family1 => 0x110,
             EPublicKeyFamily.Family3 => 0x310,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };

@@ -28,7 +28,8 @@ public static class LegacyAuthenticationScheme
         switch (publicKeyFamily)
         {
             case EPublicKeyFamily.Family0:
-                AuthenticateFamilyZero(encryptedBlobData, sessionKey, challenge, publicKey);
+            case EPublicKeyFamily.Family1:
+                AuthenticateFamilyZero(encryptedBlobData, sessionKey, challenge, publicKey, publicKeyFamily);
                 break;
             case EPublicKeyFamily.Family3:
                 AuthenticateFamilyThree(encryptedBlobData, sessionKey, challenge, publicKey);
@@ -42,8 +43,17 @@ public static class LegacyAuthenticationScheme
         Span<byte> encryptedBlobData,
         Span<byte> sessionKey,
         ReadOnlySpan<byte> challenge,
-        ReadOnlySpan<byte> publicKey)
+        ReadOnlySpan<byte> publicKey,
+        EPublicKeyFamily publicKeyFamily)
     {
+        if (publicKeyFamily != EPublicKeyFamily.Family0 && publicKeyFamily != EPublicKeyFamily.Family1)
+        {
+            throw new ArgumentException(
+                "This function can be used only with family0 and family1 keys", 
+                nameof(publicKeyFamily)
+            );
+        }
+        
         if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthFamilyZero)
         {
             throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthFamilyZero} bytes long",
@@ -62,7 +72,7 @@ public static class LegacyAuthenticationScheme
             encryptedBlobData, 
             publicKey, 
             key1, 
-            EPublicKeyFamily.Family0
+            publicKeyFamily
         );
 
         #endregion
