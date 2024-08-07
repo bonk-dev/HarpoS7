@@ -110,9 +110,9 @@ var fingerprintValueOffset = family3PacketFingerprintLengthOffset + vlqLength;
 var fingerprintStringBytes = readBuffer.AsMemory(fingerprintValueOffset, (int)fingerprintLength);
 var fingerprintString = Encoding.UTF8.GetString(fingerprintStringBytes.Span);
 
-if (!fingerprintString.StartsWith("03:") && !fingerprintString.StartsWith("00:"))
+if (!fingerprintString.StartsWith("03:") && !fingerprintString.StartsWith("00:") && !fingerprintString.StartsWith("01:"))
 {
-    Console.WriteLine("[?] Fingerprint does not start with 03:, checking family0 offset...");
+    Console.WriteLine("[?] Fingerprint does not start with 03:, checking family0/1 offset...");
     
     fingerprintLength = Vlq.DecodeAsVlq32(readBuffer.AsSpan(family0PacketFingerprintLengthOffset, 5), out vlqLength);
     fingerprintValueOffset = family0PacketFingerprintLengthOffset + vlqLength;
@@ -120,14 +120,14 @@ if (!fingerprintString.StartsWith("03:") && !fingerprintString.StartsWith("00:")
     fingerprintStringBytes = readBuffer.AsMemory(fingerprintValueOffset, (int)fingerprintLength);
     fingerprintString = Encoding.UTF8.GetString(fingerprintStringBytes.Span);
 
-    if (!fingerprintString.StartsWith("03:") && !fingerprintString.StartsWith("00:"))
+    if (!fingerprintString.StartsWith("03:") && !fingerprintString.StartsWith("00:") && !fingerprintString.StartsWith("01:"))
     {
         Console.WriteLine(Convert.ToHexString(fingerprintStringBytes.ToArray()));
         Console.WriteLine("[-] Fingerprint does not start with 03: nor with 00:. Exiting");
         return;
     }
 
-    Console.WriteLine("[+] Family0 fingerprint found");
+    Console.WriteLine("[+] Family0/1 fingerprint found");
 }
 
 // again, you would normally deserialize the response packet
@@ -199,13 +199,19 @@ var setMultiVarsRequest = new SetMultiVarsRequest(
 // send request
 Console.WriteLine("Sending a set multi vars request");
 
-if (publicKeyFamily == EPublicKeyFamily.Family0)
+switch (publicKeyFamily)
 {
-    setMultiVarsRequest.WriteFamily0(stream);
-}
-else
-{
-    setMultiVarsRequest.WriteFamily3(stream);
+    case EPublicKeyFamily.Family0:
+        setMultiVarsRequest.WriteFamily0(stream);
+        break;
+    case EPublicKeyFamily.Family1:
+        setMultiVarsRequest.WriteFamily1(stream);
+        break;
+    case EPublicKeyFamily.Family3:
+        setMultiVarsRequest.WriteFamily3(stream);
+        break;
+    default:
+        throw new Exception("setMultiVarsRequest: Unsupported public key family");
 }
 
 var tokenSource = new CancellationTokenSource();

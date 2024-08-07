@@ -25,7 +25,7 @@ public static class Helpers
 
     public static void ParseAndReverseBytes(string fingerprint, Span<byte> destination)
     {
-        if (!fingerprint.StartsWith("03:") && !fingerprint.StartsWith("00:"))
+        if (!fingerprint.StartsWith("03:") && !fingerprint.StartsWith("00:") && !fingerprint.StartsWith("01:"))
         {
             throw new Exception("Invalid fingerprint");
         }
