@@ -103,11 +103,7 @@ public static class LegitimateScheme
         WriteFragmentBeefMetadata(blobDataDestination[ivChallengeMetadataOffset..], 0, 0x40);
 
         Span<byte> iv = stackalloc byte[CommonConstants.AesIvLength];
-        #if DEBUG
-        iv.Fill(0xCC);
-        #else
         iv.FillWithCryptoRandomBytes();
-        #endif
 
         // Copy the IV
         const int ivOffset = 0xAC;

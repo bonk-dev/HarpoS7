@@ -246,14 +246,9 @@ public static class LegacyAuthenticationScheme
         // 1. Generate two random 24 byte keys
         Span<byte> key1 = stackalloc byte[24];
         Span<byte> key2 = stackalloc byte[24];
-
-#if DEBUG
-        key1.Fill(0x11);
-        key2.Fill(0x22);
-#else
-        RandomNumberGenerator.Fill(key1);
-        RandomNumberGenerator.Fill(key2);
-#endif
+        
+        key1.FillWithCryptoRandomBytes();
+        key2.FillWithCryptoRandomBytes();
 
         // 2. Derive the challenge encryption key
         Span<byte> challengeKey = stackalloc byte[CommonConstants.AesKeyLengthInBytes];
@@ -261,12 +256,7 @@ public static class LegacyAuthenticationScheme
 
         // 3. Generate IV for challenge encryption
         Span<byte> ivBuffer = stackalloc byte[CommonConstants.AesIvLength];
-
-#if DEBUG
-        ivBuffer.Fill(0xCC);
-#else
-        RandomNumberGenerator.Fill(ivBuffer);
-#endif
+        ivBuffer.FillWithCryptoRandomBytes();
 
         // 4. Write metadata
         int blobIndex = BlobMetadataWriter.WriteMetadata(encryptedBlobData, publicKey, key1, EPublicKeyFamily.Family3);
