@@ -34,7 +34,7 @@ the example code and comments to fully understand how to use the library.
 ### Public keys
 Since 1.1.0 the default public keys are integrated into the library.
 
-If you want to use a public key, you can implement your own 
+If you want to use a custom public key, you can implement your own 
 [IPublicKeyStore](HarpoS7.PublicKeys/Interfaces/IPublicKeyStore.cs)
 or pass in a raw public key to the [Authenticate](HarpoS7/Auth/LegacyAuthenticationScheme.cs) 
 function directly.
