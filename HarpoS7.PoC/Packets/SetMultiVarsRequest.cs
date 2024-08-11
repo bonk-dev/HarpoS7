@@ -8,7 +8,7 @@ public class SetMultiVarsRequest
     private readonly byte[] _symmetricKeyIdVlq;
     private readonly byte[] _blobData;
 
-    private static readonly byte[] Family0Data =
+    private static readonly byte[] S71500Data =
     [
         0x03, 0x00, 0x01, 0x86, 0x02, 0xF0, 0x80, 0x72, 0x02, 0x01, 0x77, 0x31,
 	    0x00, 0x00, 0x05, 0x42, 0x00, 0x00, 0x00, 0x02, 0x70, 0x00, 0x10, 0x3D,
@@ -45,7 +45,7 @@ public class SetMultiVarsRequest
 	    0x00, 0x00, 0x72, 0x02, 0x00, 0x00
     ];
 
-    private static readonly byte[] Family1Data =
+    private static readonly byte[] S71200Data =
     [
         0x03, 0x00, 0x01, 0x8C, 0x02, 0xF0, 0x80, 0x72, 0x02, 0x01, 0x7D, 0x31,
 	    0x00, 0x00, 0x05, 0x42, 0x00, 0x00, 0x00, 0x02, 0x70, 0x40, 0x00, 0x00,
@@ -82,7 +82,7 @@ public class SetMultiVarsRequest
 	    0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0x02, 0x00, 0x00
     ];
 
-    private static readonly byte[] Family3Data =
+    private static readonly byte[] PlcSimData =
     [
         0x03, 0x00, 0x01, 0xB1, 0x02, 0xF0, 0x80, 0x72, 0x02, 0x01, 0xA2, 0x31,
 	    0x00, 0x00, 0x05, 0x42, 0x00, 0x00, 0x00, 0x02, 0x70, 0x40, 0x00, 0x00,
@@ -141,14 +141,14 @@ public class SetMultiVarsRequest
         _blobData = blobData.ToArray();
     }
     
-    public void WriteFamily0(Stream stream)
+    public void WriteS71500(Stream stream)
     {
         const int publicKeyIdOffset = 0x40;
         const int symmetricKeyIdOffset = 0x60;
         const int encryptedKeyBlobOffset = 0x7D;
 
-        Span<byte> data = stackalloc byte[Family0Data.Length];
-        Family0Data.CopyTo(data);
+        Span<byte> data = stackalloc byte[S71500Data.Length];
+        S71500Data.CopyTo(data);
         
         _publicKeyIdVlq.CopyTo(data[publicKeyIdOffset..]);
         _symmetricKeyIdVlq.CopyTo(data[symmetricKeyIdOffset..]);
@@ -157,14 +157,14 @@ public class SetMultiVarsRequest
         stream.Write(data);
     }
     
-    public void WriteFamily1(Stream stream)
+    public void WriteS71200(Stream stream)
     {
         const int publicKeyIdOffset = 0x40;
         const int symmetricKeyIdOffset = 0x61;
         const int encryptedKeyBlobOffset = 0x7E;
 
-        Span<byte> data = stackalloc byte[Family1Data.Length];
-        Family1Data.CopyTo(data);
+        Span<byte> data = stackalloc byte[S71200Data.Length];
+        S71200Data.CopyTo(data);
         
         _publicKeyIdVlq.CopyTo(data[publicKeyIdOffset..]);
         _symmetricKeyIdVlq.CopyTo(data[symmetricKeyIdOffset..]);
@@ -173,14 +173,14 @@ public class SetMultiVarsRequest
         stream.Write(data);
     }
     
-    public void WriteFamily3(Stream stream)
+    public void WritePlcSim(Stream stream)
     {
         const int publicKeyIdOffset = 0x42;
         const int symmetricKeyIdOffset = publicKeyIdOffset + 33;
         const int encryptedKeyBlobOffset = 0x80;
 
-        Span<byte> data = stackalloc byte[Family3Data.Length];
-        Family3Data.CopyTo(data);
+        Span<byte> data = stackalloc byte[PlcSimData.Length];
+        PlcSimData.CopyTo(data);
         
         _publicKeyIdVlq.CopyTo(data[publicKeyIdOffset..]);
         _symmetricKeyIdVlq.CopyTo(data[symmetricKeyIdOffset..]);

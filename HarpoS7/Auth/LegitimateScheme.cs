@@ -15,8 +15,8 @@ public static class LegitimateScheme
     private const uint DeadBeefMagic = 0xDEADBEEF;
 
     private const int BlobLengthOffset = 68;
-    public const int OutputBlobDataLengthFamily0 = CommonConstants.EncryptedBlobLengthFamilyZero + BlobLengthOffset;
-    public const int OutputBlobDataLengthFamily3 = CommonConstants.EncryptedBlobLengthFamilyThree + BlobLengthOffset;
+    public const int OutputBlobDataLengthRealPlc = CommonConstants.EncryptedBlobLengthRealPlc + BlobLengthOffset;
+    public const int OutputBlobDataLengthPlcSim = CommonConstants.EncryptedBlobLengthPlcSim + BlobLengthOffset;
     public const int ChallengeLength = 20;
 
     /// <summary>
@@ -28,7 +28,7 @@ public static class LegitimateScheme
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="password">The password</param>
     /// <exception cref="ArgumentException"></exception>
-    public static void SolveLegitimateChallengeFamily3(
+    public static void SolveLegitimateChallengePlcSim(
         Span<byte> blobDataDestination,
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey,
@@ -42,7 +42,7 @@ public static class LegitimateScheme
         Span<byte> hash = stackalloc byte[SHA1.HashSizeInBytes];
         _ = SHA1.HashData(passBytes, hash);
         
-        SolveLegitimateChallengeFamily3(
+        SolveLegitimateChallengePlcSim(
             blobDataDestination, 
             challenge, 
             publicKey,
@@ -59,16 +59,16 @@ public static class LegitimateScheme
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="passwordHash">SHA-1 hash of the PLC password</param>
     /// <exception cref="ArgumentException"></exception>
-    public static void SolveLegitimateChallengeFamily3(
+    public static void SolveLegitimateChallengePlcSim(
         Span<byte> blobDataDestination, 
         ReadOnlySpan<byte> challenge, 
         ReadOnlySpan<byte> publicKey,
         ReadOnlySpan<byte> sessionKey,
         ReadOnlySpan<byte> passwordHash)
     {
-        if (blobDataDestination.Length < OutputBlobDataLength)
+        if (blobDataDestination.Length < OutputBlobDataLengthPlcSim)
         {
-            throw new ArgumentException($"BlobDataDestination must be at least {OutputBlobDataLength} bytes long",
+            throw new ArgumentException($"BlobDataDestination must be at least {OutputBlobDataLengthPlcSim} bytes long",
                 nameof(blobDataDestination));
         }
 

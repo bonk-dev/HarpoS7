@@ -8,15 +8,15 @@ public enum EPublicKeyFamily
     /// <summary>
     /// Used by S7-1500s
     /// </summary>
-    Family0 = 0x00,
+    S71500 = 0x00,
     
     /// <summary>
     /// Used by S7-1200s
     /// </summary>
-    Family1 = 0x01,
+    S71200 = 0x01,
     
     /// <summary>
     /// Used by PLCSIMs
     /// </summary>
-    Family3 = 0x03
+    PlcSim = 0x03
 }

@@ -10,9 +10,9 @@ public class DefaultPublicKeyStore : IPublicKeyStore
     public int GetPublicKeyLength(string variableNameFingerprint) =>
         GetFamilyType(variableNameFingerprint) switch
         {
-            "00" => Constants.PublicKeyLengthFamilyZero,
-            "01" => Constants.PublicKeyLengthFamilyZero,
-            "03" => Constants.PublicKeyLengthFamilyThree,
+            "00" => Constants.PublicKeyLengthRealPlc,
+            "01" => Constants.PublicKeyLengthRealPlc,
+            "03" => Constants.PublicKeyLengthPlcSim,
             _ => throw new ArgumentException($"Unsupported public key family ({GetFamilyType(variableNameFingerprint)})")
         };
 

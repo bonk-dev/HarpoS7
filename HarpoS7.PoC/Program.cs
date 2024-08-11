@@ -100,12 +100,12 @@ await stream.WriteAsync(emptyDtData);
 // read the public key fingerprint
 // the string length is serialized as a VLQ-encoded number
 
-const int family3PacketFingerprintLengthOffset = 0x37;
-const int family0PacketFingerprintLengthOffset = 0x2F;
+const int plcSimPacketFingerprintLengthOffset = 0x37;
+const int realPlcPacketFingerprintLengthOffset = 0x2F;
 
 // max length of a 32-bit VLQ number is 5 (4+1) bytes
-var fingerprintLength = Vlq.DecodeAsVlq32(readBuffer.AsSpan(family3PacketFingerprintLengthOffset, 5), out var vlqLength);
-var fingerprintValueOffset = family3PacketFingerprintLengthOffset + vlqLength;
+var fingerprintLength = Vlq.DecodeAsVlq32(readBuffer.AsSpan(plcSimPacketFingerprintLengthOffset, 5), out var vlqLength);
+var fingerprintValueOffset = plcSimPacketFingerprintLengthOffset + vlqLength;
 
 var fingerprintStringBytes = readBuffer.AsMemory(fingerprintValueOffset, (int)fingerprintLength);
 var fingerprintString = Encoding.UTF8.GetString(fingerprintStringBytes.Span);
@@ -114,8 +114,8 @@ if (!fingerprintString.StartsWith("03:") && !fingerprintString.StartsWith("00:")
 {
     Console.WriteLine("[?] Fingerprint does not start with 03:, checking family0/1 offset...");
     
-    fingerprintLength = Vlq.DecodeAsVlq32(readBuffer.AsSpan(family0PacketFingerprintLengthOffset, 5), out vlqLength);
-    fingerprintValueOffset = family0PacketFingerprintLengthOffset + vlqLength;
+    fingerprintLength = Vlq.DecodeAsVlq32(readBuffer.AsSpan(realPlcPacketFingerprintLengthOffset, 5), out vlqLength);
+    fingerprintValueOffset = realPlcPacketFingerprintLengthOffset + vlqLength;
 
     fingerprintStringBytes = readBuffer.AsMemory(fingerprintValueOffset, (int)fingerprintLength);
     fingerprintString = Encoding.UTF8.GetString(fingerprintStringBytes.Span);
@@ -168,7 +168,7 @@ Console.WriteLine("[+] Public key found");
 
 // create buffers
 var sessionKey = new byte[Constants.SessionKeyLength];
-var keyBlob = new byte[fingerprintString.StartsWith("03:") ? CommonConstants.EncryptedBlobLengthFamilyThree : CommonConstants.EncryptedBlobLengthFamilyZero];
+var keyBlob = new byte[fingerprintString.StartsWith("03:") ? CommonConstants.EncryptedBlobLengthPlcSim : CommonConstants.EncryptedBlobLengthRealPlc];
 
 Console.WriteLine("Doing the encryption...");
 
@@ -201,14 +201,14 @@ Console.WriteLine("Sending a set multi vars request");
 
 switch (publicKeyFamily)
 {
-    case EPublicKeyFamily.Family0:
-        setMultiVarsRequest.WriteFamily0(stream);
+    case EPublicKeyFamily.S71500:
+        setMultiVarsRequest.WriteS71500(stream);
         break;
-    case EPublicKeyFamily.Family1:
-        setMultiVarsRequest.WriteFamily1(stream);
+    case EPublicKeyFamily.S71200:
+        setMultiVarsRequest.WriteS71200(stream);
         break;
-    case EPublicKeyFamily.Family3:
-        setMultiVarsRequest.WriteFamily3(stream);
+    case EPublicKeyFamily.PlcSim:
+        setMultiVarsRequest.WritePlcSim(stream);
         break;
     default:
         throw new Exception("setMultiVarsRequest: Unsupported public key family");

@@ -27,26 +27,26 @@ public static class LegacyAuthenticationScheme
     {
         switch (publicKeyFamily)
         {
-            case EPublicKeyFamily.Family0:
-            case EPublicKeyFamily.Family1:
-                AuthenticateFamilyZero(encryptedBlobData, sessionKey, challenge, publicKey, publicKeyFamily);
+            case EPublicKeyFamily.S71500:
+            case EPublicKeyFamily.S71200:
+                AuthenticateRealPlc(encryptedBlobData, sessionKey, challenge, publicKey, publicKeyFamily);
                 break;
-            case EPublicKeyFamily.Family3:
-                AuthenticateFamilyThree(encryptedBlobData, sessionKey, challenge, publicKey);
+            case EPublicKeyFamily.PlcSim:
+                AuthenticatePlcSim(encryptedBlobData, sessionKey, challenge, publicKey);
                 break;
             default:
                 throw new ArgumentException("Unsupported key family", nameof(publicKeyFamily));
         }
     }
     
-    public static void AuthenticateFamilyZero(
+    public static void AuthenticateRealPlc(
         Span<byte> encryptedBlobData,
         Span<byte> sessionKey,
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey,
         EPublicKeyFamily publicKeyFamily)
     {
-        if (publicKeyFamily != EPublicKeyFamily.Family0 && publicKeyFamily != EPublicKeyFamily.Family1)
+        if (publicKeyFamily != EPublicKeyFamily.S71500 && publicKeyFamily != EPublicKeyFamily.S71200)
         {
             throw new ArgumentException(
                 "This function can be used only with family0 and family1 keys", 
@@ -54,9 +54,9 @@ public static class LegacyAuthenticationScheme
             );
         }
         
-        if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthFamilyZero)
+        if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthRealPlc)
         {
-            throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthFamilyZero} bytes long",
+            throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthRealPlc} bytes long",
                 nameof(encryptedBlobData));
         }
 
@@ -230,16 +230,16 @@ public static class LegacyAuthenticationScheme
         KeyUtilities.DeriveSessionKey(sessionKey, key1, challenge);
     }
 
-    public static void AuthenticateFamilyThree(
+    public static void AuthenticatePlcSim(
         Span<byte> encryptedBlobData,
         Span<byte> sessionKey,
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey)
     {
         // so i dont forget - sessionkey, the one for calculating packet digests, is calculated using 0x11 key
-        if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthFamilyThree)
+        if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthPlcSim)
         {
-            throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthFamilyThree} bytes long",
+            throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthPlcSim} bytes long",
                 nameof(encryptedBlobData));
         }
 
@@ -259,7 +259,7 @@ public static class LegacyAuthenticationScheme
         ivBuffer.FillWithCryptoRandomBytes();
 
         // 4. Write metadata
-        int blobIndex = BlobMetadataWriter.WriteMetadata(encryptedBlobData, publicKey, key1, EPublicKeyFamily.Family3);
+        int blobIndex = BlobMetadataWriter.WriteMetadata(encryptedBlobData, publicKey, key1, EPublicKeyFamily.PlcSim);
 
         // 5. Generate and encrypt seed
         HarpoSeedUtilities.GenerateEncryptedSeed(

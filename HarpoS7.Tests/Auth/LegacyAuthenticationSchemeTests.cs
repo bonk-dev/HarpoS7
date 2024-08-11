@@ -38,7 +38,7 @@ public class LegacyAuthenticationSchemeTests
             0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD,
             0xDD, 0xDD, 0xDD, 0xDD
         },
-        new byte[CommonConstants.PublicKeyLengthFamilyZero] {
+        new byte[CommonConstants.PublicKeyLengthRealPlc] {
             0x84, 0x56, 0xA2, 0x69, 0x96, 0x12, 0x22, 0x16, 0xC9, 0x21, 0xC5, 0x71,
             0xFF, 0x11, 0xE0, 0xBE, 0xFA, 0xFD, 0xB1, 0xD7, 0x0B, 0x5D, 0x4B, 0xC8,
             0x39, 0x0F, 0x5B, 0x0C, 0xC2, 0x73, 0xEC, 0x14, 0x2A, 0x03, 0xF2, 0xA0,
@@ -46,8 +46,8 @@ public class LegacyAuthenticationSchemeTests
         },
         new byte[] { 0x35, 0x35, 0x2D, 0x2D, 0x25 } // Key1, Key2, Transform6 (2x), IV
     )]
-    [Experimental("familyZero")]
-    public void AuthenticateFamilyZeroTest(
+    [Experimental("RealPlc")]
+    public void AuthenticateRealPlcTest(
         byte[] expectedEncryptedBlobData,
         byte[] expectedSessionKey,
         byte[] challenge,
@@ -57,15 +57,15 @@ public class LegacyAuthenticationSchemeTests
         var origSeq = SpanExtensions.StaticFillSequence;
         SpanExtensions.StaticFillSequence = staticFillSequence;
         
-        var blobData = new byte[CommonConstants.EncryptedBlobLengthFamilyZero];
+        var blobData = new byte[CommonConstants.EncryptedBlobLengthRealPlc];
         var sessionKey = new byte[expectedSessionKey.Length];
         
-        LegacyAuthenticationScheme.AuthenticateFamilyZero(
+        LegacyAuthenticationScheme.AuthenticateRealPlc(
             blobData, 
             sessionKey.AsSpan(),
             challenge.AsSpan(),
             publicKey.AsSpan(),
-            EPublicKeyFamily.Family0
+            EPublicKeyFamily.S71500
         );
         
         Assert.Multiple(() =>
@@ -117,7 +117,7 @@ public class LegacyAuthenticationSchemeTests
             0x2E, 0x68, 0x0A, 0xDF, 0xC4, 0x4B, 0x16, 0x34,
             0x68, 0xE4, 0x27, 0x36
         },
-        new byte[CommonConstants.PublicKeyLengthFamilyZero] {
+        new byte[CommonConstants.PublicKeyLengthRealPlc] {
             0xE0, 0xE1, 0xF0, 0x4A, 0x5C, 0xA3, 0xF9, 0x01,
             0x48, 0x17, 0x86, 0x89, 0xBD, 0x0C, 0x93, 0x0A,
             0xB9, 0xDB, 0x86, 0x7B, 0x4F, 0x0A, 0xB1, 0x09,
@@ -137,15 +137,15 @@ public class LegacyAuthenticationSchemeTests
         var origSeq = SpanExtensions.StaticFillSequence;
         SpanExtensions.StaticFillSequence = staticFillSequence;
         
-        var blobData = new byte[CommonConstants.EncryptedBlobLengthFamilyZero];
+        var blobData = new byte[CommonConstants.EncryptedBlobLengthRealPlc];
         var sessionKey = new byte[expectedSessionKey.Length];
         
-        LegacyAuthenticationScheme.AuthenticateFamilyZero(
+        LegacyAuthenticationScheme.AuthenticateRealPlc(
             blobData, 
             sessionKey.AsSpan(),
             challenge.AsSpan(),
             publicKey.AsSpan(),
-            EPublicKeyFamily.Family1
+            EPublicKeyFamily.S71200
         );
         
         Assert.Multiple(() =>

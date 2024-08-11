@@ -21,9 +21,9 @@ internal static class BlobMetadataWriter
     {
         var publicKeyLength = keyFamily switch
         {
-            EPublicKeyFamily.Family0 => CommonConstants.PublicKeyLengthFamilyZero,
-            EPublicKeyFamily.Family1 => CommonConstants.PublicKeyLengthFamilyZero,
-            EPublicKeyFamily.Family3 => CommonConstants.PublicKeyLengthFamilyThree,
+            EPublicKeyFamily.S71500 => CommonConstants.PublicKeyLengthRealPlc,
+            EPublicKeyFamily.S71200 => CommonConstants.PublicKeyLengthRealPlc,
+            EPublicKeyFamily.PlcSim => CommonConstants.PublicKeyLengthPlcSim,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
 
@@ -69,9 +69,9 @@ internal static class BlobMetadataWriter
     public static int GetBlobLength(EPublicKeyFamily keyFamily) =>
         keyFamily switch
         {
-            EPublicKeyFamily.Family0 => CommonConstants.EncryptedBlobLengthFamilyZero,
-            EPublicKeyFamily.Family1 => CommonConstants.EncryptedBlobLengthFamilyZero,
-            EPublicKeyFamily.Family3 => CommonConstants.EncryptedBlobLengthFamilyThree,
+            EPublicKeyFamily.S71500 => CommonConstants.EncryptedBlobLengthRealPlc,
+            EPublicKeyFamily.S71200 => CommonConstants.EncryptedBlobLengthRealPlc,
+            EPublicKeyFamily.PlcSim => CommonConstants.EncryptedBlobLengthPlcSim,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
     
@@ -84,9 +84,9 @@ internal static class BlobMetadataWriter
     public static int GetSymmetricKeyFlags(EPublicKeyFamily keyFamily) =>
         keyFamily switch
         {
-            EPublicKeyFamily.Family0 => 0x1,
-            EPublicKeyFamily.Family1 => 0x101,
-            EPublicKeyFamily.Family3 => 0x301,
+            EPublicKeyFamily.S71500 => 0x1,
+            EPublicKeyFamily.S71200 => 0x101,
+            EPublicKeyFamily.PlcSim => 0x301,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
     
@@ -99,9 +99,9 @@ internal static class BlobMetadataWriter
     public static int GetPublicKeyFlags(EPublicKeyFamily keyFamily) =>
         keyFamily switch
         {
-            EPublicKeyFamily.Family0 => 0x10,
-            EPublicKeyFamily.Family1 => 0x110,
-            EPublicKeyFamily.Family3 => 0x310,
+            EPublicKeyFamily.S71500 => 0x10,
+            EPublicKeyFamily.S71200 => 0x110,
+            EPublicKeyFamily.PlcSim => 0x310,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
 }
