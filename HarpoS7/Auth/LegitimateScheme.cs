@@ -12,9 +12,11 @@ public static class LegitimateScheme
 {
     internal const int BeefSeedMetadataLength = 0x40;
     internal const int BeefFragmentMetadataLength = 0x0C;
-    private const uint DeadBeefMagic = 0xDEADBEEF; 
-    
-    public const int OutputBlobDataLength = 284;
+    private const uint DeadBeefMagic = 0xDEADBEEF;
+
+    private const int BlobLengthOffset = 68;
+    public const int OutputBlobDataLengthFamily0 = CommonConstants.EncryptedBlobLengthFamilyZero + BlobLengthOffset;
+    public const int OutputBlobDataLengthFamily3 = CommonConstants.EncryptedBlobLengthFamilyThree + BlobLengthOffset;
     public const int ChallengeLength = 20;
 
     /// <summary>

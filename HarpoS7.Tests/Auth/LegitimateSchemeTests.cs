@@ -38,7 +38,7 @@ public class LegitimateSchemeTests
             0xEB, 0x54, 0xAF, 0x6D, 0x27, 0xB8, 0x9F, 0x75,
             0xF1, 0x62, 0x44, 0xB7, 0x92, 0x95, 0xC4, 0x0A,
             0xBC, 0x30, 0x6E, 0x39
-        }, new byte[LegitimateScheme.OutputBlobDataLength] {
+        }, new byte[LegitimateScheme.OutputBlobDataLengthFamily3] {
             0xEF, 0xBE, 0xAD, 0xDE, 0xA0, 0x00, 0x00, 0x00,
             0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00,
@@ -83,7 +83,7 @@ public class LegitimateSchemeTests
         byte[] passwordHash,
         byte[] expected)
     {
-        var destination = new byte[LegitimateScheme.OutputBlobDataLength];
+        var destination = new byte[LegitimateScheme.OutputBlobDataLengthFamily3];
         LegitimateScheme.SolveLegitimateChallengeFamily3(
             destination, 
             challenge, 
@@ -118,7 +118,7 @@ public class LegitimateSchemeTests
             0xEF, 0xA6, 0x89, 0x7C, 0xD3, 0x38, 0xF7, 0x0B
         }, 
         "Access123$",
-        new byte[LegitimateScheme.OutputBlobDataLength] {
+        new byte[LegitimateScheme.OutputBlobDataLengthFamily3] {
             0xEF, 0xBE, 0xAD, 0xDE, 0xA0, 0x00, 0x00, 0x00,
             0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00,
@@ -163,7 +163,7 @@ public class LegitimateSchemeTests
         string password,
         byte[] expected)
     {
-        var destination = new byte[LegitimateScheme.OutputBlobDataLength];
+        var destination = new byte[LegitimateScheme.OutputBlobDataLengthFamily3];
         LegitimateScheme.SolveLegitimateChallengeFamily3(
             destination, 
             challenge, 
