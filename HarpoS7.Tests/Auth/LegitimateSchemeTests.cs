@@ -191,6 +191,8 @@ public class LegitimateSchemeTests
             0x28, 0x1C, 0xBF, 0xC8, 0x22, 0xEB, 0xD8, 0x4B,
             0x37, 0x8E, 0xF4, 0x5D, 0xC5, 0xE5, 0x27, 0x8E           
         }, 
+        0xA0,
+        CommonConstants.EncryptedSeedLength,
         new byte[LegitimateScheme.BeefSeedMetadataLength] {
             0xEF, 0xBE, 0xAD, 0xDE, 0xA0, 0x00, 0x00, 0x00,
             0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
@@ -201,10 +203,21 @@ public class LegitimateSchemeTests
             0xD8, 0xB8, 0xF7, 0xCA, 0x01, 0x03, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00
         })]
-    public void WriteSeedBeefMetadata(byte[] publicKey, byte[] symmetricKey, byte[] expected)
+    public void WriteSeedBeefMetadata(
+        byte[] publicKey, 
+        byte[] symmetricKey, 
+        int fragmentLength, 
+        int seedLength, 
+        byte[] expected)
     {
         var destination = new byte[LegitimateScheme.BeefSeedMetadataLength];
-        LegitimateScheme.WriteSeedBeefMetadata(destination, publicKey, symmetricKey);
+        LegitimateScheme.WriteSeedBeefMetadata(
+            destination, 
+            publicKey, 
+            symmetricKey, 
+            fragmentLength, 
+            seedLength
+        );
         
         Assert.That(destination, Is.EqualTo(expected));
     }

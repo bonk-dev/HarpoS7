@@ -90,7 +90,13 @@ public static class LegitimateScheme
         KeyUtilities.DeriveChallengeEncryptionKey(challengeKey, symmetricKey);
 
         // The first metadata is at the beginning
-        WriteSeedBeefMetadata(blobDataDestination, publicKey, symmetricKey);
+        WriteSeedBeefMetadata(
+            blobDataDestination, 
+            publicKey, 
+            symmetricKey, 
+            0xA0, 
+            CommonConstants.EncryptedSeedLength
+        );
         
         const int seedOffset = BeefSeedMetadataLength;
         HarpoSeedUtilities.GenerateEncryptedSeed(
@@ -153,12 +159,14 @@ public static class LegitimateScheme
     internal static void WriteSeedBeefMetadata(
         Span<byte> destination, 
         ReadOnlySpan<byte> publicKey,
-        ReadOnlySpan<byte> symmetricKey)
+        ReadOnlySpan<byte> symmetricKey,
+        int fragmentLength,
+        int seedLength)
     {
         var dwords = destination.AsDwords();
 
         dwords[0] = DeadBeefMagic;
-        dwords[1] = 0xA0; // TODO: Hardcoded length
+        dwords[1] = (uint)fragmentLength;
         dwords[2] = 0x01; // these two are actually hardcoded
         dwords[3] = 0x02;
         destination[0x15] = 0x04;
@@ -173,7 +181,7 @@ public static class LegitimateScheme
         dwords[13] = 769; // symmetric key flags
         dwords[14] = 0; // symmetric key internal flags
 
-        dwords[15] = CommonConstants.EncryptedSeedLength;
+        dwords[15] = (uint)seedLength;
     }
 
     internal static void WriteFragmentBeefMetadata(Span<byte> destination, int index, int length)
