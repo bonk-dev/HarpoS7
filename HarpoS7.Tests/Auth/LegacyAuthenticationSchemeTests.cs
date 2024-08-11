@@ -43,19 +43,19 @@ public class LegacyAuthenticationSchemeTests
             0xFF, 0x11, 0xE0, 0xBE, 0xFA, 0xFD, 0xB1, 0xD7, 0x0B, 0x5D, 0x4B, 0xC8,
             0x39, 0x0F, 0x5B, 0x0C, 0xC2, 0x73, 0xEC, 0x14, 0x2A, 0x03, 0xF2, 0xA0,
             0x4E, 0x6F, 0x15, 0x93
-        }
+        },
+        new byte[] { 0x35, 0x35, 0x2D, 0x2D, 0x25 } // Key1, Key2, Transform6 (2x), IV
     )]
     [Experimental("familyZero")]
     public void AuthenticateFamilyZeroTest(
         byte[] expectedEncryptedBlobData,
         byte[] expectedSessionKey,
         byte[] challenge,
-        byte[] publicKey)
+        byte[] publicKey,
+        byte[] staticFillSequence)
     {
         var origSeq = SpanExtensions.StaticFillSequence;
-        
-        // Key1, Transform6 (2x), IV, Key2
-        SpanExtensions.StaticFillSequence = [0x35, 0x2D, 0x2D, 0x25, 0x35];
+        SpanExtensions.StaticFillSequence = staticFillSequence;
         
         var blobData = new byte[CommonConstants.EncryptedBlobLengthFamilyZero];
         var sessionKey = new byte[expectedSessionKey.Length];
@@ -123,19 +123,19 @@ public class LegacyAuthenticationSchemeTests
             0xB9, 0xDB, 0x86, 0x7B, 0x4F, 0x0A, 0xB1, 0x09,
             0x62, 0x39, 0x59, 0xAA, 0x32, 0x31, 0x6B, 0x78,
             0x80, 0xED, 0x1B, 0x4F, 0x9A, 0x9B, 0x18, 0x9F
-        }
+        },
+        new byte[] { 0x35, 0x35, 0x2D, 0x2D, 0x25 } // Key1, Key2, Transform6 (2x), IV
     )]
     [Experimental("familyOne")]
     public void AuthenticateFamilyOneTest(
         byte[] expectedEncryptedBlobData,
         byte[] expectedSessionKey,
         byte[] challenge,
-        byte[] publicKey)
+        byte[] publicKey,
+        byte[] staticFillSequence)
     {
         var origSeq = SpanExtensions.StaticFillSequence;
-        
-        // Key1, Transform6 (2x), IV, Key2
-        SpanExtensions.StaticFillSequence = [0x35, 0x2D, 0x2D, 0x25, 0x35];
+        SpanExtensions.StaticFillSequence = staticFillSequence;
         
         var blobData = new byte[CommonConstants.EncryptedBlobLengthFamilyZero];
         var sessionKey = new byte[expectedSessionKey.Length];
