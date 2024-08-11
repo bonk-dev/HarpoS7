@@ -28,6 +28,73 @@ public static class LegitimateScheme
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="password">The password</param>
     /// <exception cref="ArgumentException"></exception>
+    public static void SolveLegitimateChallengeRealPlc(
+        Span<byte> blobDataDestination,
+        ReadOnlySpan<byte> challenge,
+        ReadOnlySpan<byte> publicKey,
+        ReadOnlySpan<byte> sessionKey,
+        string password)
+    {
+        var length = Encoding.UTF8.GetByteCount(password);
+        Span<byte> passBytes = stackalloc byte[length];
+        Encoding.UTF8.GetBytes(password, passBytes);
+        
+        Span<byte> hash = stackalloc byte[SHA1.HashSizeInBytes];
+        _ = SHA1.HashData(passBytes, hash);
+        
+        SolveLegitimateChallengeRealPlc(
+            blobDataDestination, 
+            challenge, 
+            publicKey,
+            sessionKey, 
+            hash);
+    }
+
+    /// <summary>
+    /// Solve the legitimation challenge to be able to communicate with PLCs that require a password.
+    /// </summary>
+    /// <param name="blobDataDestination">Blob data output for SetVarSubStreamed</param>
+    /// <param name="challenge">Challenge from GetVarSubStreamed</param>
+    /// <param name="publicKey">Public key required by PLC</param>
+    /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
+    /// <param name="passwordHash">SHA-1 hash of the access password</param>
+    /// <exception cref="ArgumentException"></exception>
+    public static void SolveLegitimateChallengeRealPlc(
+        Span<byte> blobDataDestination,
+        ReadOnlySpan<byte> challenge,
+        ReadOnlySpan<byte> publicKey,
+        ReadOnlySpan<byte> sessionKey,
+        ReadOnlySpan<byte> passwordHash)
+    {
+        if (blobDataDestination.Length < OutputBlobDataLengthPlcSim)
+        {
+            throw new ArgumentException($"BlobDataDestination must be at least {OutputBlobDataLengthPlcSim} bytes long",
+                nameof(blobDataDestination));
+        }
+
+        if (passwordHash.Length < SHA1.HashSizeInBytes)
+        {
+            throw new ArgumentException("Password hash is not a SHA1 (too short)", nameof(passwordHash));
+        }
+
+        if (challenge.Length < ChallengeLength)
+        {
+            throw new ArgumentException($"Challenge must be at least {ChallengeLength} bytes long",
+                nameof(challenge));
+        }
+
+        throw new NotImplementedException("Real PLC (Family0/1) legitimation is not yet implemented");
+    }
+
+    /// <summary>
+    /// Solve the legitimation challenge to be able to communicate with PLCs that require a password.
+    /// </summary>
+    /// <param name="blobDataDestination">Blob data output for SetVarSubStreamed</param>
+    /// <param name="challenge">Challenge from GetVarSubStreamed</param>
+    /// <param name="publicKey">Public key required by PLC</param>
+    /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
+    /// <param name="password">The password</param>
+    /// <exception cref="ArgumentException"></exception>
     public static void SolveLegitimateChallengePlcSim(
         Span<byte> blobDataDestination,
         ReadOnlySpan<byte> challenge,
