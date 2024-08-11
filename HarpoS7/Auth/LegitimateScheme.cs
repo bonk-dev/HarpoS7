@@ -26,7 +26,7 @@ public static class LegitimateScheme
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="password">The password</param>
     /// <exception cref="ArgumentException"></exception>
-    public static void SolveLegitimateChallenge(
+    public static void SolveLegitimateChallengeFamily3(
         Span<byte> blobDataDestination,
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey,
@@ -40,7 +40,7 @@ public static class LegitimateScheme
         Span<byte> hash = stackalloc byte[SHA1.HashSizeInBytes];
         _ = SHA1.HashData(passBytes, hash);
         
-        SolveLegitimateChallenge(
+        SolveLegitimateChallengeFamily3(
             blobDataDestination, 
             challenge, 
             publicKey,
@@ -57,7 +57,7 @@ public static class LegitimateScheme
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="passwordHash">SHA-1 hash of the PLC password</param>
     /// <exception cref="ArgumentException"></exception>
-    public static void SolveLegitimateChallenge(
+    public static void SolveLegitimateChallengeFamily3(
         Span<byte> blobDataDestination, 
         ReadOnlySpan<byte> challenge, 
         ReadOnlySpan<byte> publicKey,

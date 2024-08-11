@@ -76,7 +76,7 @@ public class LegitimateSchemeTests
             0xEF, 0xBE, 0xAD, 0xDE, 0x02, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00
         })]
-    public void SolveLegitimateChallengeHashTest( 
+    public void SolveLegitimateChallengeFamily3HashTest( 
         byte[] challenge, 
         byte[] publicKey,
         byte[] sessionKey,
@@ -84,7 +84,7 @@ public class LegitimateSchemeTests
         byte[] expected)
     {
         var destination = new byte[LegitimateScheme.OutputBlobDataLength];
-        LegitimateScheme.SolveLegitimateChallenge(
+        LegitimateScheme.SolveLegitimateChallengeFamily3(
             destination, 
             challenge, 
             publicKey, 
@@ -94,7 +94,7 @@ public class LegitimateSchemeTests
         Assert.That(destination, Is.EqualTo(expected));
     }
     
-        [Test]
+    [Test]
     [TestCase(
         // TODO: Add test case for random challenge
         new byte[LegitimateScheme.ChallengeLength] {
@@ -156,7 +156,7 @@ public class LegitimateSchemeTests
             0xEF, 0xBE, 0xAD, 0xDE, 0x02, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00
         })]
-    public void SolveLegitimateChallengePasswordStringTest( 
+    public void SolveLegitimateChallengeFamily3PasswordStringTest( 
         byte[] challenge, 
         byte[] publicKey,
         byte[] sessionKey,
@@ -164,7 +164,7 @@ public class LegitimateSchemeTests
         byte[] expected)
     {
         var destination = new byte[LegitimateScheme.OutputBlobDataLength];
-        LegitimateScheme.SolveLegitimateChallenge(
+        LegitimateScheme.SolveLegitimateChallengeFamily3(
             destination, 
             challenge, 
             publicKey, 
