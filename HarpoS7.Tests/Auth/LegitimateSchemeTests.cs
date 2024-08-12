@@ -58,14 +58,19 @@ public class LegitimateSchemeTests
             0x4E, 0x78, 0x15, 0xA3, 0x92, 0xE8, 0x68, 0xCA, 0x9D, 0xAD, 0xA9, 0xAA,
             0xBA, 0x2E, 0x60, 0xEB, 0x7E, 0x70, 0xD3, 0x01, 0xEF, 0xBE, 0xAD, 0xDE,
             0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        })]
+        },
+        new byte[] { 0x2D, 0x2D, 0x25 })]
     public void SolveLegitimateChallengeRealPlcHashTest( 
         byte[] challenge, 
         byte[] publicKey,
         byte[] sessionKey,
         byte[] passwordHash,
-        byte[] expected)
+        byte[] expected,
+        byte[] randomFillSequence)
     {
+        var originalSeq = SpanExtensions.StaticFillSequence;
+        SpanExtensions.StaticFillSequence = randomFillSequence;
+        
         var destination = new byte[LegitimateScheme.OutputBlobDataLengthPlcSim];
         LegitimateScheme.SolveLegitimateChallengeRealPlc(
             destination, 
@@ -75,6 +80,8 @@ public class LegitimateSchemeTests
             passwordHash);
         
         Assert.That(destination, Is.EqualTo(expected));
+
+        SpanExtensions.StaticFillSequence = originalSeq;
     }
     
     [Test]
@@ -119,14 +126,19 @@ public class LegitimateSchemeTests
             0x4E, 0x78, 0x15, 0xA3, 0x92, 0xE8, 0x68, 0xCA, 0x9D, 0xAD, 0xA9, 0xAA,
             0xBA, 0x2E, 0x60, 0xEB, 0x7E, 0x70, 0xD3, 0x01, 0xEF, 0xBE, 0xAD, 0xDE,
             0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        })]
+        },
+        new byte[] { 0x2D, 0x2D, 0x25 })]
     public void SolveLegitimateChallengeRealPlcPasswordStringTest( 
         byte[] challenge, 
         byte[] publicKey,
         byte[] sessionKey,
         string password,
-        byte[] expected)
+        byte[] expected,
+        byte[] randomFillSequence)
     {
+        var originalSeq = SpanExtensions.StaticFillSequence;
+        SpanExtensions.StaticFillSequence = randomFillSequence;
+        
         var destination = new byte[LegitimateScheme.OutputBlobDataLengthPlcSim];
         LegitimateScheme.SolveLegitimateChallengeRealPlc(
             destination, 
@@ -136,6 +148,8 @@ public class LegitimateSchemeTests
             password);
         
         Assert.That(destination, Is.EqualTo(expected));
+
+        SpanExtensions.StaticFillSequence = originalSeq;
     }
     
     [Test]
