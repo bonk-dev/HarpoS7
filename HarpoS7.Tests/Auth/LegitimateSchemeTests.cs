@@ -28,6 +28,7 @@ public class LegitimateSchemeTests
             0x62, 0x39, 0x59, 0xAA, 0x32, 0x31, 0x6B, 0x78,
             0x80, 0xED, 0x1B, 0x4F, 0x9A, 0x9B, 0x18, 0x9F
         }, 
+        EPublicKeyFamily.S71200,
         new byte[Constants.SessionKeyLength] {
             0x65, 0xC4, 0xF1, 0x79, 0x98, 0x0A, 0x43, 0xCB, 0x60, 0xE1, 0x19, 0x4B, 0xA5, 0x00, 0xF5, 0xB9,
             0xD0, 0x4F, 0x37, 0x4B, 0x56, 0x37, 0x48, 0x66
@@ -60,10 +61,11 @@ public class LegitimateSchemeTests
             0xBA, 0x2E, 0x60, 0xEB, 0x7E, 0x70, 0xD3, 0x01, 0xEF, 0xBE, 0xAD, 0xDE,
             0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         },
-        new byte[] { 0x2D, 0x2D, 0x25 })]
+        new byte[] { 0x25, 0x2D, 0x2D })]
     public void SolveLegitimateChallengeRealPlcHashTest( 
         byte[] challenge, 
         byte[] publicKey,
+        EPublicKeyFamily keyFamily,
         byte[] sessionKey,
         byte[] passwordHash,
         byte[] expected,
@@ -77,6 +79,7 @@ public class LegitimateSchemeTests
             destination, 
             challenge, 
             publicKey, 
+            keyFamily,
             sessionKey, 
             passwordHash);
         
@@ -100,6 +103,7 @@ public class LegitimateSchemeTests
             0x62, 0x39, 0x59, 0xAA, 0x32, 0x31, 0x6B, 0x78,
             0x80, 0xED, 0x1B, 0x4F, 0x9A, 0x9B, 0x18, 0x9F
         }, 
+        EPublicKeyFamily.S71200,
         new byte[Constants.SessionKeyLength] {
             0x65, 0xC4, 0xF1, 0x79, 0x98, 0x0A, 0x43, 0xCB, 0x60, 0xE1, 0x19, 0x4B, 0xA5, 0x00, 0xF5, 0xB9,
             0xD0, 0x4F, 0x37, 0x4B, 0x56, 0x37, 0x48, 0x66
@@ -128,10 +132,11 @@ public class LegitimateSchemeTests
             0xBA, 0x2E, 0x60, 0xEB, 0x7E, 0x70, 0xD3, 0x01, 0xEF, 0xBE, 0xAD, 0xDE,
             0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         },
-        new byte[] { 0x2D, 0x2D, 0x25 })]
+        new byte[] { 0x25, 0x2D, 0x2D })]
     public void SolveLegitimateChallengeRealPlcPasswordStringTest( 
         byte[] challenge, 
         byte[] publicKey,
+        EPublicKeyFamily keyFamily,
         byte[] sessionKey,
         string password,
         byte[] expected,
@@ -145,6 +150,7 @@ public class LegitimateSchemeTests
             destination, 
             challenge, 
             publicKey, 
+            keyFamily,
             sessionKey, 
             password);
         
@@ -327,13 +333,12 @@ public class LegitimateSchemeTests
             0x69, 0x19, 0x84, 0x33, 0x8E, 0xEC, 0x20, 0x47,
             0x68, 0x1D, 0x95, 0x8D, 0xC5, 0xC5, 0x08, 0x6A
         }, 
+        EPublicKeyFamily.PlcSim,
         new byte[Constants.SymmetricKeyLength] {
             0xA4, 0x3A, 0x36, 0x8E, 0xBD, 0xD2, 0xD2, 0x9A,
             0x28, 0x1C, 0xBF, 0xC8, 0x22, 0xEB, 0xD8, 0x4B,
             0x37, 0x8E, 0xF4, 0x5D, 0xC5, 0xE5, 0x27, 0x8E           
         }, 
-        0xA0,
-        CommonConstants.EncryptedSeedLength,
         new byte[LegitimateScheme.BeefSeedMetadataLength] {
             0xEF, 0xBE, 0xAD, 0xDE, 0xA0, 0x00, 0x00, 0x00,
             0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
@@ -345,19 +350,17 @@ public class LegitimateSchemeTests
             0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00
         })]
     public void WriteSeedBeefMetadata(
-        byte[] publicKey, 
-        byte[] symmetricKey, 
-        int fragmentLength, 
-        int seedLength, 
+        byte[] publicKey,
+        EPublicKeyFamily keyFamily,
+        byte[] symmetricKey,
         byte[] expected)
     {
         var destination = new byte[LegitimateScheme.BeefSeedMetadataLength];
-        LegitimateScheme.WriteSeedBeefMetadata(
+        BlobMetadataWriter.WriteSeedBeefMetadata(
             destination, 
             publicKey, 
-            symmetricKey, 
-            fragmentLength, 
-            seedLength
+            keyFamily,
+            symmetricKey
         );
         
         Assert.That(destination, Is.EqualTo(expected));

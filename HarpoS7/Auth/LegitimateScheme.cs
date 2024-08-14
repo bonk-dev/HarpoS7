@@ -160,12 +160,11 @@ public static class LegitimateScheme
         KeyUtilities.DeriveChallengeEncryptionKey(challengeKey, symmetricKey);
 
         // The first metadata is at the beginning
-        WriteSeedBeefMetadata(
+        BlobMetadataWriter.WriteSeedBeefMetadata(
             blobDataDestination, 
             publicKey, 
-            symmetricKey, 
-            0xA0, 
-            CommonConstants.EncryptedSeedLength
+            EPublicKeyFamily.PlcSim,
+            symmetricKey
         );
         
         const int seedOffset = BeefSeedMetadataLength;
@@ -224,34 +223,6 @@ public static class LegitimateScheme
         // Write last, empty beef fragment
         const int lastFragmentOffset = checksumOffset + 0x10;
         WriteFragmentBeefMetadata(blobDataDestination[lastFragmentOffset..], 2, 0);
-    }
-
-    internal static void WriteSeedBeefMetadata(
-        Span<byte> destination, 
-        ReadOnlySpan<byte> publicKey,
-        ReadOnlySpan<byte> symmetricKey,
-        int fragmentLength,
-        int seedLength)
-    {
-        var dwords = destination.AsDwords();
-
-        dwords[0] = DeadBeefMagic;
-        dwords[1] = (uint)fragmentLength;
-        dwords[2] = 0x01; // these two are actually hardcoded
-        dwords[3] = 0x02;
-        destination[0x15] = 0x04;
-        
-        // public key
-        publicKey.DeriveKeyId(destination[0x1C..]);
-        dwords[9] = 784; // public key flags
-        dwords[10] = 0; // public key internal flags
-        
-        // symmetric key
-        symmetricKey.DeriveKeyId(destination[0x2C..]);
-        dwords[13] = 769; // symmetric key flags
-        dwords[14] = 0; // symmetric key internal flags
-
-        dwords[15] = (uint)seedLength;
     }
 
     internal static void WriteFragmentBeefMetadata(Span<byte> destination, int index, int length)
