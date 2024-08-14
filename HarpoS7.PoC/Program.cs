@@ -251,7 +251,10 @@ for (var i = returnValueOffset; i < returnValueOffset + returnValueLength; ++i)
 	}
 }
 
-Console.WriteLine("[++] Success! Looks like the authentication was successful. Check the packet dump (e.g. in Wireshark) to be sure.");
+Helpers.UseColor(() =>
+{
+    Console.WriteLine("[++] Success! Looks like the authentication was successful. Check the packet dump (e.g. in Wireshark) to be sure.");
+}, ConsoleColor.Green);
 
 if (args.Length <= 1)
 {
@@ -302,7 +305,7 @@ LegitimateScheme.SolveLegitimateChallengeRealPlc(
     accessPassword
 );
 
-Console.WriteLine("Challenge solved");
+Console.WriteLine("[+] Challenge solved");
 Console.WriteLine("Sending the SetVarSubStreamed request...");
 
 var legitSetChallenge = new SetVarSubStreamedRequest(sessionKey, legitBlob);

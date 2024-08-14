@@ -51,4 +51,12 @@ public static class Helpers
             destination[j++] = b;
         } 
     }
+
+    public static void UseColor(Action action, ConsoleColor color)
+    {
+        var original = Console.ForegroundColor;
+        Console.ForegroundColor = color;
+        action();
+        Console.ForegroundColor = original;
+    }
 }
