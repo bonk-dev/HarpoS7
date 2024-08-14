@@ -2,6 +2,7 @@ using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using HarpoS7.Aes;
+using HarpoS7.Family0.Auth;
 using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
 using HarpoS7.Seed;
@@ -11,7 +12,6 @@ namespace HarpoS7.Auth;
 
 public static class LegitimateScheme
 {
-    internal const int BeefSeedMetadataLength = 0x40;
     internal const int BeefFragmentMetadataLength = 0x0C;
     private const uint DeadBeefMagic = 0xDEADBEEF;
 
@@ -167,7 +167,7 @@ public static class LegitimateScheme
             symmetricKey
         );
         
-        const int seedOffset = BeefSeedMetadataLength;
+        const int seedOffset = BlobMetadataWriter.BeefSeedMetadataLength;
         HarpoSeedUtilities.GenerateEncryptedSeed(
             blobDataDestination[seedOffset..], 
             publicKey, 
