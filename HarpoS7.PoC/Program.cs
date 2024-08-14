@@ -5,6 +5,7 @@ using HarpoS7;
 using HarpoS7.Auth;
 using HarpoS7.Extensions;
 using HarpoS7.PoC;
+using HarpoS7.PoC.Models;
 using HarpoS7.PoC.Packets;
 using HarpoS7.PublicKeys.Exceptions;
 using HarpoS7.PublicKeys.Impl;
@@ -335,10 +336,17 @@ catch (IOException)
 var legitResponse = new SetVarSubStreamedResponse(readBuffer.AsSpan()[..read]);
 if (Enum.IsDefined(legitResponse.StatusCode))
 {
-    Helpers.UseColor(() =>
+    if (legitResponse.StatusCode != EStatusCode.InvalidPassword)
     {
-        Console.WriteLine($"[++] Legitimation successful: {Enum.GetName(legitResponse.StatusCode)}. Check Wireshark to be sure"); 
-    }, ConsoleColor.Green);
+        Helpers.UseColor(() =>
+        {
+            Console.WriteLine($"[++] Legitimation successful: {Enum.GetName(legitResponse.StatusCode)}. Check Wireshark to be sure"); 
+        }, ConsoleColor.Green);   
+    }
+    else
+    {
+        Console.WriteLine("[-] Legitimation failed: invalid password (the PLC was happy with the crypto stuff tho)");
+    }
 }
 else
 {
