@@ -112,7 +112,6 @@ public class RealPlcAuthenticator : IDisposable
         
         // Encrypt 16 bytes of challenge
         Span<byte> ciphertextBlock = stackalloc byte[_aes.BlockSize / 8];
-        // challenge.Slice(2, ciphertextBlock.Length).CopyTo(ciphertextBlock);
         
         _aes.EncryptEcb(
             _iv.Span,
