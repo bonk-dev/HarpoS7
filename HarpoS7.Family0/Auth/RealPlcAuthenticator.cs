@@ -26,13 +26,26 @@ public class RealPlcAuthenticator : IDisposable
 
     private int _encryptedBytes;
 
+    public int Key2LeftOverLength => _key2.Length % (_aes.BlockSize / 8);
+
     public RealPlcAuthenticator(
         ReadOnlySpan<byte> key1 = default, 
         ReadOnlySpan<byte> key2 = default)
     {
         _iv = MemoryOwner<byte>.Allocate(16);
         _key1 = MemoryOwner<byte>.Allocate(24);
-        _key2 = MemoryOwner<byte>.Allocate(24);
+
+        if (key2.IsEmpty)
+        {
+            _key2 = MemoryOwner<byte>.Allocate(24);
+            _key2.Span.FillWithCryptoRandomBytes();
+        }
+        else
+        {
+            _key2 = MemoryOwner<byte>.Allocate(key2.Length);
+            key2.CopyTo(_key2.Span);
+        }
+        
         _lookupTable = MemoryOwner<byte>.Allocate(Transform3.DestinationSize);
         _checksum = MemoryOwner<byte>.Allocate(16);
 
