@@ -332,4 +332,15 @@ catch (IOException)
     return;
 }
 
-// TODO: Check response
+var legitResponse = new SetVarSubStreamedResponse(readBuffer.AsSpan()[..read]);
+if (Enum.IsDefined(legitResponse.StatusCode))
+{
+    Helpers.UseColor(() =>
+    {
+        Console.WriteLine($"[++] Legitimation successful: {Enum.GetName(legitResponse.StatusCode)}. Check Wireshark to be sure"); 
+    }, ConsoleColor.Green);
+}
+else
+{
+    Console.WriteLine($"[-] Legitimation failed: {(int)legitResponse.StatusCode}. Please create an issue on GitHub and include a Wireshark dump.");
+}

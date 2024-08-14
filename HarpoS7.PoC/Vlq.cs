@@ -25,6 +25,31 @@ public static class Vlq
         return value;
     }
     
+    public static ulong DecodeAsVlq64(this ReadOnlySpan<byte> bytes, out int length)
+    {
+        ulong value = 0UL;
+
+        int index = 0;
+        byte vlqPartValue;
+
+        do
+        {
+            value <<= 7;
+
+            vlqPartValue = bytes[index++];
+            value |= (byte)(vlqPartValue & 0b0111_1111);
+        } while ((vlqPartValue & 0b1000_0000) != 0 && index < 8);
+
+        if (index >= 8 && bytes[index] != 0)
+        {
+            value <<= 8;
+            value |= bytes[index++];
+        }
+
+        length = index;
+        return value;
+    }
+    
     public static int EncodeAsVlq(this ulong value, Span<byte> destination)
     {
         if (value == 0x00UL)
