@@ -4,7 +4,7 @@ namespace HarpoS7.Utilities.Auth;
 
 public static class BlobMetadataWriter
 {
-    private const int BeefSeedMetadataLength = 0x40;
+    internal const int BeefSeedMetadataLength = 0x40;
     
     /// <summary>
     /// Writes encrypted blob metadata
