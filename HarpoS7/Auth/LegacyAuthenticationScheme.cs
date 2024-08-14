@@ -60,10 +60,10 @@ public static class LegacyAuthenticationScheme
         offset += authenticator.EncryptFullBlocks(encryptedBlobData[offset..], challenge);
         _ = authenticator.EncryptFinalBlock(encryptedBlobData[offset..]);
 
-        Span<byte> key1 = stackalloc byte[24];
-        authenticator.ExtractKey1(key1);
+        Span<byte> key2 = stackalloc byte[24];
+        authenticator.ExtractKey2(key2);
 
-        KeyUtilities.DeriveSessionKey(sessionKey, key1, challenge);
+        KeyUtilities.DeriveSessionKey(sessionKey, key2, challenge);
     }
 
     public static void AuthenticatePlcSim(

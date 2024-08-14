@@ -196,11 +196,11 @@ public class RealPlcAuthenticator : IDisposable
     }
 
     /// <summary>
-    /// Writes the generated key1 to the specified buffer. Key1 is used for the derivation of the session key.
+    /// Writes the generated key2 to the specified buffer. Key2 is used for the derivation of the session key.
     /// </summary>
-    /// <param name="destination">The key1 buffer</param>
-    public void ExtractKey1(Span<byte> destination) => 
-        _key1.Span.CopyTo(destination);
+    /// <param name="destination">The key2 buffer</param>
+    public void ExtractKey2(Span<byte> destination) => 
+        _key2.Span.CopyTo(destination);
 
     private void DeriveKeysAndLookupTable(ReadOnlySpan<byte> t1)
     {
