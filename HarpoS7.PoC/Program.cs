@@ -257,6 +257,11 @@ if (args.Length <= 1)
 {
     return;
 }
+if (publicKeyFamily != EPublicKeyFamily.S71200)
+{
+    Console.WriteLine("[-] Legitimation is currently only supported on S7-1200s");
+    return;
+}
 
 var accessPassword = args[1];
 Console.WriteLine($"Trying to legitimate the session with a password (\"{accessPassword}\")");
@@ -284,3 +289,39 @@ var legitimationChallenge = readBuffer.AsSpan(realPlcLegitimationChallengeOffset
 
 Console.Write("[+] Legitimation challenge: ");
 Helpers.PrintBuffer(legitimationChallenge);
+
+Console.WriteLine("Solving the legitimation challenge...");
+
+var legitBlob = new byte[CommonConstants.EncryptedLegitimationBlobLengthRealPlc]; 
+LegitimateScheme.SolveLegitimateChallengeRealPlc(
+    legitBlob.AsSpan(),
+    legitimationChallenge.AsSpan(),
+    publicKey.AsSpan(),
+    publicKeyFamily,
+    sessionKey.AsSpan(),
+    accessPassword
+);
+
+Console.WriteLine("Challenge solved");
+Console.WriteLine("Sending the SetVarSubStreamed request...");
+
+var legitSetChallenge = new SetVarSubStreamedRequest(sessionKey, legitBlob);
+legitSetChallenge.WriteS71200(stream);
+
+await stream.WriteAsync(emptyDtData);
+
+tokenSource = new CancellationTokenSource();
+tokenSource.CancelAfter(3000);
+Console.WriteLine("Waiting for the response...");
+
+try
+{
+    read = await stream.ReadAsync(readBuffer, tokenSource.Token);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("[-] No response after 3000 ms - legitimation failed");
+    return;
+}
+
+// TODO: Check response
