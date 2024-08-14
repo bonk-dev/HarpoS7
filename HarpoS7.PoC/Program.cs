@@ -4,7 +4,6 @@ using System.Text;
 using HarpoS7;
 using HarpoS7.Auth;
 using HarpoS7.Extensions;
-using HarpoS7.Keys;
 using HarpoS7.PoC;
 using HarpoS7.PoC.Packets;
 using HarpoS7.PublicKeys.Exceptions;
@@ -18,8 +17,9 @@ using HarpoS7.Utilities.Extensions;
 var readBuffer = new byte[1024];
 if (args.Length < 1 || !IPEndPoint.TryParse(args[0], out var endPoint))
 {
-    Console.WriteLine("Usage: HarpoS7.PoC ip_address:port");
-    Console.WriteLine("Example: HarpoS7.PoC 192.168.1.10:102");
+    Console.WriteLine("Usage: HarpoS7.PoC ip_address:port [optional access password]");
+    Console.WriteLine("Example (no password): HarpoS7.PoC 192.168.1.10:102");
+    Console.WriteLine("Example (w. password): HarpoS7.PoC 192.168.1.10:102 \"zaq1@WSX\"");
     
     return;
 }
@@ -252,3 +252,35 @@ for (var i = returnValueOffset; i < returnValueOffset + returnValueLength; ++i)
 }
 
 Console.WriteLine("[++] Success! Looks like the authentication was successful. Check the packet dump (e.g. in Wireshark) to be sure.");
+
+if (args.Length <= 1)
+{
+    return;
+}
+
+var accessPassword = args[1];
+Console.WriteLine($"Trying to legitimate the session with a password (\"{accessPassword}\")");
+
+Console.WriteLine("Requesting the legitimation challenge");
+var subStreamRequest = new GetVarSubStreamedRequest(sessionKey.AsSpan());
+subStreamRequest.WriteS71200(stream);
+
+tokenSource = new CancellationTokenSource();
+tokenSource.CancelAfter(3000);
+Console.WriteLine("Waiting for the challenge...");
+
+try
+{
+    read = await stream.ReadAsync(readBuffer, tokenSource.Token);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("[-] No response after 3000 ms - legitimation failed");
+    return;
+}
+
+const int realPlcLegitimationChallengeOffset = 0x3B;
+var legitimationChallenge = readBuffer.AsSpan(realPlcLegitimationChallengeOffset, 20).ToArray();
+
+Console.Write("[+] Legitimation challenge: ");
+Helpers.PrintBuffer(legitimationChallenge);
