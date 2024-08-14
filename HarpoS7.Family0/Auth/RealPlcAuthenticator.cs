@@ -13,7 +13,7 @@ public class RealPlcAuthenticator : IDisposable
 {
     private static readonly ArrayPool<byte> AesKeyPool = ArrayPool<byte>.Create(16, 2);
 
-    private const PaddingMode Padding = PaddingMode.Zeros;
+    private const PaddingMode Padding = PaddingMode.None;
 
     private readonly MemoryOwner<byte> _iv;
     private readonly MemoryOwner<byte> _key1;
