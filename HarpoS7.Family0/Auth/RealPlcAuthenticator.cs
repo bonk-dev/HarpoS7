@@ -26,16 +26,34 @@ public class RealPlcAuthenticator : IDisposable
 
     private int _encryptedBytes;
 
-    public RealPlcAuthenticator()
+    public RealPlcAuthenticator(
+        ReadOnlySpan<byte> key1 = default, 
+        ReadOnlySpan<byte> key2 = default)
     {
         _iv = MemoryOwner<byte>.Allocate(16);
         _key1 = MemoryOwner<byte>.Allocate(24);
         _key2 = MemoryOwner<byte>.Allocate(24);
         _lookupTable = MemoryOwner<byte>.Allocate(Transform3.DestinationSize);
         _checksum = MemoryOwner<byte>.Allocate(16);
-        
-        _key1.Span.FillWithCryptoRandomBytes();
-        _key2.Span.FillWithCryptoRandomBytes();
+
+        if (key1.IsEmpty)
+        {
+            _key1.Span.FillWithCryptoRandomBytes();
+        }
+        else
+        {
+            key1.CopyTo(_key1.Span);
+        }
+
+        if (key2.IsEmpty)
+        {
+            _key2.Span.FillWithCryptoRandomBytes();
+        }
+        else
+        {
+            key2.CopyTo(_key2.Span);
+        }
+
         _iv.Span.FillWithCryptoRandomBytes();
 
         _aes = Aes.Create();
