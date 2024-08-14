@@ -1,4 +1,3 @@
-using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using HarpoS7.Aes;
@@ -26,6 +25,7 @@ public static class LegitimateScheme
     /// <param name="blobDataDestination">Blob data output for SetVarSubStreamed</param>
     /// <param name="challenge">Challenge from GetVarSubStreamed</param>
     /// <param name="publicKey">Public key required by PLC</param>
+    /// <param name="publicKeyFamily">The public key family</param>
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="password">The password</param>
     /// <exception cref="ArgumentException"></exception>
@@ -33,6 +33,7 @@ public static class LegitimateScheme
         Span<byte> blobDataDestination,
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey,
+        EPublicKeyFamily publicKeyFamily,
         ReadOnlySpan<byte> sessionKey,
         string password)
     {
@@ -47,6 +48,7 @@ public static class LegitimateScheme
             blobDataDestination, 
             challenge, 
             publicKey,
+            publicKeyFamily,
             sessionKey, 
             hash);
     }
@@ -57,6 +59,7 @@ public static class LegitimateScheme
     /// <param name="blobDataDestination">Blob data output for SetVarSubStreamed</param>
     /// <param name="challenge">Challenge from GetVarSubStreamed</param>
     /// <param name="publicKey">Public key required by PLC</param>
+    /// <param name="publicKeyFamily">The public key family</param>
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="passwordHash">SHA-1 hash of the access password</param>
     /// <exception cref="ArgumentException"></exception>
@@ -64,6 +67,7 @@ public static class LegitimateScheme
         Span<byte> blobDataDestination,
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey,
+        EPublicKeyFamily publicKeyFamily,
         ReadOnlySpan<byte> sessionKey,
         ReadOnlySpan<byte> passwordHash)
     {
@@ -84,7 +88,65 @@ public static class LegitimateScheme
                 nameof(challenge));
         }
 
-        throw new NotImplementedException("Real PLC (Family0/1) legitimation is not yet implemented");
+        #region Keys
+
+        Span<byte> challengeKey = stackalloc byte[24];
+        KeyUtilities.DeriveLegitimationChallengeKey(challengeKey, sessionKey);
+
+        Span<byte> key2 = stackalloc byte[passwordHash.Length + challenge.Length];
+        passwordHash.CopyTo(key2);
+        challenge.CopyTo(key2[passwordHash.Length..]);
+
+        #endregion
+
+        #region Seed
+
+        BlobMetadataWriter.WriteSeedBeefMetadata(
+            blobDataDestination, 
+            publicKey, 
+            publicKeyFamily,
+            challengeKey
+        );
+
+        var offset = BlobMetadataWriter.BeefSeedMetadataLength;
+        var authenticator = new RealPlcAuthenticator(
+            key1: challengeKey,
+            key2: key2
+        );
+
+        offset += authenticator.WriteSeed(blobDataDestination[offset..], publicKey);
+
+        #endregion
+
+        #region Part #1 (IV + full key2 blocks)
+
+        WriteFragmentBeefMetadata(
+            blobDataDestination[offset..], 
+            0x00, 
+            0x10 + 0x30 // iv + encrypted part
+        );
+        offset += BeefFragmentMetadataLength;
+
+        Span<byte> zeroChallenge = stackalloc byte[20];
+        zeroChallenge.Clear();
+        offset += authenticator.EncryptFullBlocks(blobDataDestination[offset..], zeroChallenge);
+
+        #endregion
+
+        #region Part #2 (last, partial key2 block + checksum)
+
+        WriteFragmentBeefMetadata(
+            blobDataDestination[offset..], 
+            0x01, 
+            authenticator.Key2LeftOverLength + 16 // + checksum
+        );
+        offset += BeefFragmentMetadataLength;
+        offset += authenticator.EncryptFinalBlock(blobDataDestination[offset..]);
+
+        #endregion
+        
+        // Write last, empty beef fragment
+        WriteFragmentBeefMetadata(blobDataDestination[offset..], 2, 0);
     }
 
     /// <summary>
