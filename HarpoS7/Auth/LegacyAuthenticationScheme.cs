@@ -57,8 +57,8 @@ public static class LegacyAuthenticationScheme
         var authenticator = new RealPlcAuthenticator();
         var offset = authenticator.WriteMetadata(encryptedBlobData, publicKey, publicKeyFamily);
         offset += authenticator.WriteSeed(encryptedBlobData[offset..], publicKey);
-        offset += authenticator.EncryptPart1(encryptedBlobData[offset..], challenge);
-        _ = authenticator.EncryptPart2(encryptedBlobData[offset..]);
+        offset += authenticator.EncryptFullBlocks(encryptedBlobData[offset..], challenge);
+        _ = authenticator.EncryptFinalBlock(encryptedBlobData[offset..]);
 
         Span<byte> key1 = stackalloc byte[24];
         authenticator.ExtractKey1(key1);

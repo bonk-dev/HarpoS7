@@ -58,15 +58,6 @@ public class RealPlcAuthenticator : IDisposable
             key1.CopyTo(_key1.Span);
         }
 
-        if (key2.IsEmpty)
-        {
-            _key2.Span.FillWithCryptoRandomBytes();
-        }
-        else
-        {
-            key2.CopyTo(_key2.Span);
-        }
-
         _iv.Span.FillWithCryptoRandomBytes();
 
         _aes = Aes.Create();
@@ -116,7 +107,7 @@ public class RealPlcAuthenticator : IDisposable
         return offset;
     }
 
-    public int EncryptPart1(Span<byte> destination, ReadOnlySpan<byte> challenge)
+    public int EncryptFullBlocks(Span<byte> destination, ReadOnlySpan<byte> challenge)
     {
         // Copy the starting IV
         var offset = 0;
@@ -139,44 +130,49 @@ public class RealPlcAuthenticator : IDisposable
         // Rotate IV
         BigIntOperations.RotateLeft31(_iv.Span);
         UpdateChecksum(ciphertextBlock);
-        
-        // Encrypt first 16 bytes of key2
-        _aes.EncryptEcb(
-            _iv.Span,
-            ciphertextBlock,
-            Padding
-        );
-        ciphertextBlock.Xor(_key2.Span[..ciphertextBlock.Length]);
-        ciphertextBlock.CopyTo(destination[offset..]);
-        offset += ciphertextBlock.Length;
-        _encryptedBytes += ciphertextBlock.Length;
-        
-        // Rotate IV
-        BigIntOperations.RotateLeft31(_iv.Span);
-        UpdateChecksum(ciphertextBlock);
+
+        // Encrypt all full blocks (16 byte chunks) of _key2
+        for (var i = 0; i < _key2.Length / 16; ++i)
+        {
+            _aes.EncryptEcb(
+                _iv.Span,
+                ciphertextBlock,
+                Padding
+            );
+            ciphertextBlock.Xor(_key2.Span.Slice(i * 16, ciphertextBlock.Length));
+            ciphertextBlock.CopyTo(destination[offset..]);
+            offset += ciphertextBlock.Length;
+            _encryptedBytes += ciphertextBlock.Length;
+
+            // Rotate IV
+            BigIntOperations.RotateLeft31(_iv.Span);
+            UpdateChecksum(ciphertextBlock);
+        }
 
         return offset;
     }
 
-    public int EncryptPart2(Span<byte> destination)
+    public int EncryptFinalBlock(Span<byte> destination)
     {
         Span<byte> ciphertextBlock = stackalloc byte[_aes.BlockSize / 8];
         
-        // Encrypt last 8 bytes of key2
+        // Encrypt partial key2 block
+        
+        var leftOverStartIndex = _key2.Length - Key2LeftOverLength;
+        
         _aes.EncryptEcb(
             _iv.Span, 
             ciphertextBlock, 
             Padding
         );
-        ciphertextBlock.Xor(_key2.Span[ciphertextBlock.Length..]);
+        ciphertextBlock.Xor(_key2.Span.Slice(leftOverStartIndex, Key2LeftOverLength));
         
-        var key2LeftOverLength = _key2.Span.Length - ciphertextBlock.Length;
-        ciphertextBlock[..key2LeftOverLength].CopyTo(destination);
-        _encryptedBytes += key2LeftOverLength;
-        var offset = key2LeftOverLength;
+        ciphertextBlock[..Key2LeftOverLength].CopyTo(destination);
+        _encryptedBytes += Key2LeftOverLength;
+        var offset = Key2LeftOverLength;
         
         // Final checksum calculation & encryption
-        ciphertextBlock[key2LeftOverLength..].Clear();
+        ciphertextBlock[Key2LeftOverLength..].Clear();
         
         UpdateChecksum(ciphertextBlock);
             
