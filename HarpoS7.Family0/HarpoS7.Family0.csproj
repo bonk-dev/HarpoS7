@@ -15,4 +15,10 @@
       <EmbeddedResource Include="Data\Blobs\Transform12Metadata.bin" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="CommunityToolkit.HighPerformance">
+        <HintPath>..\..\..\.nuget\packages\communitytoolkit.highperformance\8.2.2\lib\net7.0\CommunityToolkit.HighPerformance.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

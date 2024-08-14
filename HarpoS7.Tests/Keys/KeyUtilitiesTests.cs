@@ -1,4 +1,5 @@
 using HarpoS7.Keys;
+using HarpoS7.Utilities.Extensions;
 
 namespace HarpoS7.Tests.Keys;
 

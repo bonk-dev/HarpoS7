@@ -9,6 +9,8 @@ using HarpoS7.PoC;
 using HarpoS7.PoC.Packets;
 using HarpoS7.PublicKeys.Exceptions;
 using HarpoS7.PublicKeys.Impl;
+using HarpoS7.Utilities.Auth;
+using HarpoS7.Utilities.Extensions;
 
 // All "requests" were extracted from a Wireshark dump
 // in a real library/app you would obviously serialize/deserialize these dynamically

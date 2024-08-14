@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using HarpoS7.Auth;
+using HarpoS7.Utilities.Auth;
 using HarpoS7.Utilities.Extensions;
 
 namespace HarpoS7.Tests.Auth;

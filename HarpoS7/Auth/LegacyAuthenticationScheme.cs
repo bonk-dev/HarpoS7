@@ -8,6 +8,7 @@ using HarpoS7.Family0.Transforms;
 using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
 using HarpoS7.Seed;
+using HarpoS7.Utilities.Auth;
 
 namespace HarpoS7.Auth;
 

@@ -1,4 +1,4 @@
-namespace HarpoS7.Auth;
+namespace HarpoS7.Utilities.Auth;
 
 public static class CommonConstants
 {

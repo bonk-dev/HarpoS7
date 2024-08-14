@@ -1,4 +1,5 @@
 using HarpoS7.Auth;
+using HarpoS7.Utilities.Auth;
 
 namespace HarpoS7.Extensions;
 

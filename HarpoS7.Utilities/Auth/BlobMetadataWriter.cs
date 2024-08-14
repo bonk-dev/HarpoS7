@@ -1,9 +1,8 @@
-using HarpoS7.Keys;
 using HarpoS7.Utilities.Extensions;
 
-namespace HarpoS7.Auth;
+namespace HarpoS7.Utilities.Auth;
 
-internal static class BlobMetadataWriter
+public static class BlobMetadataWriter
 {
     /// <summary>
     /// Writes encrypted blob metadata
