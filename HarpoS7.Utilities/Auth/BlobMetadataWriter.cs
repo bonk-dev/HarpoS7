@@ -83,7 +83,7 @@ public static class BlobMetadataWriter
         
         // symmetric key
         symmetricKey.DeriveKeyId(destination[0x2C..]);
-        dwords[13] = (uint)GetSymmetricKeyFlags(keyFamily); // symmetric key flags
+        dwords[13] = (uint)GetSymmetricKeyFlagsLegitimation(keyFamily); // symmetric key flags
         dwords[14] = 0; // symmetric key internal flags
 
         dwords[15] = (uint)GetEncryptedSeedLength(keyFamily);
@@ -130,6 +130,21 @@ public static class BlobMetadataWriter
         {
             EPublicKeyFamily.S71500 => 0x1,
             EPublicKeyFamily.S71200 => 0x101,
+            EPublicKeyFamily.PlcSim => 0x301,
+            _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
+        };
+    
+    /// <summary>
+    /// Get the symmetric key flags based on the public key family sent by the PLC for the legitimation process
+    /// </summary>
+    /// <param name="keyFamily">The public key family</param>
+    /// <returns>Symmetric key flags</returns>
+    /// <exception cref="ArgumentException">Thrown when the key family is invalid</exception>
+    public static int GetSymmetricKeyFlagsLegitimation(EPublicKeyFamily keyFamily) =>
+        keyFamily switch
+        {
+            EPublicKeyFamily.S71500 => 0x1,
+            EPublicKeyFamily.S71200 => 0x1,
             EPublicKeyFamily.PlcSim => 0x301,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
