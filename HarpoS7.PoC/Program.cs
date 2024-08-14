@@ -323,5 +323,10 @@ catch (OperationCanceledException)
     Console.WriteLine("[-] No response after 3000 ms - legitimation failed");
     return;
 }
+catch (IOException)
+{
+    Console.WriteLine("[-] Connection closed by the PLC - legitimation failed");
+    return;
+}
 
 // TODO: Check response
