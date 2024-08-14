@@ -12,7 +12,7 @@ public static class CommonConstants
     public const int PublicKeyLengthRealPlc = 40;
     public const int PublicKeyLengthPlcSim = 64;
     
-    public const int EncryptedSeedLengthRealPlc = 96;
+    public const int EncryptedSeedLengthRealPlc = 60;
     public const int EncryptedSeedLength = 96;
     
     public const int AesKeyLengthInBytes = 128 / 8;
