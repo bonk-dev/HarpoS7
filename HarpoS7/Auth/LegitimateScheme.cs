@@ -67,9 +67,9 @@ public static class LegitimateScheme
         ReadOnlySpan<byte> sessionKey,
         ReadOnlySpan<byte> passwordHash)
     {
-        if (blobDataDestination.Length < OutputBlobDataLengthPlcSim)
+        if (blobDataDestination.Length < OutputBlobDataLengthRealPlc)
         {
-            throw new ArgumentException($"BlobDataDestination must be at least {OutputBlobDataLengthPlcSim} bytes long",
+            throw new ArgumentException($"BlobDataDestination must be at least {OutputBlobDataLengthRealPlc} bytes long",
                 nameof(blobDataDestination));
         }
 

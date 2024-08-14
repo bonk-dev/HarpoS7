@@ -74,7 +74,7 @@ public class LegitimateSchemeTests
         var originalSeq = SpanExtensions.StaticFillSequence;
         SpanExtensions.StaticFillSequence = randomFillSequence;
         
-        var destination = new byte[LegitimateScheme.OutputBlobDataLengthPlcSim];
+        var destination = new byte[LegitimateScheme.OutputBlobDataLengthRealPlc];
         LegitimateScheme.SolveLegitimateChallengeRealPlc(
             destination, 
             challenge, 
@@ -145,7 +145,7 @@ public class LegitimateSchemeTests
         var originalSeq = SpanExtensions.StaticFillSequence;
         SpanExtensions.StaticFillSequence = randomFillSequence;
         
-        var destination = new byte[LegitimateScheme.OutputBlobDataLengthPlcSim];
+        var destination = new byte[LegitimateScheme.OutputBlobDataLengthRealPlc];
         LegitimateScheme.SolveLegitimateChallengeRealPlc(
             destination, 
             challenge, 
