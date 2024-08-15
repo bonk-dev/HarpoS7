@@ -10,7 +10,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>nuget-icon.png</PackageIcon>
-        <PackageVersion>1.1.0-pre3</PackageVersion>
+        <PackageVersion>1.1.0-alpha3</PackageVersion>
         <RepositoryUrl>https://github.com/bonk-dev/HarpoS7</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>siemens</PackageTags>
