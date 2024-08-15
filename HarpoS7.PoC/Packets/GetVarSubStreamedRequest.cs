@@ -31,7 +31,7 @@ public class GetVarSubStreamedRequest
         sessionKey.CopyTo(_sessionKey.AsSpan());
     }
 
-    public void WriteS71200(Stream stream)
+    public void WriteRealPlc(Stream stream)
     {
         Span<byte> buffer = stackalloc byte[S71200Data.Length];
         S71200Data.CopyTo(buffer);

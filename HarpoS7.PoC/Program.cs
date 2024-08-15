@@ -268,9 +268,9 @@ if (args.Length <= 1)
 {
     return;
 }
-if (publicKeyFamily != EPublicKeyFamily.S71200)
+if (publicKeyFamily != EPublicKeyFamily.S71200 && publicKeyFamily != EPublicKeyFamily.S71500)
 {
-    Console.WriteLine("[-] Legitimation is currently only supported on S7-1200s");
+    Console.WriteLine("[-] Legitimation is currently only supported on S7-1200s and S7-1500s");
     return;
 }
 
@@ -279,7 +279,7 @@ Console.WriteLine($"Trying to legitimate the session with a password (\"{accessP
 
 Console.WriteLine("Requesting the legitimation challenge");
 var subStreamRequest = new GetVarSubStreamedRequest(sessionKey.AsSpan(), sessionId);
-subStreamRequest.WriteS71200(stream);
+subStreamRequest.WriteRealPlc(stream);
 
 tokenSource = new CancellationTokenSource();
 tokenSource.CancelAfter(3000);
@@ -317,7 +317,7 @@ Console.WriteLine("[+] Challenge solved");
 Console.WriteLine("Sending the SetVarSubStreamed request...");
 
 var legitSetChallenge = new SetVarSubStreamedRequest(sessionKey, legitBlob, sessionId);
-legitSetChallenge.WriteS71200(stream);
+legitSetChallenge.WriteRealPlc(stream);
 
 await stream.WriteAsync(emptyDtData);
 

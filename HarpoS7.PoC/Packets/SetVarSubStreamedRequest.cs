@@ -50,7 +50,7 @@ public class SetVarSubStreamedRequest
         _sessionId = sessionId;
     }
 
-    public void WriteS71200(Stream stream)
+    public void WriteRealPlc(Stream stream)
     {
         const int integrityOffset = 0x0C;
         const int dataOffset = 0x2C;
