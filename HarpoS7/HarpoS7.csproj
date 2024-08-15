@@ -17,8 +17,7 @@
         <AssemblyVersion>1.1.0</AssemblyVersion>
         <FileVersion>1.1.0</FileVersion>
         <Version>1.1.0</Version>
-        <PackageReleaseNotes>1.1.0 - S7-1500 support
-1.0.1 - basic legitimation (password auth) support</PackageReleaseNotes>
+        <PackageReleaseNotes>Real S7-1200/1500 support</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
