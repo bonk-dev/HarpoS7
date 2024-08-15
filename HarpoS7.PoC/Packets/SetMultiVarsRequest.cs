@@ -4,6 +4,7 @@ namespace HarpoS7.PoC.Packets;
 
 public class SetMultiVarsRequest
 {
+    private readonly uint _sessionId;
     private readonly byte[] _publicKeyIdVlq;
     private readonly byte[] _symmetricKeyIdVlq;
     private readonly byte[] _blobData;
@@ -126,8 +127,11 @@ public class SetMultiVarsRequest
     public SetMultiVarsRequest(
         ReadOnlySpan<byte> publicKeyId, 
         ReadOnlySpan<byte> symmetricKeyId, 
-        ReadOnlySpan<byte> blobData)
+        ReadOnlySpan<byte> blobData,
+        uint sessionId)
     {
+        _sessionId = sessionId;
+        
         var pubKeyIdUlong = BinaryPrimitives.ReadUInt64LittleEndian(publicKeyId);
         var symmetricKeyIdUlong = BinaryPrimitives.ReadUInt64LittleEndian(symmetricKeyId);
 
@@ -146,6 +150,7 @@ public class SetMultiVarsRequest
         const int publicKeyIdOffset = 0x40;
         const int symmetricKeyIdOffset = 0x60;
         const int encryptedKeyBlobOffset = 0x7D;
+        const int sessionIdOffset = 0x14;
 
         Span<byte> data = stackalloc byte[S71500Data.Length];
         S71500Data.CopyTo(data);
@@ -153,6 +158,9 @@ public class SetMultiVarsRequest
         _publicKeyIdVlq.CopyTo(data[publicKeyIdOffset..]);
         _symmetricKeyIdVlq.CopyTo(data[symmetricKeyIdOffset..]);
         _blobData.CopyTo(data[encryptedKeyBlobOffset..]);
+        
+        BinaryPrimitives.WriteUInt32BigEndian(data[sessionIdOffset..], _sessionId);
+        BinaryPrimitives.WriteUInt32BigEndian(data[(sessionIdOffset + 5)..], _sessionId);
         
         stream.Write(data);
     }
@@ -162,6 +170,7 @@ public class SetMultiVarsRequest
         const int publicKeyIdOffset = 0x40;
         const int symmetricKeyIdOffset = 0x61;
         const int encryptedKeyBlobOffset = 0x7E;
+        const int sessionIdOffset = 0x14;
 
         Span<byte> data = stackalloc byte[S71200Data.Length];
         S71200Data.CopyTo(data);
@@ -169,6 +178,9 @@ public class SetMultiVarsRequest
         _publicKeyIdVlq.CopyTo(data[publicKeyIdOffset..]);
         _symmetricKeyIdVlq.CopyTo(data[symmetricKeyIdOffset..]);
         _blobData.CopyTo(data[encryptedKeyBlobOffset..]);
+        
+        BinaryPrimitives.WriteUInt32BigEndian(data[sessionIdOffset..], _sessionId);
+        BinaryPrimitives.WriteUInt32BigEndian(data[(sessionIdOffset + 5)..], _sessionId);
         
         stream.Write(data);
     }

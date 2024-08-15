@@ -100,6 +100,12 @@ _ = await stream.ReadAsync(readBuffer);
 
 await stream.WriteAsync(emptyDtData);
 
+// read the session object id
+const int sessionIdOffset = 0x17;
+var sessionId = Vlq.DecodeAsVlq32(readBuffer.AsSpan(sessionIdOffset, 5), out _);
+
+Console.WriteLine($"Session ID: 0x{sessionId:X8}");
+
 // read the public key fingerprint
 // the string length is serialized as a VLQ-encoded number
 
@@ -196,7 +202,8 @@ sessionKey.DeriveKeyId(sessionKeyId);
 var setMultiVarsRequest = new SetMultiVarsRequest(
     pubKeyId,
     sessionKeyId,
-    keyBlob.AsSpan()
+    keyBlob.AsSpan(),
+    sessionId
 );
 
 // send request
@@ -271,7 +278,7 @@ var accessPassword = args[1];
 Console.WriteLine($"Trying to legitimate the session with a password (\"{accessPassword}\")");
 
 Console.WriteLine("Requesting the legitimation challenge");
-var subStreamRequest = new GetVarSubStreamedRequest(sessionKey.AsSpan());
+var subStreamRequest = new GetVarSubStreamedRequest(sessionKey.AsSpan(), sessionId);
 subStreamRequest.WriteS71200(stream);
 
 tokenSource = new CancellationTokenSource();
@@ -309,7 +316,7 @@ LegitimateScheme.SolveLegitimateChallengeRealPlc(
 Console.WriteLine("[+] Challenge solved");
 Console.WriteLine("Sending the SetVarSubStreamed request...");
 
-var legitSetChallenge = new SetVarSubStreamedRequest(sessionKey, legitBlob);
+var legitSetChallenge = new SetVarSubStreamedRequest(sessionKey, legitBlob, sessionId);
 legitSetChallenge.WriteS71200(stream);
 
 await stream.WriteAsync(emptyDtData);
