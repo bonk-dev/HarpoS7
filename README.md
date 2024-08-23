@@ -17,7 +17,7 @@ for end users.
 - Fully managed
 - Supports challenge-based authentication (pre-V17 TIA portal)
 - Supports TLS authentication (post-V17 TIA portal)
-- Supports legitimation (password authorization) - requires testing
+- Supports legitimation (password authorization)
 
 ### Tested on
 - S7-1200 (1214C DC/DC/DC, 6ES7214-1AG40-0XB0)
