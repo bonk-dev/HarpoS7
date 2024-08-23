@@ -40,7 +40,7 @@ If you want to use a custom public key, you can implement your own
 or pass in a raw public key to the [Authenticate](HarpoS7/Auth/LegacyAuthenticationScheme.cs) 
 function directly.
 
-### Legacy auth sample
+### Legacy auth usage
 In order to authenticate a legacy session (challenge-based):
 ```csharp
 // The "input" buffers - you have to load/fill them yourselves
@@ -53,6 +53,11 @@ var challenge = new byte[20];
 // can be identified by the fingerprint sent by the PLC)
 var publicKey = new byte[64];
 
+// Input - public key family (must be read from the fingerprint)
+// Example: 00:181B7B0847D11694, the 00 before the ':' is the public key family
+// Currently the 00, 01 and 03 families are supported.
+var family = EPublicKeyFamily.S71500;
+
 // Output - "Encrypted key" which you send back to the PLC (216 bytes long)
 var keyBlob = new byte[Constants.FinalBlobDataLength];
 
@@ -63,7 +68,8 @@ LegacyAuthenticationScheme.Authenticate(
     keyBlob.AsSpan(),
     sessionKey.AsSpan(),
     challenge.AsSpan(),
-    publicKey.AsSpan());
+    publicKey.AsSpan(),
+    family);
 ```
 
 In order to calculate a packet digest (these are used to prevent tampering):
