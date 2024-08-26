@@ -104,7 +104,7 @@ In order to authorize with a password you need to firstly obtain a valid session
 Then you need to get a legitimation challenge using a GetVarSubStreamed request (use Wireshark to know how).
 Finally, you can pass everything down to the ```SolveLegitimateChallenge``` function.
 
-### Code:
+### Example
 ```csharp
 using HarpoS7.Auth;
 
