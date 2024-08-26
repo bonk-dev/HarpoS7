@@ -126,3 +126,4 @@ LegitimateScheme.SolveLegitimateChallenge(
   for dissecting S7-Comm Plus packets.
 - [Cheng Lei, Li Donghong, Ma Liang, The spear to break the security wall of S7CommPlus](https://www.blackhat.com/docs/eu-17/materials/eu-17-Lei-The-Spear-To-Break%20-The-Security-Wall-Of-S7CommPlus-wp.pdf) - a document describing the S7-Comm Plus protocol
 - [Ghidra Software Reverse Engineering Framework](https://github.com/NationalSecurityAgency/ghidra) - "Ghidra is a software reverse engineering (SRE) framework created and maintained by the National Security Agency Research Directorate."
+- [x64dbg](https://github.com/x64dbg/x64dbg) - "An open-source user mode debugger for Windows. Optimized for reverse engineering and malware analysis."
