@@ -44,6 +44,9 @@ function directly.
 ### Legacy auth usage
 In order to authenticate a legacy session (challenge-based):
 ```csharp
+using HarpoS7.Auth;
+using HarpoS7.PublicKeys.Impl;
+
 // The "input" buffers - you have to load/fill them yourselves
 // The "output" buffers - the library fills them
 
