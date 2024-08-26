@@ -52,7 +52,10 @@ var challenge = new byte[20];
 
 // Input - public key used by the PLC (loaded from local storage, 
 // can be identified by the fingerprint sent by the PLC)
-var publicKey = new byte[64];
+var exampleFingerprint = "00:181B7B0847D1169";
+var store = new DefaultPublicKeyStore();
+var publicKey = new byte[store.GetPublicKeyLength(exampleFingerprint)];
+store.ReadPublicKey(publicKey.AsSpan(), exampleFingerprint);
 
 // Input - public key family (must be read from the fingerprint)
 // Example: 00:181B7B0847D11694, the 00 before the ':' is the public key family
