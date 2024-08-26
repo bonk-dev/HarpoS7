@@ -8,11 +8,11 @@ using HarpoS7.Utilities.Extensions;
 
 namespace HarpoS7.Family0.Transforms;
 
-public static class Transform6
+public static class SeedTransform
 {
     public const int DestinationSize = 0x3C;
     public const int PublicKeyLength = 0x28;
-    public const int Transform1Size = Transform1.DestinationSize;
+    public const int Transform1Size = PreSeedTransform.DestinationSize;
     
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> publicKey, ReadOnlySpan<byte> transform1)
     {

@@ -41,16 +41,16 @@ public static class Transform12
             switch (metadataDword)
             {
                 case 0:
-                    Transform9.Execute(dst, src, src2);
+                    BigIntMultiplication.Execute(dst, src, src2);
                     break;
                 case 1:
-                    Transform10.Execute(dst, src);
+                    BigIntSquare.Execute(dst, src);
                     break;
                 case 2:
-                    Transform8.Execute(dst, src, src2);
+                    BigIntAddition.Execute(dst, src, src2);
                     break;
                 default:
-                    Transform11.Execute(dst, src, src2);
+                    BigIntSubtraction.Execute(dst, src, src2);
                     break;
             }
         }

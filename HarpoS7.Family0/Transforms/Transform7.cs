@@ -74,7 +74,7 @@ public static class Transform7
             workBuffer[0x138..]
         );
         
-        Transform8.Execute(
+        BigIntAddition.Execute(
             ctx[0x450..],
             ctx[0x450..],
             workBuffer[0x18..]
@@ -135,7 +135,7 @@ public static class Transform7
             workBuffer[0x450..]
         );
         
-        Transform8.Execute(
+        BigIntAddition.Execute(
             ctx[0x690..],
             ctx[0x690..],
             workBuffer[0x18..]
@@ -159,7 +159,7 @@ public static class Transform7
             workBuffer[0x258..]
         );
         
-        Transform8.Execute(
+        BigIntAddition.Execute(
             ctx[0x480..],
             ctx[0x480..],
             workBuffer[0x18..]
@@ -183,7 +183,7 @@ public static class Transform7
             workBuffer[0x60..]
         );
         
-        Transform8.Execute(
+        BigIntAddition.Execute(
             ctx[0x8D0..],
             ctx[0x8D0..],
             workBuffer[0x18..]

@@ -8,7 +8,7 @@ namespace HarpoS7.Family0.Transforms;
 /// <summary>
 /// Challenge encryption key derivation
 /// </summary>
-public static class Transform2
+public static class KeyDerivationTransform
 {    
     public const int SourceSize = 0x3C;
     public const int DestinationSize = 0x30;

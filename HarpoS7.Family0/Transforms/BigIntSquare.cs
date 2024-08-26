@@ -8,7 +8,7 @@ namespace HarpoS7.Family0.Transforms;
 /// <summary>
 /// Big integer transform - raise int to the power of 2
 /// </summary>
-public static class Transform10
+public static class BigIntSquare
 {
     public const int DestinationSize = BigIntOperations.FinalizeDestinationSize;
     public const int SourceSize = BigIntOperations.PrepareSourceSize;

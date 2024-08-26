@@ -9,7 +9,7 @@ namespace HarpoS7.Family0.Transforms;
 /// Used in encrypted seed creation
 /// <para>Uses <see cref="Monoliths.Monolith9"/></para>
 /// </summary>
-public static class Transform1
+public static class PreSeedTransform
 {
     private static readonly Memory<uint> MagicPostfix = new uint[3]
     {

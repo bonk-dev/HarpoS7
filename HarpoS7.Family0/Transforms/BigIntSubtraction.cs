@@ -7,7 +7,7 @@ namespace HarpoS7.Family0.Transforms;
 /// <summary>
 /// Big integer transform - subtraction
 /// </summary>
-public static class Transform11
+public static class BigIntSubtraction
 {
     public const int DestinationSize = BigIntOperations.FinalizeDestinationSize;
     public const int MinuendSize = BigIntOperations.PrepareSourceSize;

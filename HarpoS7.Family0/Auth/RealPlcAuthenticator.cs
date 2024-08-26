@@ -46,7 +46,7 @@ public class RealPlcAuthenticator : IDisposable
             key2.CopyTo(_key2.Span);
         }
         
-        _lookupTable = MemoryOwner<byte>.Allocate(Transform3.DestinationSize);
+        _lookupTable = MemoryOwner<byte>.Allocate(LutGenerator.DestinationSize);
         _checksum = MemoryOwner<byte>.Allocate(16);
 
         if (key1.IsEmpty)
@@ -93,16 +93,16 @@ public class RealPlcAuthenticator : IDisposable
         var offset = 0;
         
         // Seed
-        Span<byte> t1 = stackalloc byte[Transform1.DestinationSize];
-        Transform1.Execute(t1, _key1.Span);
-        Transform6.Execute(destination[offset..], publicKey, t1);
-        offset += Transform6.DestinationSize;
+        Span<byte> t1 = stackalloc byte[PreSeedTransform.DestinationSize];
+        PreSeedTransform.Execute(t1, _key1.Span);
+        SeedTransform.Execute(destination[offset..], publicKey, t1);
+        offset += SeedTransform.DestinationSize;
         
         // Keys derivation
         DeriveKeysAndLookupTable(t1);
         
         // Checksum
-        Transform4.Execute(_checksum.Span, _iv.Span, _lookupTable.Span);
+        ChecksumTransform.Execute(_checksum.Span, _iv.Span, _lookupTable.Span);
 
         return offset;
     }
@@ -179,7 +179,7 @@ public class RealPlcAuthenticator : IDisposable
         var checksumDwords = MemoryMarshal.Cast<byte, uint>(_checksum.Span);
         checksumDwords[3] ^= (uint)_encryptedBytes;
         
-        Transform4.Execute(_checksum.Span, _checksum.Span, _lookupTable.Span);
+        ChecksumTransform.Execute(_checksum.Span, _checksum.Span, _lookupTable.Span);
 
         _aes.Key = _checksumEncryptionKey;
         _aes.EncryptEcb(
@@ -205,8 +205,8 @@ public class RealPlcAuthenticator : IDisposable
     private void DeriveKeysAndLookupTable(ReadOnlySpan<byte> t1)
     {
         // Generates 3, 128-bit keys
-        Span<byte> transform2Buffer = stackalloc byte[Transform2.DestinationSize];
-        Transform2.Execute(transform2Buffer, t1);
+        Span<byte> transform2Buffer = stackalloc byte[KeyDerivationTransform.DestinationSize];
+        KeyDerivationTransform.Execute(transform2Buffer, t1);
 
         // Challenge encryption key
         const int challengeEncryptionKeyLength = 128 / 8;
@@ -220,13 +220,13 @@ public class RealPlcAuthenticator : IDisposable
             .CopyTo(_checksumEncryptionKey.AsSpan());
         
         // Create the lookup table
-        Transform3.Execute(_lookupTable.Span, transform2Buffer[32..]);
+        LutGenerator.Execute(_lookupTable.Span, transform2Buffer[32..]);
     }
 
     private void UpdateChecksum(ReadOnlySpan<byte> ciphertextBlock)
     {
         _checksum.Span.Xor(ciphertextBlock);
-        Transform4.Execute(_checksum.Span, _checksum.Span, _lookupTable.Span);
+        ChecksumTransform.Execute(_checksum.Span, _checksum.Span, _lookupTable.Span);
     }
 
     public void Dispose()

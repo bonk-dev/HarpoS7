@@ -6,33 +6,33 @@ internal static class TransformBufferSizes
 {
     public static int[] SrcSizes { get; } = 
     [
-        Transform1.SourceSize,
-        Transform2.SourceSize,
-        Transform3.SourceSize,
+        PreSeedTransform.SourceSize,
+        KeyDerivationTransform.SourceSize,
+        LutGenerator.SourceSize,
         0x00,
         0x00,
         0x00,
         0x00,
         0x00,
         0x00,
-        Transform10.SourceSize,
+        BigIntSquare.SourceSize,
         0x00,
         0x00,
         Transform13.SourceSize
     ];
     public static int[] DstSizes { get; } = 
     [
-        Transform1.DestinationSize,
-        Transform2.DestinationSize,
-        Transform3.DestinationSize,
-        Transform4.DestinationSize,
+        PreSeedTransform.DestinationSize,
+        KeyDerivationTransform.DestinationSize,
+        LutGenerator.DestinationSize,
+        ChecksumTransform.DestinationSize,
         0x00,
-        Transform6.DestinationSize,
+        SeedTransform.DestinationSize,
         0x00,
-        Transform8.DestinationSize,
-        Transform9.DestinationSize,
-        Transform10.DestinationSize,
-        Transform11.DestinationSize,
+        BigIntAddition.DestinationSize,
+        BigIntMultiplication.DestinationSize,
+        BigIntSquare.DestinationSize,
+        BigIntSubtraction.DestinationSize,
         0x00,
         Transform13.DestinationSize
     ];

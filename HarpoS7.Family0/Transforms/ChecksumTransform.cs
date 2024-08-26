@@ -2,11 +2,11 @@ using System.Runtime.InteropServices;
 
 namespace HarpoS7.Family0.Transforms;
 
-public static class Transform4
+public static class ChecksumTransform
 {
     public const int KeySize = 0x10;
     public const int DestinationSize = 0x10;
-    public const int LookupTableSize = Transform3.DestinationSize;
+    public const int LookupTableSize = LutGenerator.DestinationSize;
 
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> key, ReadOnlySpan<byte> lookupTable)
     {

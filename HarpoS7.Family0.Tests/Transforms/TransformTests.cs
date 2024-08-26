@@ -9,30 +9,30 @@ namespace HarpoS7.Family0.Tests.Transforms;
 public class TransformTests
 {
     [Test]
-    [TestCase(1)]
-    [TestCase(2)]
-    [TestCase(3)]
-    [TestCase(10)]
-    [TestCase(10, 2)]
-    [TestCase(13)]
-    public void Execute(int transformIndex, int? subIndex = null)
+    [TestCase(nameof(PreSeedTransform), 1)]
+    [TestCase(nameof(KeyDerivationTransform), 2)]
+    [TestCase(nameof(LutGenerator), 3)]
+    [TestCase(nameof(BigIntSquare), 10)]
+    [TestCase(nameof(BigIntSquare), 10, 2)]
+    [TestCase(nameof(Transform13), 13)]
+    public void Execute(string className, int blobIndex, int? subIndex = null)
     {
-        var type = typeof(Transform1)
+        var type = typeof(PreSeedTransform)
             .Assembly
             .ExportedTypes
-            .SingleOrDefault(t => t.Name == "Transform" + transformIndex);
+            .SingleOrDefault(t => t.Name == className);
         Assert.That(type, Is.Not.Null);
 
         var executeMethod = type.GetMethod("Execute", BindingFlags.Public | BindingFlags.Static);
         Assert.That(executeMethod, Is.Not.Null);
 
-        var expectedSrcPath = BlobUtils.GetTransformSourcePath(transformIndex, subIndex);
+        var expectedSrcPath = BlobUtils.GetTransformSourcePath(blobIndex, subIndex);
         var expectedSrcBytes = File.ReadAllBytes(expectedSrcPath);
 
-        var expectedDstPath = BlobUtils.GetTransformDestinationPath(transformIndex, subIndex);
+        var expectedDstPath = BlobUtils.GetTransformDestinationPath(blobIndex, subIndex);
         var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
 
-        Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[transformIndex - 1]];
+        Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[blobIndex - 1]];
         
         var executeDelegate = executeMethod.CreateDelegate<TransformExecuteMethodNoReturn>();
         executeDelegate(destinationBuffer, expectedSrcBytes.AsSpan());
@@ -42,7 +42,7 @@ public class TransformTests
     }
 
     [Test]
-    public void ExecuteTransform4()
+    public void ChecksumTransform()
     {
         var expectedKeyPath = BlobUtils.GetTransformFilePath(4, "key");
         var expectedKeyBytes = File.ReadAllBytes(expectedKeyPath);
@@ -55,13 +55,13 @@ public class TransformTests
         
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[4 - 1]];
         
-        Transform4.Execute(destinationBuffer, expectedKeyBytes.AsSpan(), expectedLutBytes.AsSpan());
+        Family0.Transforms.ChecksumTransform.Execute(destinationBuffer, expectedKeyBytes.AsSpan(), expectedLutBytes.AsSpan());
         
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
     
     [Test]
-    public void ExecuteTransform6()
+    public void SeedTransform()
     {
         SpanExtensions.StaticFillSequence = [0x2D];
         
@@ -76,7 +76,7 @@ public class TransformTests
         
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[6 - 1]];
         
-        Transform6.Execute(destinationBuffer, publicKeyBytes.AsSpan(), transform1Bytes.AsSpan());
+        Family0.Transforms.SeedTransform.Execute(destinationBuffer, publicKeyBytes.AsSpan(), transform1Bytes.AsSpan());
         
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
@@ -100,7 +100,7 @@ public class TransformTests
     [Test]
     [TestCase(null)]
     [TestCase(2)]
-    public void ExecuteTransform8(int? subIndex)
+    public void BigIntAddition(int? subIndex)
     {
         var expectedDstPath = BlobUtils.GetTransformDestinationPath(8, subIndex);
         var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
@@ -111,7 +111,7 @@ public class TransformTests
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[8 - 1]];
         destinationBuffer.Clear();
         
-        Transform8.Execute(destinationBuffer, source1Bytes.AsSpan(), source2Bytes.AsSpan());
+        Family0.Transforms.BigIntAddition.Execute(destinationBuffer, source1Bytes.AsSpan(), source2Bytes.AsSpan());
         
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
@@ -120,7 +120,7 @@ public class TransformTests
     [TestCase(null)]
     [TestCase(2)]
     [TestCase(3, Description = "Resulting BigInteger is 19 bytes long, not 20")]
-    public void ExecuteTransform9(int? subIndex)
+    public void BigIntMultiplication(int? subIndex)
     {
         var expectedDstPath = BlobUtils.GetTransformDestinationPath(9, subIndex);
         var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
@@ -130,7 +130,7 @@ public class TransformTests
         
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[9 - 1]];
         
-        Transform9.Execute(destinationBuffer, source1Bytes.AsSpan(), source2Bytes.AsSpan());
+        Family0.Transforms.BigIntMultiplication.Execute(destinationBuffer, source1Bytes.AsSpan(), source2Bytes.AsSpan());
         
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }
@@ -140,7 +140,7 @@ public class TransformTests
     [TestCase(2)]
     [TestCase(3)]
     [TestCase(4)]
-    public void ExecuteTransform11(int? subIndex)
+    public void BigIntSubtraction(int? subIndex)
     {
         var expectedDstPath = BlobUtils.GetTransformDestinationPath(11, subIndex);
         var expectedDstBytes = File.ReadAllBytes(expectedDstPath);
@@ -150,7 +150,7 @@ public class TransformTests
         
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[11 - 1]];
         
-        Transform11.Execute(destinationBuffer, source1Bytes.AsSpan(), source2Bytes.AsSpan());
+        Family0.Transforms.BigIntSubtraction.Execute(destinationBuffer, source1Bytes.AsSpan(), source2Bytes.AsSpan());
         
         Assert.That(destinationBuffer.ToArray(), Is.EqualTo(expectedDstBytes));
     }

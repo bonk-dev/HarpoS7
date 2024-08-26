@@ -8,7 +8,7 @@ namespace HarpoS7.Family0.Transforms;
 /// <summary>
 /// Big integer transform - addition
 /// </summary>
-public static class Transform8
+public static class BigIntAddition
 {
     public const int DestinationSize = BigIntOperations.FinalizeDestinationSize;
     public const int Source1Size = BigIntOperations.PrepareSourceSize;

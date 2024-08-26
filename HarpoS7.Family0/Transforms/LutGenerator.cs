@@ -5,7 +5,7 @@ namespace HarpoS7.Family0.Transforms;
 /// <summary>
 /// Lookup table generation
 /// </summary>
-public static class Transform3
+public static class LutGenerator
 {
     public const int SourceSize = 0x10;
     public const int DestinationSize = 0x1000;
