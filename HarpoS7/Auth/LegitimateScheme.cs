@@ -1,21 +1,153 @@
-using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using HarpoS7.Aes;
-using HarpoS7.Extensions;
+using HarpoS7.Family0.Auth;
+using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
 using HarpoS7.Seed;
+using HarpoS7.Utilities.Auth;
 
 namespace HarpoS7.Auth;
 
 public static class LegitimateScheme
 {
-    internal const int BeefSeedMetadataLength = 0x40;
     internal const int BeefFragmentMetadataLength = 0x0C;
-    private const uint DeadBeefMagic = 0xDEADBEEF; 
-    
-    public const int OutputBlobDataLength = 284;
+    private const uint DeadBeefMagic = 0xDEADBEEF;
+
+    private const int BlobLengthOffset = 68;
+    public const int OutputBlobDataLengthRealPlc = CommonConstants.EncryptedBlobLengthRealPlc + BlobLengthOffset;
+    public const int OutputBlobDataLengthPlcSim = CommonConstants.EncryptedBlobLengthPlcSim + BlobLengthOffset;
     public const int ChallengeLength = 20;
+
+    /// <summary>
+    /// Solve the legitimation challenge to be able to communicate with PLCs that require a password.
+    /// </summary>
+    /// <param name="blobDataDestination">Blob data output for SetVarSubStreamed</param>
+    /// <param name="challenge">Challenge from GetVarSubStreamed</param>
+    /// <param name="publicKey">Public key required by PLC</param>
+    /// <param name="publicKeyFamily">The public key family</param>
+    /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
+    /// <param name="password">The password</param>
+    /// <exception cref="ArgumentException"></exception>
+    public static void SolveLegitimateChallengeRealPlc(
+        Span<byte> blobDataDestination,
+        ReadOnlySpan<byte> challenge,
+        ReadOnlySpan<byte> publicKey,
+        EPublicKeyFamily publicKeyFamily,
+        ReadOnlySpan<byte> sessionKey,
+        string password)
+    {
+        var length = Encoding.UTF8.GetByteCount(password);
+        Span<byte> passBytes = stackalloc byte[length];
+        Encoding.UTF8.GetBytes(password, passBytes);
+        
+        Span<byte> hash = stackalloc byte[SHA1.HashSizeInBytes];
+        _ = SHA1.HashData(passBytes, hash);
+        
+        SolveLegitimateChallengeRealPlc(
+            blobDataDestination, 
+            challenge, 
+            publicKey,
+            publicKeyFamily,
+            sessionKey, 
+            hash);
+    }
+
+    /// <summary>
+    /// Solve the legitimation challenge to be able to communicate with PLCs that require a password.
+    /// </summary>
+    /// <param name="blobDataDestination">Blob data output for SetVarSubStreamed</param>
+    /// <param name="challenge">Challenge from GetVarSubStreamed</param>
+    /// <param name="publicKey">Public key required by PLC</param>
+    /// <param name="publicKeyFamily">The public key family</param>
+    /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
+    /// <param name="passwordHash">SHA-1 hash of the access password</param>
+    /// <exception cref="ArgumentException"></exception>
+    public static void SolveLegitimateChallengeRealPlc(
+        Span<byte> blobDataDestination,
+        ReadOnlySpan<byte> challenge,
+        ReadOnlySpan<byte> publicKey,
+        EPublicKeyFamily publicKeyFamily,
+        ReadOnlySpan<byte> sessionKey,
+        ReadOnlySpan<byte> passwordHash)
+    {
+        if (blobDataDestination.Length < OutputBlobDataLengthRealPlc)
+        {
+            throw new ArgumentException($"BlobDataDestination must be at least {OutputBlobDataLengthRealPlc} bytes long",
+                nameof(blobDataDestination));
+        }
+
+        if (passwordHash.Length < SHA1.HashSizeInBytes)
+        {
+            throw new ArgumentException("Password hash is not a SHA1 (too short)", nameof(passwordHash));
+        }
+
+        if (challenge.Length < ChallengeLength)
+        {
+            throw new ArgumentException($"Challenge must be at least {ChallengeLength} bytes long",
+                nameof(challenge));
+        }
+
+        #region Keys
+
+        Span<byte> challengeKey = stackalloc byte[24];
+        KeyUtilities.DeriveLegitimationChallengeKey(challengeKey, sessionKey);
+
+        Span<byte> key2 = stackalloc byte[passwordHash.Length + challenge.Length];
+        passwordHash.CopyTo(key2);
+        challenge.CopyTo(key2[passwordHash.Length..]);
+
+        #endregion
+
+        #region Seed
+
+        BlobMetadataWriter.WriteSeedBeefMetadata(
+            blobDataDestination, 
+            publicKey, 
+            publicKeyFamily,
+            challengeKey
+        );
+
+        var offset = BlobMetadataWriter.BeefSeedMetadataLength;
+        var authenticator = new RealPlcAuthenticator(
+            key1: challengeKey,
+            key2: key2
+        );
+
+        offset += authenticator.WriteSeed(blobDataDestination[offset..], publicKey);
+
+        #endregion
+
+        #region Part #1 (IV + full key2 blocks)
+
+        WriteFragmentBeefMetadata(
+            blobDataDestination[offset..], 
+            0x00, 
+            0x10 + 0x30 // iv + encrypted part
+        );
+        offset += BeefFragmentMetadataLength;
+
+        Span<byte> zeroChallenge = stackalloc byte[20];
+        zeroChallenge.Clear();
+        offset += authenticator.EncryptFullBlocks(blobDataDestination[offset..], zeroChallenge);
+
+        #endregion
+
+        #region Part #2 (last, partial key2 block + checksum)
+
+        WriteFragmentBeefMetadata(
+            blobDataDestination[offset..], 
+            0x01, 
+            authenticator.Key2LeftOverLength + 16 // + checksum
+        );
+        offset += BeefFragmentMetadataLength;
+        offset += authenticator.EncryptFinalBlock(blobDataDestination[offset..]);
+
+        #endregion
+        
+        // Write last, empty beef fragment
+        WriteFragmentBeefMetadata(blobDataDestination[offset..], 2, 0);
+    }
 
     /// <summary>
     /// Solve the legitimation challenge to be able to communicate with PLCs that require a password.
@@ -26,7 +158,7 @@ public static class LegitimateScheme
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="password">The password</param>
     /// <exception cref="ArgumentException"></exception>
-    public static void SolveLegitimateChallenge(
+    public static void SolveLegitimateChallengePlcSim(
         Span<byte> blobDataDestination,
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey,
@@ -40,7 +172,7 @@ public static class LegitimateScheme
         Span<byte> hash = stackalloc byte[SHA1.HashSizeInBytes];
         _ = SHA1.HashData(passBytes, hash);
         
-        SolveLegitimateChallenge(
+        SolveLegitimateChallengePlcSim(
             blobDataDestination, 
             challenge, 
             publicKey,
@@ -57,16 +189,16 @@ public static class LegitimateScheme
     /// <param name="sessionKey">Session key generated in the earlier authentication stage</param>
     /// <param name="passwordHash">SHA-1 hash of the PLC password</param>
     /// <exception cref="ArgumentException"></exception>
-    public static void SolveLegitimateChallenge(
+    public static void SolveLegitimateChallengePlcSim(
         Span<byte> blobDataDestination, 
         ReadOnlySpan<byte> challenge, 
         ReadOnlySpan<byte> publicKey,
         ReadOnlySpan<byte> sessionKey,
         ReadOnlySpan<byte> passwordHash)
     {
-        if (blobDataDestination.Length < OutputBlobDataLength)
+        if (blobDataDestination.Length < OutputBlobDataLengthPlcSim)
         {
-            throw new ArgumentException($"BlobDataDestination must be at least {OutputBlobDataLength} bytes long",
+            throw new ArgumentException($"BlobDataDestination must be at least {OutputBlobDataLengthPlcSim} bytes long",
                 nameof(blobDataDestination));
         }
 
@@ -90,9 +222,14 @@ public static class LegitimateScheme
         KeyUtilities.DeriveChallengeEncryptionKey(challengeKey, symmetricKey);
 
         // The first metadata is at the beginning
-        WriteSeedBeefMetadata(blobDataDestination, publicKey, symmetricKey);
+        BlobMetadataWriter.WriteSeedBeefMetadata(
+            blobDataDestination, 
+            publicKey, 
+            EPublicKeyFamily.PlcSim,
+            symmetricKey
+        );
         
-        const int seedOffset = BeefSeedMetadataLength;
+        const int seedOffset = BlobMetadataWriter.BeefSeedMetadataLength;
         HarpoSeedUtilities.GenerateEncryptedSeed(
             blobDataDestination[seedOffset..], 
             publicKey, 
@@ -103,11 +240,7 @@ public static class LegitimateScheme
         WriteFragmentBeefMetadata(blobDataDestination[ivChallengeMetadataOffset..], 0, 0x40);
 
         Span<byte> iv = stackalloc byte[CommonConstants.AesIvLength];
-        #if DEBUG
-        iv.Fill(0xCC);
-        #else
         iv.FillWithCryptoRandomBytes();
-        #endif
 
         // Copy the IV
         const int ivOffset = 0xAC;
@@ -152,32 +285,6 @@ public static class LegitimateScheme
         // Write last, empty beef fragment
         const int lastFragmentOffset = checksumOffset + 0x10;
         WriteFragmentBeefMetadata(blobDataDestination[lastFragmentOffset..], 2, 0);
-    }
-
-    internal static void WriteSeedBeefMetadata(
-        Span<byte> destination, 
-        ReadOnlySpan<byte> publicKey,
-        ReadOnlySpan<byte> symmetricKey)
-    {
-        var dwords = destination.AsDwords();
-
-        dwords[0] = DeadBeefMagic;
-        dwords[1] = 0xA0; // TODO: Hardcoded length
-        dwords[2] = 0x01; // these two are actually hardcoded
-        dwords[3] = 0x02;
-        destination[0x15] = 0x04;
-        
-        // public key
-        publicKey.DeriveKeyId(destination[0x1C..]);
-        dwords[9] = 784; // public key flags
-        dwords[10] = 0; // public key internal flags
-        
-        // symmetric key
-        symmetricKey.DeriveKeyId(destination[0x2C..]);
-        dwords[13] = 769; // symmetric key flags
-        dwords[14] = 0; // symmetric key internal flags
-
-        dwords[15] = CommonConstants.EncryptedSeedLength;
     }
 
     internal static void WriteFragmentBeefMetadata(Span<byte> destination, int index, int length)

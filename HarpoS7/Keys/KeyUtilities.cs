@@ -1,55 +1,18 @@
 using System.Security.Cryptography;
 using System.Text;
-using HarpoS7.Extensions;
+using HarpoS7.Utilities.Extensions;
 using HarpoS7.Fingerprint;
 
 namespace HarpoS7.Keys;
 
 public static class KeyUtilities
 {
-    private static readonly Memory<byte> DeriveKeyIdMagic;
     private static readonly Memory<byte> DeriveLegitimationKeyMagic;
 
     static KeyUtilities()
     {
-        DeriveKeyIdMagic = new byte[6];
-        Encoding.ASCII.GetBytes("DERIVE", DeriveKeyIdMagic.Span);
-
         DeriveLegitimationKeyMagic = new byte[8];
         Encoding.ASCII.GetBytes("MISTRUST", DeriveLegitimationKeyMagic.Span);
-    }
-
-    public static void DeriveKeyId(this byte[] key, Span<byte> keyId) =>
-        key.AsSpan().DeriveKeyId(keyId);
-
-    public static void DeriveKeyId(this Span<byte> key, Span<byte> keyId) =>
-        ((ReadOnlySpan<byte>)key).DeriveKeyId(keyId);
-
-    public static void DeriveKeyId(this ReadOnlySpan<byte> key, Span<byte> keyId)
-    {
-        const int keyIdLength = 8;
-        const int keyPartLength = 24;
-
-        if (keyId.Length < keyIdLength)
-        {
-            throw new ArgumentException($"Key id span must be at least {keyIdLength} bytes long", nameof(keyId));
-        }
-
-        if (key.Length < keyPartLength)
-        {
-            throw new ArgumentException($"Key span must be at least {keyPartLength} bytes long", nameof(keyId));
-        }
-        
-        // no need to clear the "buffer", it is overwritten anyway
-        Span<byte> buffer = stackalloc byte[keyPartLength + DeriveKeyIdMagic.Length];
-        Span<byte> digest = stackalloc byte[SHA256.HashSizeInBytes];
-        digest.Clear();
-
-        key[..keyPartLength].CopyTo(buffer);
-        DeriveKeyIdMagic.Span.CopyTo(buffer[keyPartLength..]);
-
-        _ = SHA256.HashData(buffer, digest);
-        digest[..8].CopyTo(keyId);
     }
 
     public static void DeriveChallengeEncryptionKey(Span<byte> keyDestination, ReadOnlySpan<byte> randomKey)

@@ -1,0 +1,84 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Keys\00\1B580465BB0551B2.bin" />
+      <EmbeddedResource Include="Keys\00\1B580465BB0551B2.bin" />
+      <None Remove="Keys\00\2C1DD211E529278D.bin" />
+      <EmbeddedResource Include="Keys\00\2C1DD211E529278D.bin" />
+      <None Remove="Keys\00\6BA412F7F1D965AA.bin" />
+      <EmbeddedResource Include="Keys\00\6BA412F7F1D965AA.bin" />
+      <None Remove="Keys\00\60CDAAA33E0B5D20.bin" />
+      <EmbeddedResource Include="Keys\00\60CDAAA33E0B5D20.bin" />
+      <None Remove="Keys\00\99E4632334CC7993.bin" />
+      <EmbeddedResource Include="Keys\00\99E4632334CC7993.bin" />
+      <None Remove="Keys\00\181B7B0847D11694.bin" />
+      <EmbeddedResource Include="Keys\00\181B7B0847D11694.bin" />
+      <None Remove="Keys\00\0448ACCBD5A0BFD2.bin" />
+      <EmbeddedResource Include="Keys\00\0448ACCBD5A0BFD2.bin" />
+      <None Remove="Keys\00\580B8A122D42D1C0.bin" />
+      <EmbeddedResource Include="Keys\00\580B8A122D42D1C0.bin" />
+      <None Remove="Keys\00\65227E2580029B7F.bin" />
+      <EmbeddedResource Include="Keys\00\65227E2580029B7F.bin" />
+      <None Remove="Keys\00\ACD68E9BF9901F8B.bin" />
+      <EmbeddedResource Include="Keys\00\ACD68E9BF9901F8B.bin" />
+      <None Remove="Keys\00\C4F47B876DA76D52.bin" />
+      <EmbeddedResource Include="Keys\00\C4F47B876DA76D52.bin" />
+      <None Remove="Keys\00\D3F9CD55A57FE4EB.bin" />
+      <EmbeddedResource Include="Keys\00\D3F9CD55A57FE4EB.bin" />
+      <None Remove="Keys\00\E69E7A996524AFAC.bin" />
+      <EmbeddedResource Include="Keys\00\E69E7A996524AFAC.bin" />
+      <None Remove="Keys\01\A95850575DF7B3DE.bin" />
+      <EmbeddedResource Include="Keys\01\A95850575DF7B3DE.bin" />
+      <None Remove="Keys\01\AC9BE476CB324E65.bin" />
+      <EmbeddedResource Include="Keys\01\AC9BE476CB324E65.bin" />
+      <None Remove="Keys\01\BD426B091F08731A.bin" />
+      <EmbeddedResource Include="Keys\01\BD426B091F08731A.bin" />
+      <None Remove="Keys\02\1CE2E82CFB24A8BD.bin" />
+      <EmbeddedResource Include="Keys\02\1CE2E82CFB24A8BD.bin" />
+      <None Remove="Keys\02\87FB093E8CE3E247.bin" />
+      <EmbeddedResource Include="Keys\02\87FB093E8CE3E247.bin" />
+      <None Remove="Keys\02\808425F90E46629B.bin" />
+      <EmbeddedResource Include="Keys\02\808425F90E46629B.bin" />
+      <None Remove="Keys\03\5A9B6B015F48D284.bin" />
+      <EmbeddedResource Include="Keys\03\5A9B6B015F48D284.bin" />
+      <None Remove="Keys\03\4964E2F77A386F64.bin" />
+      <EmbeddedResource Include="Keys\03\4964E2F77A386F64.bin" />
+      <None Remove="Keys\03\950840E428F7C7FA.bin" />
+      <EmbeddedResource Include="Keys\03\950840E428F7C7FA.bin" />
+      <None Remove="Keys\03\09013727CCBFBF3C.bin" />
+      <EmbeddedResource Include="Keys\03\09013727CCBFBF3C.bin" />
+      <None Remove="Keys\03\AE5147B429BBA96C.bin" />
+      <EmbeddedResource Include="Keys\03\AE5147B429BBA96C.bin" />
+      <None Remove="Keys\03\B07654AC9CAA4ACA.bin" />
+      <EmbeddedResource Include="Keys\03\B07654AC9CAA4ACA.bin" />
+      <None Remove="Keys\03\CE331E08538A26B9.bin" />
+      <EmbeddedResource Include="Keys\03\CE331E08538A26B9.bin" />
+      <None Remove="Keys\03\D61B355B59D711A9.bin" />
+      <EmbeddedResource Include="Keys\03\D61B355B59D711A9.bin" />
+      <None Remove="Keys\03\E90B455D3CC46013.bin" />
+      <EmbeddedResource Include="Keys\03\E90B455D3CC46013.bin" />
+      <None Remove="Keys\04\513606A547499DB4.bin" />
+      <EmbeddedResource Include="Keys\04\513606A547499DB4.bin" />
+      <None Remove="Keys\04\BDE5B1BE1699D79E.bin" />
+      <EmbeddedResource Include="Keys\04\BDE5B1BE1699D79E.bin" />
+      <None Remove="Keys\04\C8BDDA15DE2E3398.bin" />
+      <EmbeddedResource Include="Keys\04\C8BDDA15DE2E3398.bin" />
+      <None Remove="Keys\05\116BB7F9F5C2CEFD.bin" />
+      <EmbeddedResource Include="Keys\05\116BB7F9F5C2CEFD.bin" />
+      <None Remove="Keys\05\539C166302A7E72B.bin" />
+      <EmbeddedResource Include="Keys\05\539C166302A7E72B.bin" />
+      <None Remove="Keys\05\620D50F326F60595.bin" />
+      <EmbeddedResource Include="Keys\05\620D50F326F60595.bin" />
+    </ItemGroup>
+
+</Project>

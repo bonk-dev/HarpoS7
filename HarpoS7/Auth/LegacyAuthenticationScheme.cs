@@ -1,9 +1,9 @@
-﻿using System.Security.Cryptography;
-using CommunityToolkit.HighPerformance.Buffers;
-using HarpoS7.Aes;
-using HarpoS7.Extensions;
+﻿using HarpoS7.Aes;
+using HarpoS7.Family0.Auth;
+using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
 using HarpoS7.Seed;
+using HarpoS7.Utilities.Auth;
 
 namespace HarpoS7.Auth;
 
@@ -12,32 +12,79 @@ namespace HarpoS7.Auth;
 /// </summary>
 public static class LegacyAuthenticationScheme
 {
-    public const int EncryptedBlobLength = 216;
-
     public static void Authenticate(
+        Span<byte> encryptedBlobData,
+        Span<byte> sessionKey,
+        ReadOnlySpan<byte> challenge,
+        ReadOnlySpan<byte> publicKey,
+        EPublicKeyFamily publicKeyFamily)
+    {
+        switch (publicKeyFamily)
+        {
+            case EPublicKeyFamily.S71500:
+            case EPublicKeyFamily.S71200:
+                AuthenticateRealPlc(encryptedBlobData, sessionKey, challenge, publicKey, publicKeyFamily);
+                break;
+            case EPublicKeyFamily.PlcSim:
+                AuthenticatePlcSim(encryptedBlobData, sessionKey, challenge, publicKey);
+                break;
+            default:
+                throw new ArgumentException("Unsupported key family", nameof(publicKeyFamily));
+        }
+    }
+    
+    public static void AuthenticateRealPlc(
+        Span<byte> encryptedBlobData,
+        Span<byte> sessionKey,
+        ReadOnlySpan<byte> challenge,
+        ReadOnlySpan<byte> publicKey,
+        EPublicKeyFamily publicKeyFamily)
+    {
+        if (publicKeyFamily != EPublicKeyFamily.S71500 && publicKeyFamily != EPublicKeyFamily.S71200)
+        {
+            throw new ArgumentException(
+                "This function can be used only with family0 and family1 keys", 
+                nameof(publicKeyFamily)
+            );
+        }
+        
+        if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthRealPlc)
+        {
+            throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthRealPlc} bytes long",
+                nameof(encryptedBlobData));
+        }
+
+        var authenticator = new RealPlcAuthenticator();
+        var offset = authenticator.WriteMetadata(encryptedBlobData, publicKey, publicKeyFamily);
+        offset += authenticator.WriteSeed(encryptedBlobData[offset..], publicKey);
+        offset += authenticator.EncryptFullBlocks(encryptedBlobData[offset..], challenge);
+        _ = authenticator.EncryptFinalBlock(encryptedBlobData[offset..]);
+
+        Span<byte> key2 = stackalloc byte[24];
+        authenticator.ExtractKey2(key2);
+
+        KeyUtilities.DeriveSessionKey(sessionKey, key2, challenge);
+    }
+
+    public static void AuthenticatePlcSim(
         Span<byte> encryptedBlobData,
         Span<byte> sessionKey,
         ReadOnlySpan<byte> challenge,
         ReadOnlySpan<byte> publicKey)
     {
         // so i dont forget - sessionkey, the one for calculating packet digests, is calculated using 0x11 key
-        if (encryptedBlobData.Length < EncryptedBlobLength)
+        if (encryptedBlobData.Length < CommonConstants.EncryptedBlobLengthPlcSim)
         {
-            throw new ArgumentException($"Encrypted blob data must be at least {EncryptedBlobLength} bytes long",
+            throw new ArgumentException($"Encrypted blob data must be at least {CommonConstants.EncryptedBlobLengthPlcSim} bytes long",
                 nameof(encryptedBlobData));
         }
 
         // 1. Generate two random 24 byte keys
         Span<byte> key1 = stackalloc byte[24];
         Span<byte> key2 = stackalloc byte[24];
-
-#if DEBUG
-        key1.Fill(0x11);
-        key2.Fill(0x22);
-#else
-        RandomNumberGenerator.Fill(key1);
-        RandomNumberGenerator.Fill(key2);
-#endif
+        
+        key1.FillWithCryptoRandomBytes();
+        key2.FillWithCryptoRandomBytes();
 
         // 2. Derive the challenge encryption key
         Span<byte> challengeKey = stackalloc byte[CommonConstants.AesKeyLengthInBytes];
@@ -45,15 +92,10 @@ public static class LegacyAuthenticationScheme
 
         // 3. Generate IV for challenge encryption
         Span<byte> ivBuffer = stackalloc byte[CommonConstants.AesIvLength];
-
-#if DEBUG
-        ivBuffer.Fill(0xCC);
-#else
-        RandomNumberGenerator.Fill(ivBuffer);
-#endif
+        ivBuffer.FillWithCryptoRandomBytes();
 
         // 4. Write metadata
-        int blobIndex = WriteEncryptedBlobMetadata(encryptedBlobData, publicKey, key1);
+        int blobIndex = BlobMetadataWriter.WriteMetadata(encryptedBlobData, publicKey, key1, EPublicKeyFamily.PlcSim);
 
         // 5. Generate and encrypt seed
         HarpoSeedUtilities.GenerateEncryptedSeed(
@@ -84,36 +126,5 @@ public static class LegacyAuthenticationScheme
 
         // 10. Calculate the session key
         KeyUtilities.DeriveSessionKey(sessionKey, key1, challenge);
-    }
-
-    /// <summary>
-    /// Writes encrypted blob metadata
-    /// </summary>
-    /// <param name="blobData">The output</param>
-    /// <param name="publicKey">The used public key</param>
-    /// <param name="key1">The key used for deriving session key</param>
-    /// <returns>Next writeable offset in <paramref name="blobData"/></returns>
-    private static int WriteEncryptedBlobMetadata(
-        Span<byte> blobData,
-        ReadOnlySpan<byte> publicKey,
-        ReadOnlySpan<byte> key1)
-    {
-        const uint BlobMagic = 0xFEE1DEAD;
-
-        var blobDword = blobData.AsDwords();
-        blobDword[0] = BlobMagic;
-        blobDword[1] = EncryptedBlobLength;
-        blobDword[2] = 1;
-        blobDword[3] = 1;
-
-        key1.DeriveKeyId(blobData[(sizeof(uint) * 4)..]);
-        blobDword[6] = 769;
-        blobDword[7] = 0;
-
-        publicKey.DeriveKeyId(blobData[(sizeof(uint) * 8)..]);
-        blobDword[10] = 784;
-        blobDword[11] = 0;
-
-        return 12 * sizeof(uint);
     }
 }
