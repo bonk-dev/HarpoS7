@@ -20,6 +20,7 @@ for end users.
 - Supports legitimation (password authorization)
 
 ### Tested on
+- S7-1200 (1211C DC/DC/relay, 6ES7211-1HE40-0XB0) - tested by [Siephs](https://github.com/Siephs)
 - S7-1200 (1214C DC/DC/DC, 6ES7214-1AG40-0XB0)
 - S7-1200 (1214C AC/DC/relay, 6ES7214-1BG40-0XB0) - tested by [Peter Belica](https://github.com/peterbelica)
 - S7-1500 (1516-3 PN/DP, 6ES7516-3AN02-0AB0) - tested by [Schneggo](https://github.com/Schneggo)
