@@ -2,6 +2,11 @@ using HarpoS7.Family0.Exceptions;
 
 namespace HarpoS7.Family0.Monoliths;
 
+/// <summary>
+/// Performs a cryptographic transformation on a source buffer into a destination buffer.
+/// This is a linear+quadratic mixing function that uses symmetric boolean operations on triplets of bytes.
+/// The transformation combines linear XOR operations with quadratic (two-variable) boolean terms.
+/// </summary>
 public static class Monolith11
 {
     public static void Execute(Span<byte> destination, ReadOnlySpan<byte> source)
