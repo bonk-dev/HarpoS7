@@ -37,16 +37,14 @@ public static class BlobMetadataWriter
         }
         
         const uint blobMagic = 0xFEE1DEAD;
-        
-        // These are hardcoded to 1
-        const uint unknownField1 = 1;
-        const uint unknownField2 = 1;
+        const uint securityKeyVersion = 1;
+        const uint securityLevelLegacyCsi = 1;
 
         var blobDword = blobData.AsDwords();
         blobDword[0] = blobMagic;
         blobDword[1] = (uint)GetBlobLength(keyFamily);
-        blobDword[2] = unknownField1;
-        blobDword[3] = unknownField2;
+        blobDword[2] = securityKeyVersion;
+        blobDword[3] = securityLevelLegacyCsi;
 
         const int symmetricKeyIdOffset = 4 * sizeof(uint);
         key1.DeriveKeyId(blobData[symmetricKeyIdOffset..]);
@@ -72,9 +70,9 @@ public static class BlobMetadataWriter
         const uint blobMagic = 0xDEADBEEFU;
         dwords[0] = blobMagic;
         dwords[1] = (uint)GetLegitimationSeedFragmentLength(keyFamily);
-        dwords[2] = 0x01; // these two are actually hardcoded
-        dwords[3] = 0x02;
-        destination[0x15] = 0x04;
+        dwords[2] = 0x01; // Maybe a version field;
+        dwords[3] = 0x02; // Maybe SecurityTypeCSI; 2 is the Siemens legacy CSI mode.
+        destination[0x15] = 0x04; // Maybe flags 0x400
         
         // public key
         publicKey.DeriveKeyId(destination[0x1C..]);
@@ -120,22 +118,16 @@ public static class BlobMetadataWriter
         };
     
     /// <summary>
-    /// Get the symmetric key flags based on the public key family sent by the PLC
+    /// Get the Siemens CSI symmetric-session-key flags based on the public-key family sent by the PLC.
     /// </summary>
     /// <param name="keyFamily">The public key family</param>
     /// <returns>Symmetric key flags</returns>
     /// <exception cref="ArgumentException">Thrown when the key family is invalid</exception>
     public static int GetSymmetricKeyFlags(EPublicKeyFamily keyFamily) =>
-        keyFamily switch
-        {
-            EPublicKeyFamily.S71500 => 0x1,
-            EPublicKeyFamily.S71200 => 0x101,
-            EPublicKeyFamily.PlcSim => 0x301,
-            _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
-        };
+        SiemensCsiKeyFlags.GetSymmetricKeyFlags(keyFamily);
     
     /// <summary>
-    /// Get the symmetric key flags based on the public key family sent by the PLC for the legitimation process
+    /// Get the Siemens CSI symmetric-session-key flags used by the legitimation process.
     /// </summary>
     /// <param name="keyFamily">The public key family</param>
     /// <returns>Symmetric key flags</returns>
@@ -145,24 +137,18 @@ public static class BlobMetadataWriter
         {
             EPublicKeyFamily.S71500 => 0x1,
             EPublicKeyFamily.S71200 => 0x1,
-            EPublicKeyFamily.PlcSim => 0x301,
+            EPublicKeyFamily.PlcSim => SiemensCsiKeyFlags.GetSymmetricKeyFlags(keyFamily),
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };
     
     /// <summary>
-    /// Get the public key flags based on the public key family sent by the PLC
+    /// Get the Siemens CSI communication public-key flags based on the public-key family sent by the PLC.
     /// </summary>
     /// <param name="keyFamily">The public key family</param>
     /// <returns>Public key flags</returns>
     /// <exception cref="ArgumentException">Thrown when the key family is invalid</exception>
     public static int GetPublicKeyFlags(EPublicKeyFamily keyFamily) =>
-        keyFamily switch
-        {
-            EPublicKeyFamily.S71500 => 0x10,
-            EPublicKeyFamily.S71200 => 0x110,
-            EPublicKeyFamily.PlcSim => 0x310,
-            _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
-        };
+        SiemensCsiKeyFlags.GetCommPublicKeyFlags(keyFamily);
 
     /// <summary>
     /// Get the encrypted seed length based on the public key family sent by the PLC
@@ -173,8 +159,8 @@ public static class BlobMetadataWriter
     public static int GetEncryptedSeedLength(EPublicKeyFamily keyFamily) =>
         keyFamily switch
         {
-            EPublicKeyFamily.S71500 => 0x3C, // TODO: Transform6.DestinationSize
-            EPublicKeyFamily.S71200 => 0x3C, // TODO: Transform6.DestinationSize
+            EPublicKeyFamily.S71500 => CommonConstants.EncryptedSeedLengthRealPlc,
+            EPublicKeyFamily.S71200 => CommonConstants.EncryptedSeedLengthRealPlc,
             EPublicKeyFamily.PlcSim => CommonConstants.EncryptedSeedLength,
             _ => throw new ArgumentException("Invalid public key family", nameof(keyFamily))
         };

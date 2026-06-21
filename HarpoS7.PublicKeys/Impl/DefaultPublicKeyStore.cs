@@ -8,12 +8,12 @@ public class DefaultPublicKeyStore : IPublicKeyStore
 {
     /// <inheritdoc/>
     public int GetPublicKeyLength(string variableNameFingerprint) =>
-        GetFamilyType(variableNameFingerprint) switch
+        GetFamilyPrefix(variableNameFingerprint) switch
         {
             "00" => Constants.PublicKeyLengthRealPlc,
             "01" => Constants.PublicKeyLengthRealPlc,
             "03" => Constants.PublicKeyLengthPlcSim,
-            _ => throw new ArgumentException($"Unsupported public key family ({GetFamilyType(variableNameFingerprint)})")
+            _ => throw new ArgumentException($"Unsupported Siemens OMS public-key family prefix '{GetFamilyPrefix(variableNameFingerprint)}'.")
         };
 
     /// <inheritdoc/>
@@ -23,7 +23,7 @@ public class DefaultPublicKeyStore : IPublicKeyStore
         const string extension = ".bin";
         
         // Namespace parts which begin with a number must start with a '_'
-        var resourceName = $"{baseNameSpace}._{GetFamilyType(variableNameFingerprint)}.{GetKeyId(variableNameFingerprint)}{extension}";
+        var resourceName = $"{baseNameSpace}._{GetFamilyPrefix(variableNameFingerprint)}.{GetKeyId(variableNameFingerprint)}{extension}";
         
         using var stream = Assembly
             .GetExecutingAssembly()
@@ -36,8 +36,15 @@ public class DefaultPublicKeyStore : IPublicKeyStore
         _ = stream.Read(destination);
     }
 
-    internal static string GetFamilyType(string variableNameFingerprint) => 
-        variableNameFingerprint[..2];
+    internal static string GetFamilyPrefix(string variableNameFingerprint)
+    {
+        if (string.IsNullOrWhiteSpace(variableNameFingerprint) || variableNameFingerprint.Length < 2)
+        {
+            throw new ArgumentException("Fingerprint must start with a two-digit Siemens OMS key-family prefix.", nameof(variableNameFingerprint));
+        }
+
+        return variableNameFingerprint[..2];
+    }
     
     internal static string GetKeyId(string variableNameFingerprint) => 
         variableNameFingerprint[3..];
