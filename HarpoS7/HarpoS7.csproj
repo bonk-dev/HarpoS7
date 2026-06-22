@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+    	<TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Title>HarpoS7</Title>
@@ -10,14 +10,15 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>nuget-icon.png</PackageIcon>
-        <PackageVersion>1.1.0</PackageVersion>
+        <PackageVersion>1.1.1</PackageVersion>
         <RepositoryUrl>https://github.com/bonk-dev/HarpoS7</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>siemens</PackageTags>
-        <AssemblyVersion>1.1.0</AssemblyVersion>
-        <FileVersion>1.1.0</FileVersion>
-        <Version>1.1.0</Version>
-        <PackageReleaseNotes>Real S7-1200/1500 support</PackageReleaseNotes>
+        <AssemblyVersion>1.1.1</AssemblyVersion>
+        <FileVersion>1.1.1</FileVersion>
+        <Version>1.1.1</Version>
+        <PackageReleaseNotes>Packaging fixes</PackageReleaseNotes>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -31,14 +32,24 @@
         <Link>nuget-icon.png</Link>
       </None>
     </ItemGroup>
-    
+
     <ItemGroup>
         <None Include="..\README.md" Pack="true" PackagePath=""/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <ProjectReference Include="..\HarpoS7.Family0\HarpoS7.Family0.csproj" />
-      <ProjectReference Include="..\HarpoS7.Utilities\HarpoS7.Utilities.csproj" />
+      <ProjectReference Include="..\HarpoS7.Family0\HarpoS7.Family0.csproj" PrivateAssets="all" />
+      <ProjectReference Include="..\HarpoS7.Utilities\HarpoS7.Utilities.csproj" PrivateAssets="all" />
     </ItemGroup>
-    
+
+    <PropertyGroup>
+      <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    </PropertyGroup>
+
+    <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+      <ItemGroup>
+        <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('Extension', '.dll'))" />
+      </ItemGroup>
+    </Target>
+
 </Project>

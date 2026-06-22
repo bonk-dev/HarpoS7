@@ -12,6 +12,7 @@
     <ItemGroup>
       <ProjectReference Include="..\HarpoS7.PublicKeys\HarpoS7.PublicKeys.csproj" />
       <ProjectReference Include="..\HarpoS7\HarpoS7.csproj" />
+      <ProjectReference Include="..\HarpoS7.Utilities\HarpoS7.Utilities.csproj" />
     </ItemGroup>
 
 </Project>
