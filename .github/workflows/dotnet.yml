@@ -23,10 +23,17 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build -c Release --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      run: dotnet test -c Release --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: Pack NuGet Package
+      run: dotnet pack HarpoS7/HarpoS7.csproj -c Release --output ./nupkg_output
+    - name: Upload NuGet Package as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: HarpoS7-NuGet-Package
+        path: ./nupkg_output/*.nupkg
