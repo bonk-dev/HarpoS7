@@ -30,10 +30,12 @@ jobs:
       uses: codecov/codecov-action@v7
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    - name: Pack NuGet Package
+    - name: Pack main NuGet Package
       run: dotnet pack HarpoS7/HarpoS7.csproj -c Release --output ./nupkg_output
+    - name: Pack PublicKeys NuGet Package
+      run: dotnet pack HarpoS7.PublicKeys/HarpoS7.PublicKeys.csproj -c Release --output ./nupkg_output
     - name: Upload NuGet Package as Artifact
       uses: actions/upload-artifact@v7
       with:
-        name: HarpoS7-NuGet-Package
+        name: HarpoS7-NuGet-Packages
         path: ./nupkg_output/*.nupkg
