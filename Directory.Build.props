@@ -17,12 +17,10 @@
         <Version>1.1.2</Version>
         <PackageReleaseNotes>Internal naming changes</PackageReleaseNotes>
 
-        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>nuget-icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
         <None Include="$(MSBuildThisFileDirectory)tools\nuget-icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 </Project>

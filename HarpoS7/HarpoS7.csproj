@@ -3,6 +3,7 @@
     <PropertyGroup>
         <Title>HarpoS7</Title>
         <Description>HarpoS7 is a C# library designed to authenticate sessions in the S7 Comm Plus protocol. </Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,5 +24,9 @@
         <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('Extension', '.dll'))" />
       </ItemGroup>
     </Target>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
 </Project>
