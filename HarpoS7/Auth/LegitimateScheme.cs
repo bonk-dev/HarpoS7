@@ -14,9 +14,8 @@ public static class LegitimateScheme
     internal const int BeefFragmentMetadataLength = 0x0C;
     private const uint DeadBeefMagic = 0xDEADBEEF;
 
-    private const int BlobLengthOffset = 68;
-    public const int OutputBlobDataLengthRealPlc = CommonConstants.EncryptedBlobLengthRealPlc + BlobLengthOffset;
-    public const int OutputBlobDataLengthPlcSim = CommonConstants.EncryptedBlobLengthPlcSim + BlobLengthOffset;
+    public const int OutputBlobDataLengthRealPlc = CommonConstants.EncryptedLegitimationBlobLengthRealPlc;
+    public const int OutputBlobDataLengthPlcSim = CommonConstants.EncryptedLegitimationBlobLengthPlcSim;
     public const int ChallengeLength = 20;
 
     /// <summary>
@@ -90,7 +89,7 @@ public static class LegitimateScheme
 
         #region Keys
 
-        Span<byte> challengeKey = stackalloc byte[24];
+        Span<byte> challengeKey = stackalloc byte[Constants.SymmetricKeyLength];
         KeyUtilities.DeriveLegitimationChallengeKey(challengeKey, sessionKey);
 
         Span<byte> key2 = stackalloc byte[passwordHash.Length + challenge.Length];
@@ -127,7 +126,7 @@ public static class LegitimateScheme
         );
         offset += BeefFragmentMetadataLength;
 
-        Span<byte> zeroChallenge = stackalloc byte[20];
+        Span<byte> zeroChallenge = stackalloc byte[ChallengeLength];
         zeroChallenge.Clear();
         offset += authenticator.EncryptFullBlocks(blobDataDestination[offset..], zeroChallenge);
 
@@ -138,7 +137,7 @@ public static class LegitimateScheme
         WriteFragmentBeefMetadata(
             blobDataDestination[offset..], 
             0x01, 
-            authenticator.Key2LeftOverLength + 16 // + checksum
+            authenticator.Key2LeftOverLength + CommonConstants.AesBlockLength
         );
         offset += BeefFragmentMetadataLength;
         offset += authenticator.EncryptFinalBlock(blobDataDestination[offset..]);
@@ -231,36 +230,39 @@ public static class LegitimateScheme
         
         const int seedOffset = BlobMetadataWriter.BeefSeedMetadataLength;
         HarpoSeedUtilities.GenerateEncryptedSeed(
-            blobDataDestination[seedOffset..], 
+            blobDataDestination[seedOffset..],
             publicKey, 
             challengeKey);
         
         // IV + Challenge
-        const int ivChallengeMetadataOffset = 0xA0;
-        WriteFragmentBeefMetadata(blobDataDestination[ivChallengeMetadataOffset..], 0, 0x40);
+        const int ivChallengeMetadataOffset = seedOffset + CommonConstants.EncryptedSeedLength; // 0xA0
+        WriteFragmentBeefMetadata(
+            blobDataDestination[ivChallengeMetadataOffset..],
+            0,
+            0x40);
 
         Span<byte> iv = stackalloc byte[CommonConstants.AesIvLength];
         iv.FillWithCryptoRandomBytes();
 
         // Copy the IV
-        const int ivOffset = 0xAC;
+        const int ivOffset = ivChallengeMetadataOffset + BeefFragmentMetadataLength;
         iv.CopyTo(blobDataDestination[ivOffset..]);
 
         // Init AES-CTR
         using var aesCtr = new HarpoAesCtr(challengeKey[..CommonConstants.AesKeyLengthInBytes]);
         aesCtr.Init(iv);
         
-        // Encrypt 16 0x00 bytes
-        const int zeroCiphertextOffset = ivOffset + 0x10;
+        // Encrypt one zero AES block
+        const int zeroCiphertextOffset = ivOffset + CommonConstants.AesIvLength;
         {
-            Span<byte> zeroBytes = stackalloc byte[16];
+            Span<byte> zeroBytes = stackalloc byte[CommonConstants.AesBlockLength];
             aesCtr.EncryptCtr(zeroBytes, blobDataDestination[zeroCiphertextOffset..]);
         }
 
         // Encrypt hash+challenge
-        const int encryptedHashOffset = zeroCiphertextOffset + 0x10;
+        const int encryptedHashOffset = zeroCiphertextOffset + CommonConstants.AesBlockLength;
         {
-            const int hashPartLength = 0x14;
+            const int hashPartLength = ChallengeLength;
             const int challengePartLength = CommonConstants.AesBlockSize - hashPartLength;
             
             Span<byte> concat = stackalloc byte[hashPartLength + challengePartLength];
@@ -280,10 +282,10 @@ public static class LegitimateScheme
         
         // Extract checksum
         const int checksumOffset = challengePartOffset + 8;
-        aesCtr.CalculateChecksum(blobDataDestination.Slice(checksumOffset, 0x10));
+        aesCtr.CalculateChecksum(blobDataDestination.Slice(checksumOffset, CommonConstants.AesBlockLength));
         
         // Write last, empty beef fragment
-        const int lastFragmentOffset = checksumOffset + 0x10;
+        const int lastFragmentOffset = checksumOffset + CommonConstants.AesBlockLength;
         WriteFragmentBeefMetadata(blobDataDestination[lastFragmentOffset..], 2, 0);
     }
 

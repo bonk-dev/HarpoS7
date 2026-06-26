@@ -80,6 +80,19 @@ LegacyAuthenticationScheme.Authenticate(
     family);
 ```
 
+### Siemens OMS CSI naming
+
+The legacy challenge path is Siemens OMS `SecurityTypeCSI`. The first two
+digits of the PLC fingerprint map to Siemens key families:
+
+- `00` -> `KeyFamilyCPU1500`
+- `01` -> `KeyFamilyCPU1200`
+- `03` -> `KeyFamilyVPLC` / PLCSIM
+
+CSI key-id flags use the low byte for the key type and bits 8..15 for the
+family. `SiemensCsiKeyFlags` centralizes those values so the blob writer uses
+named Siemens-derived constants instead of raw `0x101` / `0x310` style literals.
+
 In order to calculate a packet digest (these are used to prevent tampering):
 ```csharp
 // Input - your packet data (without the S7-Header and S7-Trailer)
