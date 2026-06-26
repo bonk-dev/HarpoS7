@@ -1,0 +1,28 @@
+<Project>
+	<PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+
+        <PackageProjectUrl>https://github.com/bonk-dev/HarpoS7</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/bonk-dev/HarpoS7</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>siemens;s7</PackageTags>
+
+        <PackageVersion>1.1.2</PackageVersion>
+        <AssemblyVersion>1.1.2</AssemblyVersion>
+        <FileVersion>1.1.2</FileVersion>
+        <Version>1.1.2</Version>
+        <PackageReleaseNotes>Internal naming changes</PackageReleaseNotes>
+
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>nuget-icon.png</PackageIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+        <None Include="$(MSBuildThisFileDirectory)tools\nuget-icon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+</Project>

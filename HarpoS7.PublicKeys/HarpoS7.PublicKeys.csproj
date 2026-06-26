@@ -1,14 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
-
-    <ItemGroup>
-      
-    </ItemGroup>
 
     <ItemGroup>
       <None Remove="Keys\00\1B580465BB0551B2.bin" />
