@@ -33,14 +33,7 @@ public static class HarpoPacketDigest
                 nameof(sessionKey));
         }
 
-        if (!HMACSHA256.TryHashData(sessionKey[..Constants.SessionKeyLength], data, destination, out var bytesWritten))
-        {
-            throw new Exception("Could not calculate the packet digest");
-        }
-
-        if (bytesWritten != DigestLength)
-        {
-            throw new Exception($"Calculated digest length ({bytesWritten}) did not match the expected length ({DigestLength})");
-        }
+        HarpoS7.Utilities.Compatibility.CryptoCompatibility.HmacSha256(
+            sessionKey[..Constants.SessionKeyLength], data, destination);
     }
 }

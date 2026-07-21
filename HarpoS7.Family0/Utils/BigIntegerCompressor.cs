@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Compatibility;
 
 namespace HarpoS7.Family0.Utils;
 
@@ -17,17 +18,13 @@ public static class BigIntegerCompressor
         length = integerBuffer.Length;
         if (length > BigIntOperations.FinalizeSourceSize)
         {
-            var overflowInt = new BigInteger(
-                integerBuffer[BigIntOperations.FinalizeSourceSize..],
-                isUnsigned: true,
-                isBigEndian: false);
-            var compressedProduct = new BigInteger(
-                integerBuffer[..BigIntOperations.FinalizeSourceSize],
-                isUnsigned: true,
-                isBigEndian: false);
+            var overflowInt = BigIntegerCompatibility.FromUnsignedLittleEndian(
+                integerBuffer[BigIntOperations.FinalizeSourceSize..]);
+            var compressedProduct = BigIntegerCompatibility.FromUnsignedLittleEndian(
+                integerBuffer[..BigIntOperations.FinalizeSourceSize]);
 
             var product = overflowInt * 0x2F + compressedProduct;
-            _ = product.TryWriteBytes(integerBuffer, out length, isUnsigned: true, isBigEndian: false);
+            length = BigIntegerCompatibility.WriteLittleEndian(product, integerBuffer, isUnsigned: true);
         }
 
         return length > BigIntOperations.FinalizeSourceSize;

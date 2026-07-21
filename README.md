@@ -13,6 +13,17 @@ authentication introduced in project made using TIA Portal V17 and newer.
 HarpoS7 is intended for integration into other libraries and frameworks rather than as a standalone tool 
 for end users.
 
+## Supported frameworks
+
+- .NET 8.0
+- .NET Standard 2.0, including .NET Framework 4.8
+
+Both the `HarpoS7` and `HarpoS7.PublicKeys` NuGet packages provide these targets.
+
+On .NET Standard 2.0, use the `HarpoTlsAuth.AuthenticateUsingTlsAsync` overload that accepts a target-host string.
+The overload accepting `SslClientAuthenticationOptions` is available only on .NET 8.0 because that options type is
+not part of .NET Standard 2.0.
+
 ## Features
 - Fully managed
 - Supports challenge-based authentication (pre-V17 TIA portal)

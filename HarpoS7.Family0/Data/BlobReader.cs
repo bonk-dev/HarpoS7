@@ -28,7 +28,19 @@ public static class BlobReader
             throw new Exception("Transform12 metadata stream was null");
         }
         
-        _t12Metadata = new byte[stream.Length];
-        _ = stream.Read(_t12Metadata.Span);
+        var metadata = new byte[stream.Length];
+        var offset = 0;
+        while (offset < metadata.Length)
+        {
+            var bytesRead = stream.Read(metadata, offset, metadata.Length - offset);
+            if (bytesRead == 0)
+            {
+                throw new EndOfStreamException("Transform12 metadata stream ended unexpectedly");
+            }
+
+            offset += bytesRead;
+        }
+
+        _t12Metadata = metadata;
     }
 }

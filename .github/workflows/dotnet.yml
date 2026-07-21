@@ -25,7 +25,7 @@ jobs:
     - name: Build
       run: dotnet build -c Release --no-restore
     - name: Test
-      run: dotnet test -c Release --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      run: dotnet test -c Release --framework net8.0 --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v7
       env:
@@ -54,11 +54,55 @@ jobs:
         name: HarpoS7.PoC_Windows_x64_SelfContained
         path: ./windows/*
 
+  net48-compatibility:
+    runs-on: windows-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+      - name: Run library tests on .NET Framework 4.8
+        shell: pwsh
+        run: |
+          $testProjects = @(
+            'HarpoS7.Tests/HarpoS7.Tests.csproj',
+            'HarpoS7.Family0.Tests/HarpoS7.Family0.Tests.csproj',
+            'HarpoS7.Utilities.Tests/HarpoS7.Utilities.Tests.csproj',
+            'HarpoS7.PublicKeys.Tests/HarpoS7.PublicKeys.Tests.csproj'
+          )
+
+          $resultsDirectory = Join-Path $env:RUNNER_TEMP 'harpos7-net48-results'
+          foreach ($testProject in $testProjects) {
+            $testName = [IO.Path]::GetFileNameWithoutExtension($testProject)
+            $resultFile = "$testName.trx"
+            dotnet test $testProject -c Release --framework net48 `
+              --logger "trx;LogFileName=$resultFile" `
+              --results-directory $resultsDirectory
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+            [xml]$testResult = Get-Content (Join-Path $resultsDirectory $resultFile)
+            if ([int]$testResult.TestRun.ResultSummary.Counters.total -eq 0) {
+              throw "No .NET Framework 4.8 tests were discovered for $testProject"
+            }
+          }
+      - uses: actions/download-artifact@v7
+        with:
+          name: HarpoS7-NuGet-Packages
+          path: ./artifacts
+      - name: Validate .NET Framework 4.8 NuGet packages
+        shell: pwsh
+        run: |
+          $packageSource = (Resolve-Path ./artifacts).Path
+          dotnet restore HarpoS7.NetFramework48.SmokeTest/HarpoS7.NetFramework48.SmokeTest.csproj -p:RestoreAdditionalProjectSources="$packageSource"
+          dotnet run --project HarpoS7.NetFramework48.SmokeTest/HarpoS7.NetFramework48.SmokeTest.csproj -c Release --no-restore
+
   publish-nuget:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: nuget-release
-    needs: [build]
+    needs: [build, net48-compatibility]
     permissions:
       id-token: write  # enable GitHub OIDC token issuance for this job
     steps:

@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+        <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
         <PackageId>HarpoS7.PublicKeys</PackageId>
         <Title>HarpoS7.PublicKeys</Title>
         <Description>Public keys and cryptographic assets required for HarpoS7 authentication.</Description>

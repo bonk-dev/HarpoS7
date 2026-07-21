@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Text;
+using HarpoS7.Compatibility;
 
 namespace HarpoS7.Transport;
 
@@ -49,7 +50,7 @@ public class CotpStream : Stream
             WriteTpktHeader(header, length, doNotAddHeaderLength: true);
             SerializeConnectionRequest(header.AsSpan()[4..], destinationTsap);
 
-            await _underlyingStream.WriteAsync(header[..length]);
+            await _underlyingStream.WriteAsync(header, 0, length);
         }
         finally
         {
@@ -69,7 +70,10 @@ public class CotpStream : Stream
 
         try
         {
-            var read = await _underlyingStream.ReadAsync(header.AsMemory()[..ExpectedCotpConConfirmLength], cancellationToken);
+            var read = await StreamCompatibility.ReadAsync(
+                _underlyingStream,
+                header.AsMemory()[..ExpectedCotpConConfirmLength],
+                cancellationToken);
             Debug.WriteLine($"COTP CC: Read {read} bytes");
             if (read < 6)
             {
@@ -87,7 +91,10 @@ public class CotpStream : Stream
             while (remainingBytes > 0)
             {
                 Debug.WriteLine($"COTP CC: discarding {remainingBytes}");
-                remainingBytes -= await _underlyingStream.ReadAsync(header.AsMemory()[..remainingBytes], cancellationToken);
+                remainingBytes -= await StreamCompatibility.ReadAsync(
+                    _underlyingStream,
+                    header.AsMemory()[..remainingBytes],
+                    cancellationToken);
             }
         }
         finally
@@ -96,19 +103,24 @@ public class CotpStream : Stream
         }
     }
 
-    internal async Task WriteEmptyDtDataAsync() => await _underlyingStream.WriteAsync(EmptyDtDataCotpPacket);
+    internal async Task WriteEmptyDtDataAsync() =>
+        await _underlyingStream.WriteAsync(EmptyDtDataCotpPacket, 0, EmptyDtDataCotpPacket.Length);
 
+#if NETSTANDARD2_0
+    public async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = new())
+#else
     public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = new())
+#endif
     {
         switch (buffer.Length)
         {
             case <= 0:
-                return await _underlyingStream.ReadAsync(buffer, cancellationToken);
+                return await StreamCompatibility.ReadAsync(_underlyingStream, buffer, cancellationToken);
             case < HeaderLength:
                 throw new ArgumentException(BufferLengthExceptionMessage, nameof(buffer));
         }
 
-        var read = await _underlyingStream.ReadAsync(buffer[..HeaderLength], cancellationToken);
+        var read = await StreamCompatibility.ReadAsync(_underlyingStream, buffer[..HeaderLength], cancellationToken);
         if (read != HeaderLength)
         {
             throw new Exception(string.Format(InvalidHeaderReadExceptionMessage, read, HeaderLength));
@@ -116,7 +128,7 @@ public class CotpStream : Stream
 
         var tpktLength = BinaryPrimitives.ReadUInt16BigEndian(buffer[2..].Span);
         var packetLength = tpktLength - 7;
-        return await _underlyingStream.ReadAsync(buffer[..packetLength], cancellationToken);
+        return await StreamCompatibility.ReadAsync(_underlyingStream, buffer[..packetLength], cancellationToken);
     }
 
     public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
@@ -129,7 +141,7 @@ public class CotpStream : Stream
                 throw new ArgumentException(BufferLengthExceptionMessage, nameof(buffer));
         }
 
-        var read = await _underlyingStream.ReadAsync(buffer.AsMemory(0, HeaderLength), cancellationToken);
+        var read = await _underlyingStream.ReadAsync(buffer, 0, HeaderLength, cancellationToken);
         if (read != HeaderLength)
         {
             throw new Exception(string.Format(InvalidHeaderReadExceptionMessage, read, HeaderLength));
@@ -182,7 +194,11 @@ public class CotpStream : Stream
     public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) => 
         await WriteAsync(buffer.AsMemory(offset, count), cancellationToken);
 
+#if NETSTANDARD2_0
+    public async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = new())
+#else
     public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = new())
+#endif
     {
         var cotpBuffer = ArrayPool<byte>.Shared.Rent(HeaderLength + buffer.Length);
         try
@@ -195,7 +211,10 @@ public class CotpStream : Stream
             // and data into one buffer
             buffer.CopyTo(cotpBuffer.AsMemory(HeaderLength));
 
-            await _underlyingStream.WriteAsync(cotpBuffer.AsMemory(0, HeaderLength + buffer.Length), cancellationToken);
+            await StreamCompatibility.WriteAsync(
+                _underlyingStream,
+                cotpBuffer.AsMemory(0, HeaderLength + buffer.Length),
+                cancellationToken);
         }
         finally
         {
@@ -240,7 +259,9 @@ public class CotpStream : Stream
         
         // param 2 (Dest. TSAP)
         span[11] = 0xC2; // dst-tsap
-        var stringLength = Encoding.ASCII.GetBytes(destinationTsap, span[13..]);
+        var encodedDestinationTsap = Encoding.ASCII.GetBytes(destinationTsap);
+        encodedDestinationTsap.AsSpan().CopyTo(span[13..]);
+        var stringLength = encodedDestinationTsap.Length;
         span[12] = (byte)(stringLength);
 
         // param 3. (TPDU size)
@@ -263,5 +284,13 @@ public class CotpStream : Stream
     
     protected override void Dispose(bool disposing) => _underlyingStream.Dispose();
 
+#if NETSTANDARD2_0
+    public ValueTask DisposeAsync()
+    {
+        _underlyingStream.Dispose();
+        return default;
+    }
+#else
     public override async ValueTask DisposeAsync() => await _underlyingStream.DisposeAsync();
+#endif
 }

@@ -72,7 +72,8 @@ public class MonolithTests
         
         Span<byte> destinationBuffer = stackalloc byte[MonolithBufferSizes.GetDestinationBufferSize(monolithIndex)];
 
-        var executeDelegate = executeMethod.CreateDelegate<MonolithExecuteMethodNoReturn>();
+        var executeDelegate = (MonolithExecuteMethodNoReturn)executeMethod.CreateDelegate(
+            typeof(MonolithExecuteMethodNoReturn));
         executeDelegate(destinationBuffer, expectedSrcBytes.AsSpan());
         
         // Arrays work better with Is.EqualTo than Span<T> (shows the error index) 

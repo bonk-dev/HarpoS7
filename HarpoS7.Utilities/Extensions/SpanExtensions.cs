@@ -1,6 +1,6 @@
 ﻿using System.Buffers.Binary;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
+using HarpoS7.Utilities.Compatibility;
 
 namespace HarpoS7.Utilities.Extensions;
 
@@ -47,7 +47,7 @@ public static class SpanExtensions
         }
         else
         {
-            RandomNumberGenerator.Fill(spanOfBytes);
+            CryptoCompatibility.FillRandom(spanOfBytes);
         }
     }
 

@@ -1,5 +1,6 @@
 using System.Numerics;
 using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Compatibility;
 using HarpoS7.Family0.Exceptions;
 using HarpoS7.Family0.Utils;
 
@@ -38,14 +39,14 @@ public static class BigIntMultiplication
         Span<byte> buffer2 = stackalloc byte[5 * sizeof(uint)];
         BigIntOperations.Prepare(buffer2, source2);
 
-        var buf1BigInteger = new BigInteger(buffer1, isUnsigned: true, isBigEndian: false);
-        var buf2BigInteger = new BigInteger(buffer2, isUnsigned: true, isBigEndian: false);
+        var buf1BigInteger = BigIntegerCompatibility.FromUnsignedLittleEndian(buffer1);
+        var buf2BigInteger = BigIntegerCompatibility.FromUnsignedLittleEndian(buffer2);
         var product = buf1BigInteger * buf2BigInteger;
 
-        var productLength = product.GetByteCount();
+        var productLength = BigIntegerCompatibility.GetSignedByteCount(product);
         
         Span<byte> productBuffer = stackalloc byte[productLength];
-        _ = product.TryWriteBytes(productBuffer, out _, isUnsigned: true, isBigEndian: false);
+        productLength = BigIntegerCompatibility.WriteLittleEndian(product, productBuffer, isUnsigned: true);
 
         // Compress max 2 times
         if (BigIntegerCompressor.Compress(productBuffer, out productLength) &&

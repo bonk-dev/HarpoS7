@@ -17,6 +17,7 @@ public static class HarpoTlsAuth
         0x00, 0x00
     ];
     
+#if !NETSTANDARD2_0
     public static async Task<SslStream> AuthenticateUsingTlsAsync(
         Stream stream, 
         SslClientAuthenticationOptions authOptions, 
@@ -36,6 +37,7 @@ public static class HarpoTlsAuth
 
         return sslStream;
     }
+#endif
     
     public static async Task<SslStream> AuthenticateUsingTlsAsync(
         Stream stream, 
@@ -47,7 +49,7 @@ public static class HarpoTlsAuth
         await cotpStream.ReadConnectionConfirmAsync();
 
         await cotpStream.WriteAsync(InitSslRequest);
-        _ = await stream.ReadAsync(DiscardBuffer); // discard SSL response
+        _ = await stream.ReadAsync(DiscardBuffer, 0, DiscardBuffer.Length); // discard SSL response
         
         await cotpStream.WriteEmptyDtDataAsync();
 

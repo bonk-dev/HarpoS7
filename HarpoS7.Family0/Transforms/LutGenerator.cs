@@ -33,24 +33,28 @@ public static class LutGenerator
         srcDwords[..srcDwordsToCopy].CopyTo(dstDwords[srcDwordsToCopy..]);
         
         // Include zeros in the span for cleaner index math
-        var dstQDwords = MemoryMarshal.Cast<uint, UInt128>(dstDwords[..]);
+        var dstQwords = MemoryMarshal.Cast<uint, ulong>(dstDwords[..]);
         for (var i = 1; i < 128; i *= 2)
         {
-            var multiplicand = dstQDwords[i];
-            var product = multiplicand * 2;
+            var multiplicandLow = dstQwords[i * 2];
+            var multiplicandHigh = dstQwords[i * 2 + 1];
+            var productLow = multiplicandLow << 1;
+            var productHigh = (multiplicandHigh << 1) | (multiplicandLow >> 63);
             
-            var msbSet = multiplicand >> 0x7F != 0;
+            var msbSet = multiplicandHigh >> 63 != 0;
             if (msbSet)
             {
-                product ^= 0x01_0000_8005;
+                productLow ^= 0x01_0000_8005;
             }
 
             var productIndex = i * 2;
-            dstQDwords[productIndex] = product;
+            dstQwords[productIndex * 2] = productLow;
+            dstQwords[productIndex * 2 + 1] = productHigh;
 
             for (var j = 1; j < productIndex; ++j)
             {
-                dstQDwords[productIndex + j] = dstQDwords[j] ^ product;
+                dstQwords[(productIndex + j) * 2] = dstQwords[j * 2] ^ productLow;
+                dstQwords[(productIndex + j) * 2 + 1] = dstQwords[j * 2 + 1] ^ productHigh;
             }
         }
     }

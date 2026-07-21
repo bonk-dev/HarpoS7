@@ -9,7 +9,8 @@ public static class HarpoHash
         uint t1 = a1[3];
 
         uint index = ((t1 >> 0x11) & 0x80808080) * 2;
-        ushort t2 = BitConverter.ToUInt16(AesConsts.LutSeed[(int)index..].Span);
+        ushort t2 = System.Buffers.Binary.BinaryPrimitives.ReadUInt16LittleEndian(
+            AesConsts.LutSeed[(int)index..].Span);
 
         uint LutSeedInit(uint val1)
         {

@@ -33,7 +33,20 @@ public class DefaultPublicKeyStore : IPublicKeyStore
             throw new UnknownPublicKeyException(variableNameFingerprint);
         }
         
-        _ = stream.Read(destination);
+        var publicKey = new byte[stream.Length];
+        var offset = 0;
+        while (offset < publicKey.Length)
+        {
+            var bytesRead = stream.Read(publicKey, offset, publicKey.Length - offset);
+            if (bytesRead == 0)
+            {
+                throw new EndOfStreamException("Public-key resource ended unexpectedly");
+            }
+
+            offset += bytesRead;
+        }
+
+        publicKey.AsSpan().CopyTo(destination);
     }
 
     internal static string GetFamilyPrefix(string variableNameFingerprint)

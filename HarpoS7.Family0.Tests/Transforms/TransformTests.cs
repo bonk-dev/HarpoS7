@@ -34,7 +34,8 @@ public class TransformTests
 
         Span<byte> destinationBuffer = stackalloc byte[TransformBufferSizes.DstSizes[blobIndex - 1]];
         
-        var executeDelegate = executeMethod.CreateDelegate<TransformExecuteMethodNoReturn>();
+        var executeDelegate = (TransformExecuteMethodNoReturn)executeMethod.CreateDelegate(
+            typeof(TransformExecuteMethodNoReturn));
         executeDelegate(destinationBuffer, expectedSrcBytes.AsSpan());
         
         // Arrays work better with Is.EqualTo than Span<T> (shows the error index) 

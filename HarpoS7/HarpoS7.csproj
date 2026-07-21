@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
         <Title>HarpoS7</Title>
         <Description>HarpoS7 is a C# library designed to authenticate sessions in the S7 Comm Plus protocol. </Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>

@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using HarpoS7.Utilities.Extensions;
 using HarpoS7.Fingerprint;
+using HarpoS7.Utilities.Compatibility;
 
 namespace HarpoS7.Keys;
 
@@ -12,7 +13,7 @@ public static class KeyUtilities
     static KeyUtilities()
     {
         DeriveLegitimationKeyMagic = new byte[8];
-        Encoding.ASCII.GetBytes("MISTRUST", DeriveLegitimationKeyMagic.Span);
+        Encoding.ASCII.GetBytes("MISTRUST").AsSpan().CopyTo(DeriveLegitimationKeyMagic.Span);
     }
 
     public static void DeriveChallengeEncryptionKey(Span<byte> keyDestination, ReadOnlySpan<byte> randomKey)
@@ -41,7 +42,7 @@ public static class KeyUtilities
         plaintextDword[3] = 0xF0E0DU;
 
         // 3. calculate the digest
-        SHA256.HashData(plaintext, tempDigest);
+        CryptoCompatibility.Sha256(plaintext, tempDigest);
 
         // 4. copy 16 bytes of the 32 byte digest
         tempDigest[..16].CopyTo(keyDestination);
@@ -83,7 +84,7 @@ public static class KeyUtilities
         do
         {
             v1[^1] = offset;
-            _ = SHA256.HashData(v1, tempDigest);
+            CryptoCompatibility.Sha256(v1, tempDigest);
 
             int size = (0x30 - offset < 0x20) ? 0x30 - offset : 0x20;
             tempDigest[..size].CopyTo(destination[offset..]);
@@ -120,8 +121,8 @@ public static class KeyUtilities
 
         challenge.Slice(2, 16).CopyTo(source[8..]);
 
-        Span<byte> digestBuffer = stackalloc byte[HMACSHA256.HashSizeInBytes];
-        HMACSHA256.HashData(key1[..24], source, digestBuffer);
+        Span<byte> digestBuffer = stackalloc byte[CryptoCompatibility.Sha256HashSizeInBytes];
+        CryptoCompatibility.HmacSha256(key1[..24], source, digestBuffer);
 
         digestBuffer[..24].CopyTo(sessionKeyDestination);
     }
@@ -151,8 +152,8 @@ public static class KeyUtilities
         DeriveLegitimationKeyMagic.Span.CopyTo(source[Constants.SessionKeyLength..]);
         
         // SHA256 the concat
-        Span<byte> digest = stackalloc byte[SHA256.HashSizeInBytes];
-        _ = SHA256.HashData(source, digest);
+        Span<byte> digest = stackalloc byte[CryptoCompatibility.Sha256HashSizeInBytes];
+        CryptoCompatibility.Sha256(source, digest);
         
         // Skip first 4 and take 24 bytes
         digest.Slice(4, 24)

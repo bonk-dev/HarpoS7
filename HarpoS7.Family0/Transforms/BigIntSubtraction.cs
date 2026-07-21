@@ -1,5 +1,6 @@
 using System.Numerics;
 using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Compatibility;
 using HarpoS7.Family0.Exceptions;
 
 namespace HarpoS7.Family0.Transforms;
@@ -37,8 +38,8 @@ public static class BigIntSubtraction
         Span<byte> subtrahendBuffer = stackalloc byte[1 + BigIntOperations.PrepareDestinationSize];
         BigIntOperations.Prepare(subtrahendBuffer, subtrahend);
 
-        var minuendBigInt = new BigInteger(minuendBuffer, isUnsigned: true, isBigEndian: false);
-        var subtrahendBigInt = new BigInteger(subtrahendBuffer, isUnsigned: true, isBigEndian: false);
+        var minuendBigInt = BigIntegerCompatibility.FromUnsignedLittleEndian(minuendBuffer);
+        var subtrahendBigInt = BigIntegerCompatibility.FromUnsignedLittleEndian(subtrahendBuffer);
         var difference = minuendBigInt - subtrahendBigInt;
 
         if (difference.Sign == -1)
@@ -46,9 +47,9 @@ public static class BigIntSubtraction
             difference -= 0x2F;
         }
         
-        var diffLength = difference.GetByteCount();
+        var diffLength = BigIntegerCompatibility.GetSignedByteCount(difference);
         Span<byte> diffBytes = stackalloc byte[Math.Max(diffLength, BigIntOperations.FinalizeSourceSize)];
-        _ = difference.TryWriteBytes(diffBytes, out diffLength, isBigEndian: false);
+        diffLength = BigIntegerCompatibility.WriteLittleEndian(difference, diffBytes, isUnsigned: false);
         
         if (diffLength > BigIntOperations.FinalizeSourceSize)
         {

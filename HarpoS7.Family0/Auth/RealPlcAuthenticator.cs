@@ -5,6 +5,7 @@ using CommunityToolkit.HighPerformance.Buffers;
 using HarpoS7.Family0.BitOperations;
 using HarpoS7.Family0.Transforms;
 using HarpoS7.Utilities.Auth;
+using HarpoS7.Utilities.Compatibility;
 using HarpoS7.Utilities.Extensions;
 
 namespace HarpoS7.Family0.Auth;
@@ -73,7 +74,7 @@ public class RealPlcAuthenticator : IDisposable
         if (keyFamily != EPublicKeyFamily.S71200 && keyFamily != EPublicKeyFamily.S71500)
         {
             throw new ArgumentException(
-                $"{Enum.GetName(keyFamily)} is not supported by this authenticator", 
+                $"{Enum.GetName(typeof(EPublicKeyFamily), keyFamily)} is not supported by this authenticator",
                 nameof(keyFamily)
             );
         }
@@ -117,7 +118,8 @@ public class RealPlcAuthenticator : IDisposable
         // Encrypt 16 bytes of challenge
         Span<byte> ciphertextBlock = stackalloc byte[_aes.BlockSize / 8];
         
-        _aes.EncryptEcb(
+        CryptoCompatibility.EncryptEcb(
+            _aes,
             _iv.Span,
             ciphertextBlock,
             Padding
@@ -134,7 +136,8 @@ public class RealPlcAuthenticator : IDisposable
         // Encrypt all full blocks (16 byte chunks) of _key2
         for (var i = 0; i < _key2.Length / 16; ++i)
         {
-            _aes.EncryptEcb(
+            CryptoCompatibility.EncryptEcb(
+                _aes,
                 _iv.Span,
                 ciphertextBlock,
                 Padding
@@ -160,7 +163,8 @@ public class RealPlcAuthenticator : IDisposable
         
         var leftOverStartIndex = _key2.Length - Key2LeftOverLength;
         
-        _aes.EncryptEcb(
+        CryptoCompatibility.EncryptEcb(
+            _aes,
             _iv.Span, 
             ciphertextBlock, 
             Padding
@@ -182,7 +186,8 @@ public class RealPlcAuthenticator : IDisposable
         ChecksumTransform.Execute(_checksum.Span, _checksum.Span, _lookupTable.Span);
 
         _aes.Key = _checksumEncryptionKey;
-        _aes.EncryptEcb(
+        CryptoCompatibility.EncryptEcb(
+            _aes,
             _checksum.Span,
             ciphertextBlock,
             PaddingMode.Zeros

@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Compatibility;
 using HarpoS7.Family0.Exceptions;
 
 namespace HarpoS7.Family0.Transforms;
@@ -37,15 +38,15 @@ public static class BigIntAddition
         BigIntOperations.Prepare(buffer1, source1);
         BigIntOperations.Prepare(buffer2, source2);
 
-        var bigInt1 = new BigInteger(buffer1, isUnsigned: true, isBigEndian: false);
-        var bigInt2 = new BigInteger(buffer2, isUnsigned: true, isBigEndian: false);
+        var bigInt1 = BigIntegerCompatibility.FromUnsignedLittleEndian(buffer1);
+        var bigInt2 = BigIntegerCompatibility.FromUnsignedLittleEndian(buffer2);
         var sum = bigInt1 + bigInt2;
 
         // TryWriteBytes(out int) and GetByteCount() can differ 
-        var length = sum.GetByteCount();
+        var length = BigIntegerCompatibility.GetSignedByteCount(sum);
         
         Span<byte> sumBuffer = stackalloc byte[length];
-        _ = sum.TryWriteBytes(sumBuffer, out length, isUnsigned: true, isBigEndian: false);
+        length = BigIntegerCompatibility.WriteLittleEndian(sum, sumBuffer, isUnsigned: true);
 
         if (length > BigIntOperations.FinalizeSourceSize)
         {

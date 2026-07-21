@@ -6,6 +6,7 @@ using HarpoS7.Utilities.Extensions;
 using HarpoS7.Keys;
 using HarpoS7.Seed;
 using HarpoS7.Utilities.Auth;
+using HarpoS7.Utilities.Compatibility;
 
 namespace HarpoS7.Auth;
 
@@ -38,10 +39,10 @@ public static class LegitimateScheme
     {
         var length = Encoding.UTF8.GetByteCount(password);
         Span<byte> passBytes = stackalloc byte[length];
-        Encoding.UTF8.GetBytes(password, passBytes);
+        Encoding.UTF8.GetBytes(password).AsSpan().CopyTo(passBytes);
         
-        Span<byte> hash = stackalloc byte[SHA1.HashSizeInBytes];
-        _ = SHA1.HashData(passBytes, hash);
+        Span<byte> hash = stackalloc byte[CryptoCompatibility.Sha1HashSizeInBytes];
+        CryptoCompatibility.Sha1(passBytes, hash);
         
         SolveLegitimateChallengeRealPlc(
             blobDataDestination, 
@@ -76,7 +77,7 @@ public static class LegitimateScheme
                 nameof(blobDataDestination));
         }
 
-        if (passwordHash.Length < SHA1.HashSizeInBytes)
+        if (passwordHash.Length < CryptoCompatibility.Sha1HashSizeInBytes)
         {
             throw new ArgumentException("Password hash is not a SHA1 (too short)", nameof(passwordHash));
         }
@@ -166,10 +167,10 @@ public static class LegitimateScheme
     {
         var length = Encoding.UTF8.GetByteCount(password);
         Span<byte> passBytes = stackalloc byte[length];
-        Encoding.UTF8.GetBytes(password, passBytes);
+        Encoding.UTF8.GetBytes(password).AsSpan().CopyTo(passBytes);
         
-        Span<byte> hash = stackalloc byte[SHA1.HashSizeInBytes];
-        _ = SHA1.HashData(passBytes, hash);
+        Span<byte> hash = stackalloc byte[CryptoCompatibility.Sha1HashSizeInBytes];
+        CryptoCompatibility.Sha1(passBytes, hash);
         
         SolveLegitimateChallengePlcSim(
             blobDataDestination, 
@@ -201,7 +202,7 @@ public static class LegitimateScheme
                 nameof(blobDataDestination));
         }
 
-        if (passwordHash.Length < SHA1.HashSizeInBytes)
+        if (passwordHash.Length < CryptoCompatibility.Sha1HashSizeInBytes)
         {
             throw new ArgumentException("Password hash is not a SHA1 (too short)", nameof(passwordHash));
         }

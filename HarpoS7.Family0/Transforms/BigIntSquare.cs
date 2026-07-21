@@ -1,5 +1,6 @@
 using System.Numerics;
 using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Compatibility;
 using HarpoS7.Family0.Exceptions;
 using HarpoS7.Family0.Utils;
 
@@ -29,12 +30,12 @@ public static class BigIntSquare
         Span<byte> op1Buffer = stackalloc byte[BigIntOperations.PrepareDestinationSize];
         BigIntOperations.Prepare(op1Buffer, source);
 
-        var baseInt = new BigInteger(op1Buffer, isUnsigned: true, isBigEndian: false);
+        var baseInt = BigIntegerCompatibility.FromUnsignedLittleEndian(op1Buffer);
         var result = BigInteger.Pow(baseInt, 2);
 
-        var length = result.GetByteCount();
+        var length = BigIntegerCompatibility.GetSignedByteCount(result);
         Span<byte> productBuffer = stackalloc byte[length];
-        _ = result.TryWriteBytes(productBuffer, out _, isUnsigned: true, isBigEndian: false);
+        length = BigIntegerCompatibility.WriteLittleEndian(result, productBuffer, isUnsigned: true);
 
         if (BigIntegerCompressor.Compress(productBuffer[..length], out length) && 
             BigIntegerCompressor.Compress(productBuffer[..length], out length))

@@ -71,7 +71,7 @@ public class HarpoCrc32
     public void Update(string value)
     {
         Span<byte> buffer = stackalloc byte[Encoding.UTF8.GetByteCount(value)];
-        Encoding.UTF8.GetBytes(value, buffer);
+        Encoding.UTF8.GetBytes(value).AsSpan().CopyTo(buffer);
 
         Update(buffer);
         

@@ -24,11 +24,17 @@ public class HarpoFingerprintTests
     public void FingerprintChallengeHandlesCapturedLegacyRenewalEdgeCase()
     {
         Span<byte> fingerprint = stackalloc byte[FingerprintConsts.FingerprintLength];
-        var challenge = Convert.FromHexString("5B15B4694FC38A775E6778F0770C6E7A3118200D");
+        var challenge = new byte[]
+        {
+            0x5B, 0x15, 0xB4, 0x69, 0x4F, 0xC3, 0x8A, 0x77, 0x5E, 0x67,
+            0x78, 0xF0, 0x77, 0x0C, 0x6E, 0x7A, 0x31, 0x18, 0x20, 0x0D
+        };
 
         HarpoFingerprint.FingerprintChallenge(fingerprint, challenge);
 
-        Assert.That(Convert.ToHexString(fingerprint), Is.EqualTo("6AB5811DE6D28746"));
+        Assert.That(
+            fingerprint.ToArray(),
+            Is.EqualTo(new byte[] { 0x6A, 0xB5, 0x81, 0x1D, 0xE6, 0xD2, 0x87, 0x46 }));
     }
 
     public static IEnumerable<TestCaseData> FingerprintSubProcedureCases

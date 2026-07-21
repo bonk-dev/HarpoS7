@@ -1,5 +1,6 @@
 using MsAes = System.Security.Cryptography.Aes;
 using System.Security.Cryptography;
+using HarpoS7.Utilities.Compatibility;
 
 namespace HarpoS7.Aes;
 
@@ -29,7 +30,7 @@ public class HarpoAes : IDisposable
 
     public void EncryptEcb(ReadOnlySpan<byte> plaintext, Span<byte> ciphertext)
     {
-        AesCrypt.EncryptEcb(plaintext, ciphertext, PaddingMode.Zeros);
+        CryptoCompatibility.EncryptEcb(AesCrypt, plaintext, ciphertext, PaddingMode.Zeros);
     }
 
     public void Xor(Span<uint> output, ReadOnlySpan<uint> a, ReadOnlySpan<uint> b)

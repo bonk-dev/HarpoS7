@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using HarpoS7.Utilities.Compatibility;
 
 namespace HarpoS7.Utilities.Extensions;
 
@@ -10,7 +11,7 @@ public static class KeyExtensions
     static KeyExtensions()
     {
         DeriveKeyIdMagic = new byte[6];
-        Encoding.ASCII.GetBytes("DERIVE", DeriveKeyIdMagic.Span);
+        Encoding.ASCII.GetBytes("DERIVE").AsSpan().CopyTo(DeriveKeyIdMagic.Span);
     }
 
     public static void DeriveKeyId(this byte[] key, Span<byte> keyId) =>
@@ -36,13 +37,13 @@ public static class KeyExtensions
         
         // no need to clear the "buffer", it is overwritten anyway
         Span<byte> buffer = stackalloc byte[keyPartLength + DeriveKeyIdMagic.Length];
-        Span<byte> digest = stackalloc byte[SHA256.HashSizeInBytes];
+        Span<byte> digest = stackalloc byte[CryptoCompatibility.Sha256HashSizeInBytes];
         digest.Clear();
 
         key[..keyPartLength].CopyTo(buffer);
         DeriveKeyIdMagic.Span.CopyTo(buffer[keyPartLength..]);
 
-        _ = SHA256.HashData(buffer, digest);
+        CryptoCompatibility.Sha256(buffer, digest);
         digest[..8].CopyTo(keyId);
     }
 }
