@@ -18,6 +18,8 @@
 
     <PropertyGroup>
       <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+      <SignAssembly>True</SignAssembly>
+      <AssemblyOriginatorKeyFile>..\HarpoS7.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">

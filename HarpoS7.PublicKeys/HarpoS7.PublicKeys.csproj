@@ -5,6 +5,8 @@
         <PackageId>HarpoS7.PublicKeys</PackageId>
         <Title>HarpoS7.PublicKeys</Title>
         <Description>Public keys and cryptographic assets required for HarpoS7 authentication.</Description>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\HarpoS7.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>

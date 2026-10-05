@@ -4,6 +4,8 @@
         <TargetFramework>net8.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\HarpoS7.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>

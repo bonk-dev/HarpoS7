@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\HarpoS7.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
 </Project>

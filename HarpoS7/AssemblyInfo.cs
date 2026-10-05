@@ -3,4 +3,4 @@ using System.Runtime.InteropServices;
 
 [assembly:ComVisible(false)]
 [assembly:Guid("6dc8ee7e-7924-4194-9c78-0446aed86c75")]
-[assembly:InternalsVisibleTo("HarpoS7.Tests")]
+[assembly:InternalsVisibleTo("HarpoS7.Tests, PublicKey=002400000480000094000000060200000024000052534131000400000100010039edacd80b9318ec0f45f51e710f2b40ddd057ab08c007581dd72f008f22518dcbb171a5e3f7a845eace129059bb0edd6c710e14eb39bfb35825f8e2785490a65ffab55f2ff45a1d9812a465978d127e9728227a059585177386f1bdffd66d3bc308511b577708c01f3e7f8fbd2c1f8a203d64a04c01d7350ec3381b514c68ba")]
