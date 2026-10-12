@@ -10,13 +10,18 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>siemens;s7</PackageTags>
 
-        <PackageVersion>1.1.4</PackageVersion>
-        <AssemblyVersion>1.1.4</AssemblyVersion>
-        <FileVersion>1.1.4</FileVersion>
-        <Version>1.1.4</Version>
-        <PackageReleaseNotes>Add .NET Standard 2.0 and .NET Framework 4.8 support while preserving .NET 8. Fix legacy challenge fingerprint derivation for the final lookup-table block.</PackageReleaseNotes>
+        <PackageVersion>1.2.0</PackageVersion>
+        <AssemblyVersion>1.2.0</AssemblyVersion>
+        <FileVersion>1.2.0</FileVersion>
+        <Version>1.2.0</Version>
+        <PackageReleaseNotes>Add strong name signing</PackageReleaseNotes>
 
         <PackageIcon>nuget-icon.png</PackageIcon>
+
+        <!-- Projects opt into strong-naming by setting SignAssembly=true -->
+        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)HarpoS7.snk</AssemblyOriginatorKeyFile>
+        <!-- Public half of HarpoS7.snk, for InternalsVisibleTo items -->
+        <HarpoS7PublicKey>00240000048000009400000006020000002400005253413100040000010001009ded597c38aff7161d938c37e06bda89e85a351c9a77a5def8758ef3e812591dba339b3cf9948eb660bd39275be858c59d19c757f88f5b5d0540046516d7c35fdfd612ee96f31dffca0a7dc1f32a0625509ab3a0eb70119267cbcab4667664c3a622425e0247b6cf3b00a77113d28ea7ba79772351d1a4bf39f5cd9d78da3e9e</HarpoS7PublicKey>
     </PropertyGroup>
 
     <ItemGroup>
