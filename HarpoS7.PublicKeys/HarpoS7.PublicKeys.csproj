@@ -2,10 +2,15 @@
 
 	<PropertyGroup>
         <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+        <SignAssembly>true</SignAssembly>
         <PackageId>HarpoS7.PublicKeys</PackageId>
         <Title>HarpoS7.PublicKeys</Title>
         <Description>Public keys and cryptographic assets required for HarpoS7 authentication.</Description>
     </PropertyGroup>
+
+    <ItemGroup>
+      <InternalsVisibleTo Include="HarpoS7.PublicKeys.Tests" Key="$(HarpoS7PublicKey)" />
+    </ItemGroup>
 
     <ItemGroup>
       <None Remove="Keys\00\1B580465BB0551B2.bin" />
