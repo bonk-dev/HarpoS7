@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using CommunityToolkit.HighPerformance.Buffers;
 using HarpoS7.Family0.BitOperations;
+using HarpoS7.Family0.Cryptography;
 using HarpoS7.Family0.Transforms;
 using HarpoS7.Utilities.Auth;
 using HarpoS7.Utilities.Compatibility;
@@ -19,7 +20,7 @@ public class RealPlcAuthenticator : IDisposable
     private readonly MemoryOwner<byte> _iv;
     private readonly MemoryOwner<byte> _key1;
     private readonly MemoryOwner<byte> _key2;
-    private readonly MemoryOwner<byte> _lookupTable;
+    private readonly MemoryOwner<byte> _checksumHashKey;
     private readonly MemoryOwner<byte> _checksum;
     private readonly byte[] _challengeEncryptionKey;
     private readonly byte[] _checksumEncryptionKey;
@@ -47,7 +48,7 @@ public class RealPlcAuthenticator : IDisposable
             key2.CopyTo(_key2.Span);
         }
         
-        _lookupTable = MemoryOwner<byte>.Allocate(LutGenerator.DestinationSize);
+        _checksumHashKey = MemoryOwner<byte>.Allocate(16);
         _checksum = MemoryOwner<byte>.Allocate(16);
 
         if (key1.IsEmpty)
@@ -91,19 +92,23 @@ public class RealPlcAuthenticator : IDisposable
 
     public int WriteSeed(Span<byte> destination, ReadOnlySpan<byte> publicKey)
     {
+        if (destination.Length < SeedTransform.DestinationSize)
+            throw new ArgumentException("Seed destination must be at least 60 bytes", nameof(destination));
+        if (publicKey.Length < SeedTransform.PublicKeyLength)
+            throw new ArgumentException("Public key must be at least 40 bytes", nameof(publicKey));
         var offset = 0;
         
         // Seed
-        Span<byte> t1 = stackalloc byte[PreSeedTransform.DestinationSize];
-        PreSeedTransform.Execute(t1, _key1.Span);
-        SeedTransform.Execute(destination[offset..], publicKey, t1);
+        Span<byte> t1 = stackalloc byte[20];
+        LegacySeed.PreSeed(t1, _key1.Span);
+        LegacySeed.WriteSeed(destination[offset..], publicKey, t1);
         offset += SeedTransform.DestinationSize;
         
         // Keys derivation
-        DeriveKeysAndLookupTable(t1);
+        DeriveKeysAndHashKey(t1);
         
         // Checksum
-        ChecksumTransform.Execute(_checksum.Span, _iv.Span, _lookupTable.Span);
+        ChecksumTransform.Multiply(_checksum.Span, _iv.Span, _checksumHashKey.Span);
 
         return offset;
     }
@@ -183,7 +188,7 @@ public class RealPlcAuthenticator : IDisposable
         var checksumDwords = MemoryMarshal.Cast<byte, uint>(_checksum.Span);
         checksumDwords[3] ^= (uint)_encryptedBytes;
         
-        ChecksumTransform.Execute(_checksum.Span, _checksum.Span, _lookupTable.Span);
+        ChecksumTransform.Multiply(_checksum.Span, _checksum.Span, _checksumHashKey.Span);
 
         _aes.Key = _checksumEncryptionKey;
         CryptoCompatibility.EncryptEcb(
@@ -207,11 +212,11 @@ public class RealPlcAuthenticator : IDisposable
     public void ExtractKey2(Span<byte> destination) => 
         _key2.Span.CopyTo(destination);
 
-    private void DeriveKeysAndLookupTable(ReadOnlySpan<byte> t1)
+    private void DeriveKeysAndHashKey(ReadOnlySpan<byte> t1)
     {
         // Generates 3, 128-bit keys
         Span<byte> transform2Buffer = stackalloc byte[KeyDerivationTransform.DestinationSize];
-        KeyDerivationTransform.Execute(transform2Buffer, t1);
+        LegacySeed.DeriveKeys(transform2Buffer, t1);
 
         // Challenge encryption key
         const int challengeEncryptionKeyLength = 128 / 8;
@@ -224,14 +229,14 @@ public class RealPlcAuthenticator : IDisposable
         transform2Buffer.Slice(challengeEncryptionKeyLength, checksumEncryptionLength)
             .CopyTo(_checksumEncryptionKey.AsSpan());
         
-        // Create the lookup table
-        LutGenerator.Execute(_lookupTable.Span, transform2Buffer[32..]);
+        // Little-endian multiplier for the protocol checksum
+        transform2Buffer.Slice(32, 16).CopyTo(_checksumHashKey.Span);
     }
 
     private void UpdateChecksum(ReadOnlySpan<byte> ciphertextBlock)
     {
         _checksum.Span.Xor(ciphertextBlock);
-        ChecksumTransform.Execute(_checksum.Span, _checksum.Span, _lookupTable.Span);
+        ChecksumTransform.Multiply(_checksum.Span, _checksum.Span, _checksumHashKey.Span);
     }
 
     public void Dispose()
@@ -239,7 +244,7 @@ public class RealPlcAuthenticator : IDisposable
         _iv.Dispose();
         _key1.Dispose();
         _key2.Dispose();
-        _lookupTable.Dispose();
+        _checksumHashKey.Dispose();
         _checksum.Dispose();
         _aes.Dispose();
     }

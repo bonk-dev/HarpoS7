@@ -19,6 +19,12 @@ public class HarpoFingerprint
                 nameof(challenge));
         }
 
+        FingerprintSpn.Execute(fingerprintDestination, challenge);
+    }
+
+    // Keep the original network for differential tests and its existing internal helpers.
+    internal static void FingerprintChallengeLegacy(Span<byte> fingerprintDestination, ReadOnlySpan<byte> challenge)
+    {
         Span<byte> smallContext = stackalloc byte[FingerprintConsts.SmallContextLength];
         smallContext.Clear();
         Span<uint> bigContext = stackalloc uint[FingerprintConsts.BigContextLengthDword];

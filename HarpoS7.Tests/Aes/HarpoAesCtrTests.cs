@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.Reflection;
 using HarpoS7.Aes;
 
@@ -365,7 +364,7 @@ public class HarpoAesCtrTests
             HarpoAesCtr aes = new HarpoAesCtr(_key);
             aes.Init(iv);
 
-            var counter = (Memory<byte>)(typeof(HarpoAesCtr).GetField("_counter", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(aes)
+            var counter = (byte[])(typeof(HarpoAesCtr).GetField("_counter", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(aes)
                 ?? throw new Exception("_counter field was null"));
 
             ReadOnlySpan<byte> expectedCounter = new byte[16] {
@@ -373,7 +372,7 @@ public class HarpoAesCtrTests
                 0xEE, 0xFC, 0xD5, 0x13
             };
 
-            Assert.That(expectedCounter.SequenceEqual(counter.Span));
+            Assert.That(expectedCounter.SequenceEqual(counter));
         }
 
         [Test]
@@ -423,50 +422,26 @@ public class HarpoAesCtrTests
             var type = typeof(HarpoAesCtr);
 
             // Mock private fields
-            var var2Field = type.GetField("_var2", BindingFlags.Instance | BindingFlags.NonPublic);
+            var var2Field = type.GetField("_ciphertextLength", BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(var2Field, Is.Not.Null);
-            var2Field!.SetValue(aes, 0x10U);
+            var2Field!.SetValue(aes, 0x10UL);
 
-            var var1Field = type.GetField("_var1", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.That(var1Field, Is.Not.Null);
-            var1Field!.SetValue(aes, 0x00U);
+            var lut = (byte[])type.GetField("_hashKey", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(aes)!;
+            _mockChecksumLut.AsSpan(0x800, 16).CopyTo(lut);
 
-            // Mock LUT
-            var lutOwnerField = type.GetField("_lutOwner", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.That(lutOwnerField, Is.Not.Null);
-
-            var lutMemoryOwner = lutOwnerField!.GetValue(aes) as IMemoryOwner<byte>;
-            Assert.That(lutMemoryOwner, Is.Not.Null);
-
-            _mockChecksumLut.CopyTo(lutMemoryOwner!.Memory);
-
-            // Mock buffers
-            var bufferOwnerField = type.GetField("_encryptionBufferOwner", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.That(bufferOwnerField, Is.Not.Null);
-
-            var bufferMemoryOwner = bufferOwnerField!.GetValue(aes) as IMemoryOwner<byte>;
-            Assert.That(bufferMemoryOwner, Is.Not.Null);
-
-            var aes3 = bufferMemoryOwner!.Memory.Span.Slice(0x10 * 2, 0x10);
+            var aes3 = (byte[])type.GetField("_hash", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(aes)!;
             var mockAes3 = new byte[16] {
                 0x73, 0x8F, 0xA8, 0xA0, 0x7E, 0xF0, 0x89, 0x3A, 0x97, 0xCB, 0xF6, 0x81,
                 0x25, 0x0A, 0xD2, 0xFA
             };
-            mockAes3.CopyTo(aes3);
+            mockAes3.CopyTo(aes3, 0);
 
-            var aes2 = bufferMemoryOwner.Memory.Span.Slice(0x10, 0x10);
-            var mockAes2 = new byte[16]{
-                0x47, 0x8F, 0xC2, 0x67, 0x4E, 0x3E, 0xB1, 0xDD, 0x3D, 0xD9, 0x78, 0x71,
-                0x03, 0xE9, 0x23, 0x16
-            };
-            mockAes2.CopyTo(aes2);
-
-            var ivExtension = bufferMemoryOwner.Memory.Span.Slice(0x10 * 5, 0x10);
+            var ivExtension = (byte[])type.GetField("_initialCounter", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(aes)!;
             var mockIvExtension = new byte[16] {
                 0x58, 0x5C, 0xE8, 0x58, 0x5D, 0xF1, 0x32, 0xFA, 0x4C, 0x7F, 0xD9, 0xBE,
                 0xCE, 0xB9, 0x74, 0x61
             };
-            mockIvExtension.CopyTo(ivExtension);
+            mockIvExtension.CopyTo(ivExtension, 0);
             // Mocking done
 
             // Calculate the checksum

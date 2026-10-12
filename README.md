@@ -118,6 +118,39 @@ var digestBuffer = new byte[HarpoPacketDigest.DigestLength];
 HarpoPacketDigest.CalculateDigest(digestBuffer.AsSpan(), data, sessionKey);
 ```
 
+### Readable legacy cryptography
+
+The real-PLC authentication path uses decoded implementations of the algorithms
+identified in [issue #28](https://github.com/bonk-dev/HarpoS7/issues/28):
+
+- PRESENT-80 with Siemens' three key-schedule deviations for the pre-seed, seed
+  mask, and challenge/checksum keys.
+- X-only ECDH on `y² = x³ - x + B` over `GF(2^160 - 47)` for the ephemeral and
+  shared x-coordinates. Only the first 20 public-key bytes affect the shared
+  secret; the 20 random blinding bytes remain in the seed's wire field.
+- A little-endian polynomial MAC modulo `x^128 + x^32 + x^15 + x^2 + 1` for the
+  real-PLC blob checksum. This is a different field from GCM's GHASH.
+- An AES inverse-S-box substitution/permutation network for challenge
+  fingerprinting.
+
+`HarpoAesCtr` uses AES-GCM without AAD, including the protocol's increment of
+only counter bytes 13..15. It supports partial writes, in-place encryption,
+12-byte and other IV lengths, and repeated checksum reads.
+
+The original public Family0 transforms and monoliths remain available for
+compatibility with callers using their encoded buffers and for differential
+tests. Authentication no longer calls those monoliths or constructs their
+encoded intermediate values or 4 KB checksum tables.
+
+The decoded curve computes true modular arithmetic. It intentionally differs
+from the original subtraction's carry-loss bug for structured coordinates
+(such as `x = 5`); catalogue keys and captured authentication vectors agree.
+Tests cover all real-PLC catalogue keys, random/boundary inputs, and platform
+AES-GCM comparisons. Live PLC hardware validation is still needed.
+
+Recovery credit and the reference implementation's MIT license are in
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
 ## TLS auth
 It is important to note that although TLS authentication is present in HarpoS7, it should be treated as a proof
 of concept rather than a ready-to-use solution. 
