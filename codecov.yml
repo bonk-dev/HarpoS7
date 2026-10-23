@@ -1,0 +1,7 @@
+# monoliths are no longer used in the user runtime as they were replaced by the reversed crypto implementations
+# they are kept as oracles for tests
+ignore:
+  - "HarpoS7.Family0/Monoliths/**"
+  - "HarpoS7.Family0/Data/**"
+  - "HarpoS7/Fingerprint/FingerprintConsts.cs"
+  - "**/*.Tests/**"

@@ -10,11 +10,11 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>siemens;s7</PackageTags>
 
-        <PackageVersion>1.2.0</PackageVersion>
-        <AssemblyVersion>1.2.0</AssemblyVersion>
-        <FileVersion>1.2.0</FileVersion>
-        <Version>1.2.0</Version>
-        <PackageReleaseNotes>Add strong name signing</PackageReleaseNotes>
+        <PackageVersion>1.3.0-beta.1</PackageVersion>
+        <AssemblyVersion>1.3.0</AssemblyVersion>
+        <FileVersion>1.3.0</FileVersion>
+        <Version>1.3.0-beta.1</Version>
+        <PackageReleaseNotes>Pre-release. Replaced monoliths with readable crypto. Researched by @gijzelaerr (Gijs Molenaar, s7commplus maintainer), @sullibar and others. HarpoS7 readable crypto was implemented by Jochen Kühner (jogibear9988)</PackageReleaseNotes>
 
         <PackageIcon>nuget-icon.png</PackageIcon>
 

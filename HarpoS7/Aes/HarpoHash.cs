@@ -77,32 +77,26 @@ public static class HarpoHash
 
     public static void Hash(Span<byte> output, ReadOnlySpan<byte> lut)
     {
-        uint t1 = 0;
-        uint t2 = 0;
-        uint t3 = 0;
-        uint t4 = 0;
+        // Shoup table entry 0x80 is the original GHASH multiplier H.
+        Multiply(output, lut.Slice(0x800, 16));
+    }
 
-        ReadOnlySpan<uint> lutDword = MemoryMarshal.Cast<byte, uint>(lut);
-
-        for (int i = 15; i >= 0; --i)
+    internal static void Multiply(Span<byte> output, ReadOnlySpan<byte> h)
+    {
+        var vHigh = System.Buffers.Binary.BinaryPrimitives.ReadUInt64BigEndian(h);
+        var vLow = System.Buffers.Binary.BinaryPrimitives.ReadUInt64BigEndian(h.Slice(8));
+        ulong zHigh = 0, zLow = 0;
+        for (var bit = 0; bit < 128; bit++)
         {
-            uint v1 = t3 >> 0x18;
-            uint v2 = t2 >> 0x18;
-            uint v3 = t1 >> 0x18;
-            uint v4 = output[i];
-
-            uint t5 = (v4 << 4) / 4;
-
-            t1 = (t1 << 8) ^ AesConsts.HarpoHashSeed.Span[(int)(t4 >> 0x18)] ^ lutDword[(int)t5];
-            t2 = ((t2 << 8) | v3) ^ lutDword[(int)t5 + 1];
-            t3 = ((t3 << 8) | v2) ^ lutDword[(int)t5 + 2];
-            t4 = ((t4 << 8) | v1) ^ lutDword[(int)t5 + 3];
+            var mask = 0UL - (ulong)((output[bit / 8] >> (7 - bit % 8)) & 1);
+            zHigh ^= vHigh & mask;
+            zLow ^= vLow & mask;
+            var carry = vLow & 1;
+            vLow = (vLow >> 1) | (vHigh << 63);
+            // GCM polynomial x^128 + x^7 + x^2 + x + 1, reflected bit order.
+            vHigh = (vHigh >> 1) ^ (0xE100000000000000UL & (0UL - carry));
         }
-
-        var outputAsDword = MemoryMarshal.Cast<byte, uint>(output);
-        outputAsDword[0] = t1;
-        outputAsDword[1] = t2;
-        outputAsDword[2] = t3;
-        outputAsDword[3] = t4;
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt64BigEndian(output, zHigh);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt64BigEndian(output.Slice(8), zLow);
     }
 }

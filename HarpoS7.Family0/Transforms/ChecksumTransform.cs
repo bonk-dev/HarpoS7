@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace HarpoS7.Family0.Transforms;
 
 public static class ChecksumTransform
@@ -29,69 +27,30 @@ public static class ChecksumTransform
                 nameof(lookupTable));
         }
 
-        Span<uint> workBuffer = stackalloc uint[8];
-        workBuffer.Clear();
-
-        var keyDwords = MemoryMarshal.Cast<byte, uint>(key);
-        var lutDwords = MemoryMarshal.Cast<byte, uint>(lookupTable);
-
-        for (var i = 0x18; i > 0; i -= 0x08)
-        {
-            for (var j = 0; j < 4; ++j)
-            {
-                var lutIndex = (int)(((keyDwords[j] >> i) & 0xFF) << 2);
-                Xor128(workBuffer[j..], lutDwords[lutIndex..]);
-            }
-
-            for (var j = 7; j >= 1; --j)
-            {
-                workBuffer[j] = workBuffer[j - 1] >> 0x18 | workBuffer[j] << 0x08;
-            }
-
-            workBuffer[0] <<= 0x08;
-        }
-        
-        for (var i = 0; i < 4; ++i)
-        {
-            var lutIndex = (int)((keyDwords[i] & 0xFF) << 2);
-            Xor128(workBuffer[i..], lutDwords[lutIndex..]);
-        }
-
-        var dstDwords = MemoryMarshal.Cast<byte, uint>(destination);
-        
-        var temp = (workBuffer[7] >> 0x0D ^ workBuffer[7]) >> 0x11 ^ workBuffer[4] ^ workBuffer[7];
-        dstDwords[0] = (temp << 0x0D ^ temp) << 0x02 ^ workBuffer[0] ^ temp;
-        dstDwords[1] = (temp >> 0xd ^ temp) >> 0x11 ^ (workBuffer[5] << 0xd ^ workBuffer[5]) << 2 ^ workBuffer[1]
-                        ^ temp ^ workBuffer[5];
-        dstDwords[2] = (workBuffer[5] >> 0xd ^ workBuffer[5]) >> 0x11 ^ (workBuffer[6] << 0xd ^ workBuffer[6]) << 2 ^
-                       workBuffer[2] ^ workBuffer[5] ^ workBuffer[6];
-        dstDwords[3] = (workBuffer[6] >> 0xd ^ workBuffer[6]) >> 0x11 ^ (workBuffer[7] << 0xd ^ workBuffer[7]) << 2 ^
-                       workBuffer[3] ^ workBuffer[6] ^ workBuffer[7];
+        Multiply(destination, key, lookupTable.Slice(16, 16));
     }
 
-    /// <summary>
-    /// Xors 4 32-bit DWords
-    /// </summary>
-    private static void Xor128(Span<uint> destinationSource, ReadOnlySpan<uint> xorB)
+    internal static void Multiply(Span<byte> destination, ReadOnlySpan<byte> key, ReadOnlySpan<byte> hashKey)
     {
-        const int xorLength = 4;
-        
-        if (destinationSource.Length < xorLength)
+        // Values use little-endian polynomial coefficients.
+        var aLow = System.Buffers.Binary.BinaryPrimitives.ReadUInt64LittleEndian(key);
+        var aHigh = System.Buffers.Binary.BinaryPrimitives.ReadUInt64LittleEndian(key.Slice(8));
+        var bLow = System.Buffers.Binary.BinaryPrimitives.ReadUInt64LittleEndian(hashKey);
+        var bHigh = System.Buffers.Binary.BinaryPrimitives.ReadUInt64LittleEndian(hashKey.Slice(8));
+        ulong low = 0, high = 0;
+        for (var bit = 0; bit < 128; bit++)
         {
-            throw new ArgumentException(
-                $"The destination buffer was too small ({destinationSource.Length} dwords, it must be at least {xorLength} dwords)", 
-                nameof(destinationSource));
+            var mask = 0UL - (bLow & 1);
+            low ^= aLow & mask;
+            high ^= aHigh & mask;
+            bLow = (bLow >> 1) | (bHigh << 63);
+            bHigh >>= 1;
+            var carry = aHigh >> 63;
+            aHigh = (aHigh << 1) | (aLow >> 63);
+            // x^128 + x^32 + x^15 + x^2 + 1 (not the GCM field).
+            aLow = (aLow << 1) ^ (0x100008005UL & (0UL - carry));
         }
-        if (xorB.Length < xorLength)
-        {
-            throw new ArgumentException(
-                $"The XOR buffer was too small ({xorB.Length} dwords, it must be at least {xorLength} dwords)", 
-                nameof(xorB));
-        }
-
-        for (var i = 0; i < xorLength; ++i)
-        {
-            destinationSource[i] ^= xorB[i];
-        }
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt64LittleEndian(destination, low);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt64LittleEndian(destination.Slice(8), high);
     }
 }
