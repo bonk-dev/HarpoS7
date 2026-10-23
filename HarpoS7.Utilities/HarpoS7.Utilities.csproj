@@ -2,7 +2,16 @@
 
     <PropertyGroup>
         <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+        <SignAssembly>true</SignAssembly>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
+
+    <ItemGroup>
+      <InternalsVisibleTo Include="HarpoS7.Tests" Key="$(HarpoS7PublicKey)" />
+      <InternalsVisibleTo Include="HarpoS7.Family0.Tests" Key="$(HarpoS7PublicKey)" />
+      <InternalsVisibleTo Include="HarpoS7.Utilities.Tests" Key="$(HarpoS7PublicKey)" />
+      <InternalsVisibleTo Include="HarpoS7" Key="$(HarpoS7PublicKey)" />
+      <InternalsVisibleTo Include="HarpoS7.Family0" Key="$(HarpoS7PublicKey)" />
+    </ItemGroup>
 
 </Project>
